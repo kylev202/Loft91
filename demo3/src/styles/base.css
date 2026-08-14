@@ -1,0 +1,558 @@
+/* ==========================================================================
+   base.css — reset, platform rules, the type voices, and the compositions
+   that are not utility work: the cover grade, the plate, the loader, the
+   band, the masked mark and the [TBC] marker. Consumes theme.css only.
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  * {
+    margin: 0;
+  }
+
+  html {
+    /* Native scrollbars, caret and form controls come up dark. Without this
+       the browser paints a light scrollbar down the edge of a near-black page,
+       which is the single most obvious "themed with CSS only" tell there is. */
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+    /* Anchor scrolling is driven explicitly (Lenis when running, native when
+       not) — the CSS keyword fights a smooth-scroll library for the same
+       scroll. */
+    scroll-behavior: auto;
+  }
+
+  a,
+  button,
+  [role='button'],
+  summary {
+    touch-action: manipulation; /* kills the 300ms double-tap delay */
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-ink-2);
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden; /* no horizontal page overflow, ever */
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* The nav is fixed, so a deep link must land clear of it. */
+  section[id],
+  [id] {
+    scroll-margin-top: calc(var(--nav-h) + var(--spacing-md));
+  }
+
+  /* `:focus-visible`, never `:focus` — a ring on every mouse click trains
+     people to read it as noise. The outer page-coloured ring is what keeps
+     the brass legible where focus lands on a bright patch of a photograph. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-page);
+  }
+
+  ::selection {
+    background-color: var(--color-brass);
+    color: var(--color-on-brass);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Type voices. Declared once here rather than retyped as five utilities at
+   every usage.
+   -------------------------------------------------------------------------- */
+
+/* The small voice: eyebrows, captions, spec labels, hours, nav. */
+@utility label {
+  font-family: var(--font-interface);
+  font-weight: 400;
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* The wordmark's own setting — Light, wide-tracked, uppercase. Taken from the
+   client's artwork rather than chosen: the logo is set this way, so the text
+   version of the name has to be too. */
+@utility wordmark {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
+}
+
+/* The page's horizontal frame. Safe-area aware — the arrival path is a phone,
+   and a notch eats the left inset. */
+@utility shell {
+  width: 100%;
+  max-width: var(--container-shell);
+  margin-inline: auto;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left), env(safe-area-inset-right));
+}
+
+@utility section-pad {
+  padding-block: var(--section-pad);
+}
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     THE COVER GRADE.
+
+     Every page opens on one full-bleed photograph of the real room, with the
+     page title set into the foot of it. The grade is what makes that safe and
+     what makes it look like a title card rather than a stock hero.
+
+     **The grade is anchored to the content, not to the frame, and that is the
+     whole point.** The obvious build — one `to bottom` gradient across the
+     cover with a clear window at some fixed percentage — cannot work here, and
+     measuring proved it rather than arguing it: the cover's type block is
+     bottom-anchored and sized by its own content, so it spans **46%–88% of the
+     frame at 1440px but 20%–88% at 320px**. Any fixed clear window is
+     therefore guaranteed to sit underneath the title at some viewport. Two
+     attempts at tuning percentages produced "Packages" at 1.89:1 over the lit
+     brick and "Finding us" at 1.98:1; the third attempt stopped tuning.
+
+     So there are two layers with two jobs:
+
+       `.grade-cover::before`  a top scrim for the nav — dense across the nav's
+                               own height, then faded out by 9rem.
+       `.grade-cover::after`   a light overall tint, for mood only. It seats
+                               the photograph in the palette and carries no
+                               legibility duty at all.
+       `.grade-base::before`   the real one. It lives on the CONTENT wrapper
+                               and starts 8rem above it, so it covers exactly
+                               the type — at any content height, any viewport,
+                               automatically. Nothing to re-tune.
+
+     Everything between the nav scrim and the content grade is the photographic
+     window, and it sizes itself: tall on a desktop where the type block is
+     short relative to the frame, nearly closed on a small phone where it is
+     not. That is the correct behaviour in both cases.
+
+     Worst case is a blown-out white pixel. All cover type sits at or below the
+     0.88 stop, which composites a 255-white pixel to 47 — ink reads 11.66:1
+     and brass 5.54:1 there, both AA at any size before the photograph's own
+     darkness is counted. Verified by sampling the real render.
+     ------------------------------------------------------------------------ */
+
+  /* Nav scrim: held at full density across the nav's own height rather than
+     fading from the very top, so the nav's brass active-marker has the same
+     guarantee the rest of the type does. */
+  /* ⚠ `z-index: 1` on BOTH pseudo-elements is load-bearing, and the reason is
+     not obvious.
+
+     GSAP animates `scale` on the cover photograph. A transformed element is
+     painted as though it created a stacking context at z-index 0, which moves
+     it out of the non-positioned layer and into the positioned one — where DOM
+     order decides. `::before` precedes the <picture> and so ended up painted
+     *underneath* the photograph, while `::after` (which follows it) stayed on
+     top. The nav scrim silently stopped existing, and only when motion was
+     enabled: under `prefers-reduced-motion` GSAP never runs, no transform is
+     set, and the same CSS renders correctly.
+
+     It cost the nav its legibility over every cover — measured at 1.00:1 for
+     "Gallery" over the lit wall on the home cover — and no screenshot of the
+     reduced-motion build would ever have shown it. */
+  .grade-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 1;
+    height: 7.5rem;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgb(13 12 10 / 0.9) 0,
+      rgb(13 12 10 / 0.86) var(--nav-h),
+      rgb(13 12 10 / 0) 7.5rem
+    );
+  }
+
+  /* Mood only, and deliberately slight. This started at 0.16 and the covers
+     came back as near-black rectangles in which the venue was invisible —
+     which defeats the entire thesis, since the room is supposed to be the
+     thing you see. It carries no legibility duty: that is `.grade-base`'s job
+     and it is guaranteed there. */
+  .grade-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1; /* see the note on ::before */
+    pointer-events: none;
+    background: rgb(13 12 10 / 0.06);
+  }
+
+  /* The legibility grade. `top: -4rem` is the entire mechanism: the ramp
+     completes 1rem before the content starts, whatever height the content is
+     and whatever the viewport.
+
+     4rem rather than the 8rem this began as. The lead-in is dead space — it
+     darkens photograph that carries no type — and on the home cover, whose
+     content block is 78% of the frame, an 8rem lead-in pushed the ramp off the
+     top edge entirely and graded the whole picture. Shortening it to 4rem
+     recovers 64px of visible room on every cover and costs nothing: the ramp
+     still reaches its plateau before any type. */
+  .grade-base::before {
+    content: '';
+    position: absolute;
+    inset: -4rem 0 0 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgb(13 12 10 / 0) 0,
+      rgb(13 12 10 / 0.46) 1rem,
+      rgb(13 12 10 / 0.72) 2rem,
+      rgb(13 12 10 / 0.86) 3rem,
+      rgb(13 12 10 / 0.93) 70%,
+      var(--color-page) 100%
+    );
+  }
+
+  /* The card tint — mood and the hover lift, nothing more. Above the
+     photograph, below the caption (which carries `z-10`): a generated
+     `::after` is the last child in DOM order, so without this z-index it
+     paints over the very text it would otherwise be protecting. */
+  .grade-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgb(13 12 10 / 0.12);
+    transition: opacity var(--dur-long) var(--ease-out);
+  }
+
+  /* The caption grade — the same content-anchored mechanism as `.grade-base`,
+     for the same reason.
+
+     A bottom-weighted gradient across the whole card cannot know where the
+     caption is: the caption is inset by its own padding and sized by its own
+     text, so at some card aspect it lands in the light part. Measured, that is
+     not hypothetical — the Visit block's "04" came back at 1.08:1 over the
+     lit deli wall and its blurb at 2.04:1. Anchoring the ramp to the caption
+     box makes the guarantee independent of card size, aspect and text length. */
+  .grade-caption::before {
+    content: '';
+    position: absolute;
+    inset: -3.5rem 0 0 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgb(13 12 10 / 0) 0,
+      rgb(13 12 10 / 0.55) 1rem,
+      rgb(13 12 10 / 0.86) 2.5rem,
+      rgb(13 12 10 / 0.94) 100%
+    );
+  }
+
+  /* ------------------------------------------------------------------------
+     A plate. A photograph printed onto the page — no radius, no shadow, no
+     frame. The page margin around it is the frame.
+     ------------------------------------------------------------------------ */
+  .plate {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-panel);
+  }
+  .plate > picture > img,
+  .plate > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* A transition, not a keyframe, so a pointer leaving mid-move retargets
+       from where it is instead of restarting. */
+    transition: scale var(--dur-long) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    a:hover .plate > picture > img,
+    figure:hover .plate > picture > img {
+      scale: 1.03;
+    }
+    /* The grade lifts slightly on hover, so the room brightens under the
+       cursor. Opacity only — nothing reflows. */
+    a:hover .grade-card::after {
+      opacity: 0.82;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Line mask. A line of display type in an `overflow: hidden` box, rising
+     from 100% of its own height — so it arrives from *behind* the rule above
+     it rather than fading up out of nothing. Transform and opacity only.
+     ------------------------------------------------------------------------ */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding-block-end: 0.09em; /* descenders must not be clipped */
+  }
+
+  /* ------------------------------------------------------------------------
+     The brass rule. 1px, drawn from the left, under a page title and at the
+     head of a section. This is the system's one ornament and it is a line.
+     ------------------------------------------------------------------------ */
+  .rule-brass {
+    height: 1px;
+    background-color: var(--color-brass);
+    transform-origin: left;
+  }
+
+  /* ------------------------------------------------------------------------
+     The band — the venue's own facts moving slowly across the page, between
+     the cover and the first section on the home page.
+
+     `linear`, because constant motion takes linear: easing makes the band
+     visibly accelerate and stall, at which point it stops being a moving
+     strip and starts being an animation. Two identical copies translate by
+     exactly half the track, so the loop has no seam. Non-interactive and
+     `aria-hidden` — every fact in it is stated properly elsewhere, and a
+     screen reader would otherwise hear the address twice in one screen.
+     ------------------------------------------------------------------------ */
+  .band {
+    display: flex;
+    width: max-content;
+    animation: band 52s var(--ease-constant) infinite;
+  }
+  @keyframes band {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     The mark, filled with the room.
+
+     The client's wordmark is black artwork on transparency, which makes it
+     usable as an alpha mask — so the page closes on the venue's own
+     letterforms with the neon stairwell glowing through the strokes. It is
+     the brand rather than an ornament, and it costs nothing in legibility
+     because it is decorative and `alt=""`: the venue name is set as text
+     directly above it.
+
+     Browsers without mask support get the plain white mark.
+     ------------------------------------------------------------------------ */
+  .mark-fill {
+    display: none;
+    width: 100%;
+    aspect-ratio: 6303 / 1365;
+    -webkit-mask-image: url('/img/wordmark-white-1920.png');
+    mask-image: url('/img/wordmark-white-1920.png');
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+  /* `> picture > img`, not `> img`: `<Frame>` wraps every photograph in a
+     `<picture>` so it can offer AVIF and WebP, which makes the image a
+     grandchild. Written as `.mark-fill > img` this rule silently did nothing
+     and the masked photograph rendered at its own 3:4 aspect inside a 4.6:1
+     mask — visible only in a measurement, since the mask still cropped it to
+     letter shapes. Both forms are matched so the rule cannot break again. */
+  .mark-fill > picture > img,
+  .mark-fill > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @supports (mask-image: url('/img/wordmark-white-1920.png')) {
+    .mark-fill {
+      display: block;
+    }
+    .mark-fill-fallback {
+      display: none;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Loader. The page colour, the client's white wordmark wiping in, one brass
+     rule drawing beneath it, then the whole sheet lifts. 1080ms end to end,
+     once per session.
+
+     CSS keyframes, not GSAP: this runs while the browser is at its busiest —
+     parsing, fetching, mounting React — and CSS animation runs off the main
+     thread where a rAF timeline drops frames. It also means the overlay's
+     disappearance never depends on a JS timer firing; the keyframes end on a
+     state that is invisible and non-interactive.
+     ------------------------------------------------------------------------ */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-loader);
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    background-color: var(--color-page);
+    animation: loader-lift var(--dur-short) var(--ease-move) 820ms forwards;
+  }
+  .loader__mark {
+    display: grid;
+    gap: var(--spacing-sm);
+    width: min(340px, 56vw);
+    animation: loader-mark-out var(--dur-short) var(--ease-move) 820ms forwards;
+  }
+  /* The real mark, not a text stand-in, wiping in left to right — which reads
+     as the letters arriving in sequence. A true per-letter animation needs a
+     vector with per-letter paths (MEMORY.md Q2, still open). */
+  .loader__wordmark {
+    width: 100%;
+    height: auto;
+    clip-path: inset(0 100% 0 0);
+    animation: loader-wipe var(--dur-long) var(--ease-out) 100ms forwards;
+  }
+  .loader__rule {
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-brass);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: loader-rule var(--dur-mid) var(--ease-out) 520ms forwards;
+  }
+
+  @keyframes loader-wipe {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes loader-rule {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes loader-mark-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes loader-lift {
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  /* Mobile menu — the destination list arrives one line at a time. `--index`
+     is set on the line itself, never on the parent: a custom property on a
+     parent recalculates styles for every child. */
+  .menu-line {
+    display: block;
+    animation: menu-line var(--dur-mid) var(--ease-out) calc(var(--index) * 55ms) both;
+  }
+  @keyframes menu-line {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     [TBC] — the most-used component on day one.
+
+     MEMORY.md §5 still lists package tiers, capacity, the enquiry channel and
+     the venue story as Missing, and D-05 requires the gap to be *visible*: a
+     plausible-looking placeholder published on a real bar's site sends real
+     people to a closed door. It says what is missing and who owns it, in plain
+     words, so a reviewer never has to open MEMORY.md to find out.
+
+     A dashed underline rather than a dashed box — a box is a component, and a
+     placeholder should not look like one. Dashed is reserved: nothing else on
+     this site uses it, so the marker is unmistakable in a screenshot.
+     ------------------------------------------------------------------------ */
+  .tbc {
+    display: inline;
+    font-family: var(--font-interface);
+    font-size: var(--text-small);
+    line-height: 1.55;
+    color: var(--color-ink-3);
+    text-decoration: underline dashed var(--color-rule-strong);
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   CROSS-DOCUMENT PAGE TRANSITIONS.
+
+   Five real documents (see vite.config.ts) would normally mean five hard cuts.
+   This is the one piece of choreography that earns its place on a multi-page
+   site: the cover photograph of the page you are leaving morphs into the cover
+   of the page you are arriving at, and the nav and footer stay put instead of
+   cross-fading with everything else.
+
+   Entirely declarative and entirely progressive — a browser without
+   cross-document view transitions performs an ordinary navigation and loses
+   nothing. `src/lib/transitions.ts` does one job on top of this: hand the
+   `cover` name to whichever gateway card was clicked, so the morph starts from
+   the photograph the visitor actually pressed.
+   -------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+/* The cover photograph is the element that carries across. Declared in CSS so
+   it holds without JavaScript; `lib/transitions.ts` only ever *moves* the name
+   onto a gateway block, and only on the home page. */
+[data-cover] {
+  view-transition-name: cover;
+}
+
+::view-transition-group(cover) {
+  animation-duration: var(--dur-mid);
+  animation-timing-function: var(--ease-move);
+}
+
+/* The nav and footer are the same furniture on every page. Naming them keeps
+   them out of the root cross-fade, so they hold still while the page changes
+   underneath — which is what makes five documents read as one site. */
+::view-transition-group(nav),
+::view-transition-group(footer) {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-short);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — a first-class mode, not a fallback. No loader, no smooth
+   scroll, no reveals, no page transitions, no band. The JS layer refuses to
+   start Lenis or build any ScrollTrigger; this is the belt to that braces,
+   and it also catches the CSS-only motion above.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .band {
+    animation: none !important;
+    transform: none !important;
+  }
+  /* The transition still *happens* — it just resolves instantly, which is the
+     documented way to opt a view transition out of motion. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

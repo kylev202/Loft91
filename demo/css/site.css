@@ -1,0 +1,1538 @@
+/* ==========================================================================
+   site.css — layout, sections and motion. Consumes tokens.css only.
+   No raw hex, no ad-hoc duration, no one-off easing. DESIGN.md §5–§7.
+   ========================================================================== */
+
+/* --- Reset + platform (§3, §5.2) ----------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+
+html {
+  color-scheme: dark; /* native scrollbars, caret (§3)   */
+  -webkit-tap-highlight-color: transparent; /* replaced by our own :active     */
+  scroll-behavior: smooth;
+}
+a,
+button,
+[role="button"] {
+  touch-action: manipulation;
+} /* kills 300ms delay */
+
+body {
+  background: var(--l91-void);
+  color: var(--l91-ink-2);
+  font-family: var(--font-interface);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* §9: no horizontal page overflow */
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+/* --- Type voices (§4) ---------------------------------------------------- */
+.signal {
+  font-family: var(--font-interface);
+  font-weight: 300;
+  font-size: var(--fs-signal);
+  letter-spacing: var(--track-signal);
+  text-transform: uppercase;
+  color: var(--l91-ink-3);
+  line-height: 1.4;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--l91-ink);
+}
+h2,
+h3 {
+  text-wrap: balance;
+} /* §4.2 — never on the h1 wordline */
+
+.h-display {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-display);
+  letter-spacing: var(--track-display);
+}
+.lead {
+  font-size: var(--fs-lead);
+  max-width: var(--measure);
+  text-wrap: pretty;
+  margin-block-start: var(--space-md);
+}
+.body {
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+.nums {
+  font-variant-numeric: tabular-nums;
+} /* §4.2 — prices and hours */
+
+/* The page's index, set as structure rather than as a caption. It keeps the
+   Signal voice's uppercase and tracking (it inherits `.signal`) but drops the
+   11px size, and a hairline runs from it to the edge of the column so the
+   numeral reads as the start of a rule rather than as a floating label. */
+.numeral {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--fs-numeral);
+  letter-spacing: var(--track-nav);
+  color: var(--l91-accent);
+  margin-block-end: var(--space-md);
+} /* accent role 3 */
+.numeral::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--l91-rule-strong);
+}
+
+/* --- Shell, grid and the Editorial Split (§5) ---------------------------- */
+.shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: max(
+    var(--gutter),
+    env(safe-area-inset-left),
+    env(safe-area-inset-right)
+    );
+}
+
+/* Once the sidebar appears (§7.1), every content column must clear its hard
+   right edge, plus the same `--gutter` breathing room the shell already
+   gives its other three sides — the sidebar is `position: fixed` and takes
+   no document-flow space, so this manual inset is what stops text sliding
+   underneath it. */
+@media (min-width: 1024px) {
+  .shell {
+    padding-inline-start: calc(var(--nav-rail-w) + var(--gutter));
+  }
+}
+
+.section {
+  padding-block: var(--section-pad); /* ≥ 6rem (§5, §9)   */
+  scroll-margin-top: calc(var(--space-md) + 4rem); /* §5.2 deep links   */
+}
+
+.split {
+  display: grid;
+  gap: var(--space-xl);
+}
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: repeat(12, 1fr);
+    /* --space-lg, not --space-xl, at this tier. Twelve columns cost eleven
+       gutters: at 64px that is 704px of pure gap, and once the sidebar
+       widened to 19rem the content column at 1024px is only ~618px — the
+       tracks could not shrink below their min-content and the Visit split
+       pushed 35px past the viewport. 40px gutters cost 440px and fit.
+       Verified by measurement at 1024, not by arithmetic alone. */
+    gap: var(--space-lg);
+  }
+  /* 7/5 retired with the hero (D-14); Menu and Visit both run 5/7 */
+  .split--5-7 > .split__a {
+    grid-column: span 5;
+  }
+  .split--5-7 > .split__b {
+    grid-column: span 7;
+  }
+}
+/* Full gutter restored once the content column can pay for it. */
+@media (min-width: 1280px) {
+  .split {
+    gap: var(--space-xl);
+  }
+}
+/* Below 1024 the split is a single column — never 6/6, symmetry reads as a
+   template (§5). All asymmetry is gone, not merely narrowed (§5.1). */
+
+.section__head {
+  margin-block-end: var(--space-2xl);
+}
+
+/* --- Links, buttons, focus (§6.5, §10) ---------------------------------- */
+a {
+  color: inherit;
+}
+
+.link {
+  /* inline-flex + min-height so every link clears the 44px touch floor (§10).
+     The arrival path is a phone at night; a 17px tap target is a missed tap. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--l91-ink);
+  text-decoration: none;
+  background-image: linear-gradient(var(--l91-ink), var(--l91-ink));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  padding-block-end: 2px;
+  transition:
+    background-size var(--dur-micro) var(--ease-out),
+    color var(--dur-micro) var(--ease-out);
+}
+.link--quiet {
+  color: var(--l91-ink-3);
+  background-image: linear-gradient(var(--l91-ink-3), var(--l91-ink-3));
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* §10 touch target  */
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm); /* §5: no pill CTAs  */
+  font-family: var(--font-interface);
+  font-size: var(--fs-signal);
+  font-weight: 500;
+  letter-spacing: var(--track-signal);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.btn--primary {
+  background: var(--l91-accent);
+  color: var(--l91-void);
+} /* accent role 2 */
+
+/* Hover only where hover exists — on a phone :hover sticks after a tap (§6.5) */
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    background-size: 0 1px;
+    background-position: 100% 100%;
+  }
+  .btn--primary:hover {
+    background: var(--l91-focus);
+  }
+  .strip__frame:hover .frame {
+    background: var(--l91-surface-hi);
+  }
+}
+/* :active and :focus-visible sit OUTSIDE the query — they are the touch and
+   keyboard affordances (§6.5). */
+.btn:active {
+  transform: scale(0.97);
+}
+
+:focus-visible {
+  outline: 2px solid var(--l91-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--l91-void); /* canvas-coloured inner ring so the halo survives photography (§10) */
+  border-radius: var(--radius-sm);
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  z-index: var(
+    --z-loader
+  ); /* on the §6.6 scale — see the note in the build report */
+  padding: var(--space-xs) var(--space-md);
+  background: var(--l91-surface-hi);
+  color: var(--l91-ink);
+  border: 1px solid var(--l91-rule-strong);
+  border-radius: var(--radius-sm);
+  transform: translateY(-200%);
+  transition: transform var(--dur-short) var(--ease-move);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* --- [TBC] — the most-used component on day one (§7.8) ------------------- */
+.tbc {
+  display: inline-block;
+  font-family: var(--font-interface);
+  font-size: var(--fs-signal);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--l91-ink-3); /* AA-safe: it must be readable */
+  border: 1px dashed var(--l91-rule-strong); /* the ONLY dashed border on site */
+  border-radius: var(--radius-sm);
+  padding: var(--space-2xs) var(--space-xs);
+}
+.tbc--block {
+  display: block;
+  /* Hug the text. As a plain block it stretched the dashed rule to the full
+     content column, which read as a divider rather than as a marker. */
+  width: fit-content;
+  max-width: 100%;
+  margin-block-end: var(--space-lg);
+}
+.tbc--inline {
+  border-style: dashed;
+  margin-block-start: var(--space-sm);
+}
+/* A note that qualifies content already on the page, rather than standing in
+   for content that is missing — so it follows its subject instead of
+   reserving a block of space above it. */
+.tbc--note {
+  margin-block-start: var(--space-md);
+}
+
+/* Decorative skeleton bars. Never text — --l91-ink-4 is banned as type (§3). */
+.ph {
+  display: block;
+  height: 0.75em;
+  border-radius: var(--radius-sm);
+  background: var(--l91-ink-4);
+}
+.ph--55 {
+  width: 55%;
+}
+.ph--60 {
+  width: 60%;
+}
+.ph--65 {
+  width: 65%;
+}
+.ph--70 {
+  width: 70%;
+}
+.ph--75 {
+  width: 75%;
+}
+.ph--80 {
+  width: 80%;
+}
+
+/* --- Loader (§6.3) ------------------------------------------------------- */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  display: grid;
+  place-items: center;
+  background: var(--l91-void);
+  animation: loader-lift var(--dur-short) var(--ease-move) 1080ms forwards;
+}
+@keyframes loader-lift {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+.loader__mark {
+  text-align: center;
+  animation: mark-out var(--dur-short) var(--ease-move) 1080ms forwards;
+}
+@keyframes mark-out {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* The client's real wordmark, wiped in left-to-right. The previous version
+   set "LOFT91" as text in the interface face and animated it per letter —
+   which animated a stand-in, not the logo. A directional wipe on the actual
+   mark reads as the same left-to-right arrival, on the right artwork.
+   clip-path only: no layout property animates (§6.3). */
+.loader__wordmark {
+  display: block;
+  width: min(340px, 62vw);
+  height: auto;
+  clip-path: inset(0 100% 0 0);
+  animation: mark-wipe var(--dur-long) var(--ease-out) 120ms forwards;
+}
+@keyframes mark-wipe {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.loader__rule {
+  display: block;
+  height: 1px;
+  margin-block-start: var(--space-md);
+  background: var(--l91-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: rule-draw var(--dur-mid) var(--ease-out) 780ms forwards;
+}
+@keyframes rule-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Tab/Esc during the loader — dismiss now, but eased, not an instant cut (§6.5) */
+.loader--dismiss,
+.loader--dismiss .loader__mark {
+  animation: none;
+  opacity: 0;
+  transition: opacity var(--dur-short) var(--ease-move);
+}
+
+[data-loader="skip"] .loader {
+  display: none;
+} /* repeat visit + reduced motion */
+
+/* --- Nav (§7.1) — sidebar at desktop, top bar + overlay on mobile --------
+   Below 1024px this is a compact top bar (styled here); at 1024px+ the
+   media query below turns it into a full-height sidebar panel with its own
+   fill and a hard right-edge border, which is what actually separates it
+   from the content column — see that block for the desktop shape.
+   Still `position: fixed` throughout, so it never takes document-flow
+   space; content clears it via the `.shell`/`.strip` inset instead.       */
+.nav {
+  position: fixed;
+  top: var(--space-md);
+  left: 0;
+  right: 0;
+  z-index: var(--z-nav);
+  padding-inline: max(
+    var(--gutter),
+    env(safe-area-inset-left),
+    env(safe-area-inset-right)
+  );
+}
+
+.nav__inner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-md);
+  background: color-mix(in srgb, var(--l91-surface) 92%, transparent);
+  border: 1px solid var(--l91-outline);
+  border-radius: var(--radius-md);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px); /* fixed layer only (§6.6) */
+}
+
+/* The wordmark, set the way the logo is set: Switzer Light, uppercase, widely
+   tracked (assets/logo.jpg). Family and tracking were always right — it was
+   sized as an 11px label, which read as a caption rather than a mark. */
+.nav__brand {
+  font-family: var(--font-interface);
+  font-weight: 300;
+  font-size: var(--fs-brand);
+  letter-spacing: var(--track-signal);
+  text-transform: uppercase;
+  color: var(--l91-ink);
+  text-decoration: none;
+  margin-inline-end: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* §10 touch target */
+}
+
+.nav__links {
+  display: none;
+}
+.nav__cta {
+  display: none;
+}
+
+.nav__burger {
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px; /* §10 touch target */
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+.nav__burger-bar {
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--l91-ink);
+  transition: transform var(--dur-short) var(--ease-move);
+}
+.nav__burger[aria-expanded="true"] .nav__burger-bar:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+.nav__burger[aria-expanded="true"] .nav__burger-bar:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+/* ---- A real sidebar once there is room for a column --------------------
+   Full viewport height, fixed width, its own panel fill and a hard right
+   border — content genuinely stops at that line rather than merely
+   clearing a floating shape. `--l91-surface-hi` (not `--l91-surface`, which
+   the item boxes use) so the panel reads as one tone and every box inside
+   it still pops against it — same logic as the box outlines, one level up. */
+@media (min-width: 1024px) {
+  .nav {
+    top: 0;
+    bottom: 0;
+    right: auto;
+    left: 0;
+    width: var(--nav-rail-w);
+    padding-inline: 0;
+    display: flex;
+    align-items: stretch; /* .nav__inner spans the full panel height */
+    background: var(--l91-surface-hi);
+    border-right: 1px solid var(--l91-outline);
+  }
+  /* Mark at the top, destinations through the middle, the one CTA on the
+     floor of the panel. The inner used to be pinned to the top of a
+     full-height rail, which left the bottom ~60% of a 304px-wide slab empty
+     — the largest single area of nothing on the page, and the thing that
+     read as unfinished rather than as restraint. Nothing is added to fill
+     it; the three things already in the rail are simply given the height
+     they had all along. The mark still sits at the top, which is what D-18
+     asked for. */
+  .nav__inner {
+    flex-direction: column;
+    align-items: stretch; /* one width for every box */
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: 100%;
+    margin-inline: 0;
+    padding: var(--space-lg);
+    background: none;
+    border: 0;
+    border-radius: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .nav__brand {
+    margin-inline-end: 0;
+    justify-content: center;
+    padding: var(--space-2xs) var(--space-sm);
+    background: var(--l91-surface);
+    border: 1px solid var(--l91-outline);
+    border-radius: var(--radius-sm);
+  }
+  .nav__burger {
+    display: none;
+  }
+
+  .nav__links {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2xs); /* 8px — §10 target spacing */
+  }
+  .nav__cta {
+    display: inline-flex;
+    font-size: var(--fs-body);
+    letter-spacing: var(--track-nav);
+  }
+}
+
+/* Quiet text, not a box — the underline is the only affordance, same idiom
+   as `.link` elsewhere on the site. A leading rule (::before) carries the
+   active state; it grows on the block axis only, so nothing reflows (§6.6). */
+.nav__links a {
+  position: relative;
+  font-family: var(--font-interface);
+  font-weight: 400;
+  font-size: var(--fs-body); /* 16px — was 11px Signal */
+  letter-spacing: var(--track-nav);
+  text-transform: uppercase;
+  color: var(--l91-ink-3);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* §10 touch target */
+  padding-inline: var(--space-sm);
+  background-image: linear-gradient(var(--l91-ink), var(--l91-ink));
+  background-repeat: no-repeat;
+  background-position: var(--space-sm) 100%;
+  background-size: 0 1px;
+  transition:
+    color var(--dur-micro) var(--ease-out),
+    background-size var(--dur-micro) var(--ease-out);
+}
+.nav__links a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: 0;
+  background: var(--l91-accent); /* accent role 1 */
+  transform: translateY(-50%);
+  transition: height var(--dur-micro) var(--ease-out);
+}
+.nav__links a.is-active {
+  color: var(--l91-accent);
+}
+.nav__links a.is-active::before {
+  height: 20px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav__links a:hover {
+    color: var(--l91-ink);
+    background-size: calc(100% - var(--space-sm) * 2) 1px;
+  }
+}
+
+/* --- FAQ section ------------------------------------------------------- */
+.faq__list {
+  display: grid;
+  gap: var(--space-md);
+  margin-block-start: var(--space-md);
+}
+.faq__item {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.faq__item summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--l91-outline);
+  border-radius: var(--radius-sm);
+  background: var(--l91-surface);
+}
+.faq__item[open] summary {
+  border-color: var(--l91-accent);
+  color: var(--l91-accent);
+}
+.faq__a {
+  padding: var(--space-md);
+  border: 1px solid var(--l91-outline);
+  border-top: 0;
+  background: var(--l91-surface);
+}
+
+/* Mobile overlay — a real dialog (§7.1) */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: var(--gutter);
+  padding-block-end: max(var(--space-lg), env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--l91-void) 88%, transparent);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  overscroll-behavior: contain; /* §5.2 — no scroll chaining */
+  opacity: 0;
+  transition: opacity var(--dur-short) var(--ease-move);
+}
+.nav-overlay[hidden] {
+  display: none;
+}
+.nav-overlay.is-open {
+  opacity: 1;
+}
+
+.nav-overlay__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+/* Same quiet treatment as the rail, scaled up — on a phone this overlay IS
+   the nav menu, so plain display type carries it rather than a box. */
+.nav-overlay__links a {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  color: var(--l91-ink);
+  text-decoration: none;
+  overflow: hidden;
+  display: inline-block;
+  padding: var(--space-2xs) 0 var(--space-2xs) var(--space-md);
+  transition: color var(--dur-micro) var(--ease-out);
+}
+.nav-overlay__links a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: 0;
+  background: var(--l91-accent); /* accent role 1 */
+  transform: translateY(-50%);
+  transition: height var(--dur-micro) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav-overlay__links a:hover {
+    color: var(--l91-accent);
+  }
+  .nav-overlay__links a:hover::before {
+    height: 32px;
+  }
+}
+.nav-overlay__links a:focus-visible::before {
+  height: 32px;
+}
+.nav-overlay__links a > span {
+  display: inline-block;
+  transform: translateY(28px);
+  opacity: 0;
+  transition:
+    transform var(--dur-mid) var(--ease-out),
+    opacity var(--dur-mid) var(--ease-out);
+}
+.nav-overlay.is-open .nav-overlay__links a > span {
+  transform: translateY(0);
+  opacity: 1;
+}
+.nav-overlay__links a:nth-child(1) > span {
+  transition-delay: 0ms;
+}
+.nav-overlay__links a:nth-child(2) > span {
+  transition-delay: 70ms;
+}
+.nav-overlay__links a:nth-child(3) > span {
+  transition-delay: 140ms;
+}
+.nav-overlay__links a:nth-child(4) > span {
+  transition-delay: 210ms;
+}
+.nav-overlay__links a:nth-child(5) > span {
+  transition-delay: 280ms;
+}
+
+/* --- Hero (§7.2) — bottom-anchored editorial composition -----------------
+   Was a centred stack (D-14). Everything sat on the vertical midline: mark,
+   eyebrow, a display-size wordline, facts and CTAs, all centred — which put
+   the *sentence* at the optical centre of the page while the branding it
+   describes was already stated twice above it (sidebar mark, hero mark).
+   The composition now anchors bottom-left over the full-bleed photograph:
+   the mark leads, the wordline drops to caption weight beneath it, and the
+   practical row sits on a hairline across the foot. The upper two-thirds of
+   the frame is given back to the room, which is the actual argument.        */
+.hero {
+  position: relative;
+  min-height: 100dvh; /* §5.1 — dvh, never the vh unit */
+  display: flex;
+  align-items: flex-end;
+  /* Mobile-first and deliberately tight: §7.2 requires the whole "should I go
+     tonight?" answer to be readable without scrolling on a 390x844 handset.
+     Roomier rhythm is restored from 768px up, where there is height to spend. */
+  padding-block: var(--space-2xl) var(--space-xl);
+  padding-block-end: max(var(--space-xl), env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+/* The room, full bleed. This replaces the drifting accent-wash gradient that
+   used to fill the hero: that was a coloured light standing in for a
+   photograph nobody had yet. The photograph exists now, so the stand-in
+   goes rather than sitting on top of it. */
+.hero__media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* 116% tall and pulled up 8%, so the frame sits over the MIDDLE of the
+   photograph with 8% of spare image above and below. That headroom is what
+   the scroll drift below moves into; at a flush 100% the first pixel of
+   parallax would expose the empty top edge of the hero.
+   Why 8% of headroom for a 6% drift, and not 6%: `translate` resolves its
+   percentage against the ELEMENT's own height, not the container's, so a 6%
+   drift on an image 116% of the frame travels 6.96% of the frame. At 112%/6%
+   that overshot by 6.5px at full scroll and briefly showed the hero's own
+   background at the top edge — measured, not predicted. */
+.hero__media img {
+  position: absolute;
+  top: -8%;
+  left: 0;
+  width: 100%;
+  height: 116%;
+  object-fit: cover;
+}
+/* Scrim, graded by direction rather than laid on flat. The old rule veiled
+   the entire frame at --l91-scrim (0.74) and then added deep stops on top,
+   which meant the LIGHTEST any part of the photograph could ever be was a
+   quarter of its real luminance — so the brass backlight behind the counter,
+   the ribbed front and the arched shelves all flattened into one grey-brown
+   field. That is the whole reason to lead with this room, and none of it
+   survived.
+   The density now follows the composition instead of covering it: the frame
+   carries only --l91-scrim-soft overall, ramps through --l91-scrim and into
+   --l91-scrim-deep across the bottom half where every line of hero type
+   lands, and takes a second deep stop at the very top to seat the fixed nav
+   bar. Net effect at the foot of the frame is ~0.82–0.96 of charcoal — MORE
+   than the flat 0.74 the type used to sit on — while the top third of the
+   picture opens up to roughly 0.30. Type gains contrast and the room comes
+   back at the same time; the two were never actually in competition, the
+   veil just had no idea where the words were.
+   Ratios under each line are measured off the rendered page, not derived. */
+.hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Where the grade turns dense is a function of how far up the frame the
+     composition reaches, which changes with the breakpoint — so the stops
+     are parameters and the densities stay tokens. */
+  /* 40%, not 30%: the mark spans 42–58% of the frame's height and its
+     crossbars run straight across the lit arch behind the bar, where the
+     photograph is at ~247/255. Masking the sample to the artwork's own alpha
+     — stroke pixels only, not the img's mostly-transparent bounding box —
+     put the worst stroke at 3.65:1 with the ramp starting at 30%. Ten points
+     higher clears 4.5:1 and costs the arches about six points of luminance,
+     which is not visible; a soft patch across the middle of the wordmark is. */
+  --grade-dense-to: 40%; /* solid --l91-scrim up to here      */
+  --grade-clear-at: 76%; /* fully open from here to the top   */
+  --grade-cap: 26%; /* the top-down stop under the nav   */
+  background:
+    linear-gradient(
+      to top,
+      var(--l91-scrim-deep) 0%,
+      var(--l91-scrim) var(--grade-dense-to),
+      transparent var(--grade-clear-at)
+    ),
+    linear-gradient(to bottom, var(--l91-scrim-deep) 0%, transparent var(--grade-cap)),
+    var(--l91-scrim-soft);
+}
+
+/* The phone needs a different grade, and not because phones are a lesser
+   case — because the crop is different. The source is a 4:3 landscape frame;
+   `object-fit: cover` on a 390×844 portrait viewport throws away both ends
+   and keeps the centre, which is precisely the pair of backlit arches behind
+   the bar. Sampled off the render, the photograph under the hero type there
+   is sitting at ~251/255 — blown out — where the desktop crop puts the same
+   type over the counter at ~36. On top of that the composition occupies 69%
+   of the frame's height rather than 45%, so it reaches much further up into
+   the open part of the grade. Both facts push the same way: dense higher,
+   and open only at the very top, which on a phone is the only part of the
+   picture with any room left to be seen in. */
+@media (max-width: 767px) {
+  .hero__media::after {
+    --grade-dense-to: 55%;
+    --grade-clear-at: 96%;
+    --grade-cap: 14%;
+  }
+}
+
+/* The room settles into place as the loader lifts — a 4% scale coming to
+   rest, nothing else. It is the one piece of motion on this page big enough
+   to be felt rather than noticed, and it costs a single compositor-thread
+   transform on an element that is already its own layer. Held behind
+   --delay-hero like the rest of the composition, so it plays after the
+   loader rather than underneath it, and collapses to nothing on a repeat
+   visit. The scrim above does NOT scale with it: the veil is part of the
+   page, the photograph is what moves. */
+/* `scale`, not `transform`, so the settle and the scroll drift below can
+   compose on one element instead of the second silently winning. */
+@keyframes hero-settle {
+  from {
+    scale: 1.04;
+  }
+  to {
+    scale: 1;
+  }
+}
+/* Parallax: the room falls behind the page as you leave it. Driven by a
+   scroll timeline rather than a scroll listener — §9 bans
+   `addEventListener('scroll')`, and this runs off the compositor with no JS
+   at all. Browsers without scroll-driven animations (Safari, Firefox today)
+   simply get a static photograph, which is the correct degradation.
+   Deliberately small: 6% over a whole viewport of travel is a drift, and the
+   moment it is readable as an effect it stops looking like a photograph and
+   starts looking like a slideshow. This is demo-scope — D-26 puts the real
+   scroll choreography on GSAP + ScrollSmoother in the Astro build. */
+@keyframes hero-drift {
+  to {
+    translate: 0 6%;
+  }
+}
+.hero__media img {
+  animation:
+    hero-settle var(--dur-settle) var(--ease-out) var(--delay-hero) both,
+    hero-drift var(--ease-ambient) both;
+  /* Driven off the root scroller across exactly one viewport of travel —
+     which is the hero's own height — rather than a `view()` range, whose
+     entry phase never happens for an element already on screen at scroll 0. */
+  animation-timeline: auto, scroll(root block);
+  animation-range: normal, 0 100dvh;
+}
+
+.hero__inner {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* The client's own white lockup (assets/img/LOFT 91 - LOGO WHITE.png), served
+   from width-matched derivatives in assets/img/opt/ rather than the 6303px
+   original. It is white-on-transparent as supplied — no filter, no blend, and
+   nothing is upscaled past its native size (§4.2).
+   Sized to be the thing you see first. At 300px it was a caption in a 992px
+   column — smaller than the section headings further down the page, which
+   made the one element carrying the brand the quietest thing in the frame.
+   It now runs to roughly two-thirds of the content column at every tier.
+   Still a downscale, not an upscale (§4.2): the source is 6303px wide and
+   the srcset tops out at a 1920w derivative, so even 680px at 2× DPR is
+   asking for less than the artwork has. */
+.hero__mark {
+  width: min(340px, 84vw);
+  height: auto;
+  margin-block-end: var(--space-md);
+}
+
+/* Every instance of the wordmark, wherever it is sized.
+   `height: auto` is load-bearing, not tidiness: the <img> carries width/height
+   attributes for CLS, and the `height` attribute lands as a presentational
+   hint (`height: 69px`), which is NOT auto. Overriding only `width` in CSS
+   therefore leaves the height pinned at the attribute value and the mark is
+   drawn to a 1.88:1 box instead of its true 4.64:1 — visibly squashed. The
+   hero mark was already immune because it declared `height: auto` itself;
+   the nav mark was not. Declared once on the shared class so a future
+   instance cannot reintroduce it. */
+.mark {
+  height: auto;
+}
+
+/* Same artwork, sized for the nav rather than the hero — the wordmark is
+   wide (≈4.6:1), so width is the controlling axis, not height. Wrapped in a
+   link so the mark does what every masthead logo is expected to do. */
+.nav__home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* §10 touch target */
+  margin-inline-end: auto; /* pushes burger/links to the far edge */
+}
+.nav__home .mark {
+  width: 130px;
+}
+@media (min-width: 1024px) {
+  .nav__home {
+    margin-inline-end: 0;
+    justify-content: center;
+  }
+  .nav__home .mark {
+    width: 180px;
+  }
+}
+
+/* Full ink, not the Signal voice's default --l91-ink-3. This is 11px type on
+   a photograph: the ink ramp's levels are all AA against the flat canvas, but
+   none of that survives contact with a lit brick wall, and level 3 is the one
+   with no margin left to spend. */
+.hero__eyebrow {
+  color: var(--l91-ink);
+  margin-block: 0;
+}
+
+/* Demoted from --fs-h1 display type. It is a subtitle to the mark, not the
+   headline of the page — at 72px centred it was the loudest thing in the
+   viewport and it is the least load-bearing sentence on the site. Still the
+   <h1> semantically; only its voice changed. */
+.hero__wordline {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-head);
+  letter-spacing: 0;
+  /* Full ink rather than --l91-ink-2. Its size already keeps it subordinate
+     to a 680px mark; dimming it as well made it subordinate twice over, for
+     no gain, on a photograph where every step down the ink ramp costs real
+     legibility. */
+  color: var(--l91-ink);
+  hyphens: none;
+  max-width: 24ch;
+  margin-block-start: var(--space-xs);
+}
+
+/* The practical row: where, when, and how to book, on one rule across the
+   foot of the frame. Everything above it is atmosphere; this is the part
+   somebody standing on Nicholson Street at 8 PM actually needs. */
+.hero__base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-lg) var(--space-xl);
+  width: 100%;
+  margin-block-start: var(--space-xl);
+  padding-block-start: var(--space-md);
+  border-block-start: 1px solid var(--l91-rule-strong);
+}
+
+/* The two halves share a line when the column is wide enough for both and
+   drop onto their own lines when it is not — governed by a flex-basis rather
+   than a breakpoint, because what decides it is the content column left over
+   after the sidebar, not the viewport. `nowrap` here was the 1024px bug: it
+   held the halves side by side past the point where they fit, which folded
+   the facts into a stack and broke the CTA label across two lines. */
+.hero__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-lg);
+  flex: 1 1 22rem;
+  margin: 0;
+}
+.hero__fact dt {
+  margin-block-end: var(--space-2xs);
+}
+.hero__fact dd {
+  margin: 0;
+  color: var(--l91-ink-2);
+  font-size: var(--fs-small);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  /* Shrinkable, not rigid. `0 0 auto` sized this to its max-content width
+     (button + gap + link ≈ 383px), which on a 350px phone column pushed
+     "See the menu" off the right edge — invisibly, because body's
+     `overflow-x: hidden` clips it rather than reporting it. Allowing shrink
+     lets the two actions wrap onto separate lines instead. */
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-block: var(--space-3xl) var(--space-2xl);
+  }
+  .hero__mark {
+    width: min(520px, 52vw);
+    margin-block-end: var(--space-lg);
+  }
+  .hero__base {
+    margin-block-start: var(--space-2xl);
+  }
+}
+
+/* Once the sidebar is in play the viewport stops being the measure — 46vw of
+   a 1440px window is 662px inside a 992px content column, which is the
+   proportion the composition is drawn to. The 680px cap stops it running
+   away on an ultrawide, where 46vw would be over a thousand pixels of
+   wordmark. */
+@media (min-width: 1024px) {
+  .hero__mark {
+    width: min(680px, 46vw);
+  }
+}
+
+/* Short viewports (a 320x640 handset, or any squat desktop window) cannot hold
+   the generous rhythm AND keep the CTA above the fold. Height is the real
+   variable here, not width — so key off height. Must stay last: it overrides
+   the min-width block above for windows that are wide but short. */
+@media (max-height: 720px) {
+  .hero {
+    padding-block: var(--space-lg) var(--space-md);
+  }
+  /* This query fires on HEIGHT, so it catches both a squat desktop window and
+     a small handset — hence a vw cap alongside the px one. The px cap is what
+     buys back the vertical room: at 420px the mark is 91px tall, against 147px
+     at the 680px desktop size, and that 56px is roughly what a 640px-tall
+     window is short by. */
+  .hero__mark {
+    width: min(420px, 62vw);
+    margin-block-end: var(--space-sm);
+  }
+  .hero__base {
+    margin-block-start: var(--space-md);
+  }
+}
+
+/* Hero entrance (§6.4) — the composition assembles bottom-up once the loader
+   has lifted. Pure CSS with `both` fill, so it runs whether or not main.js
+   loads and never leaves an element stranded at opacity 0. Only opacity and
+   transform animate; nothing here touches layout. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hero__eyebrow,
+.hero__mark,
+.hero__wordline,
+.hero__base {
+  animation: hero-rise var(--dur-long) var(--ease-out) both;
+}
+/* The ladder follows the DOM, so the composition assembles top-down as it is
+   read. The mark leads it — it is what the loader just handed off from. */
+.hero__mark {
+  animation-delay: var(--delay-hero);
+}
+.hero__eyebrow {
+  animation-delay: calc(var(--delay-hero) + 70ms);
+}
+.hero__wordline {
+  animation-delay: calc(var(--delay-hero) + 140ms);
+}
+.hero__base {
+  animation-delay: calc(var(--delay-hero) + 210ms);
+}
+/* No loader to wait out on a repeat visit — the gate collapses to one frame's
+   worth of delay rather than 1.4s of blank photograph. */
+[data-loader="skip"] {
+  --delay-hero: var(--dur-micro);
+}
+
+/* --- Menu (§7.3) — the real drinks list, set as type ---------------------
+   Two columns of hairline-ruled rows. Category labels drop to the Signal
+   voice rather than the display serif: the section already carries one
+   Zodiak headline, and ten more would turn a menu into a poster. */
+
+/* Happy hour. Deliberately NOT in the accent — the accent budget is three
+   roles per viewport and the nav already spends all three (indicator, CTA,
+   numeral). Prominence comes from the panel, the rule weight and the
+   position, which is the more minimal answer anyway. */
+.happy {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  margin-block-end: var(--space-2xl);
+  background: var(--l91-surface);
+  border: 1px solid var(--l91-rule-strong);
+  border-radius: var(--radius-md);
+}
+@media (min-width: 768px) {
+  .happy {
+    grid-template-columns: 1fr 1.4fr;
+    align-items: start;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+  }
+}
+.happy__when {
+  font-family: var(--font-display);
+  font-size: var(--fs-lead);
+  line-height: var(--lh-head);
+  color: var(--l91-ink);
+  margin-block-start: var(--space-2xs);
+  text-wrap: balance;
+}
+.happy__list {
+  display: grid;
+}
+/* Two columns once there is room, so the panel is three rows tall rather
+   than six — otherwise the head block beside it sits over a dead half. */
+@media (min-width: 1024px) {
+  .happy__list {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-xl);
+  }
+}
+.happy__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-2xs);
+  border-block-end: 1px solid var(--l91-rule);
+  color: var(--l91-ink);
+}
+.happy__list li:last-child {
+  border-block-end: 0;
+}
+.happy__note {
+  color: var(--l91-ink-3);
+  font-size: var(--fs-small);
+}
+
+.menu-cols {
+  display: grid;
+  gap: var(--space-2xl);
+}
+@media (min-width: 768px) {
+  .menu-cols {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl) var(--space-xl);
+  }
+}
+@media (min-width: 1024px) {
+  .menu-cols {
+    gap: var(--space-2xl) var(--space-3xl);
+  }
+}
+.menu-col {
+  display: grid;
+  gap: var(--space-xl);
+  align-content: start;
+}
+
+.menu-group__h {
+  font-family: var(--font-interface);
+  font-weight: 300;
+  font-size: var(--fs-signal);
+  letter-spacing: var(--track-signal);
+  text-transform: uppercase;
+  color: var(--l91-ink-3);
+  padding-block-end: var(--space-2xs);
+  border-block-end: 1px solid var(--l91-rule-strong);
+}
+.menu-group__note {
+  margin-block-start: var(--space-2xs);
+  color: var(--l91-ink-3);
+  font-size: var(--fs-small);
+}
+
+.menu-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-xs);
+  border-block-end: 1px solid var(--l91-rule);
+  color: var(--l91-ink);
+}
+.menu-row:last-child {
+  border-block-end: 0;
+}
+/* A drink with a build listed under it — name and price still share a line,
+   the ingredients drop below at meta weight. */
+.menu-row--desc {
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+.menu-row__main {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.menu-row__desc {
+  color: var(--l91-ink-3);
+  font-size: var(--fs-small);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+/* --- A single full-width photograph inside a section --------------------- */
+.feature {
+  margin-block-end: var(--space-2xl);
+}
+.feature img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3; /* explicit both ways — zero CLS */
+  object-fit: cover;
+  border: 1px solid var(--l91-rule);
+  border-radius: var(--radius-md);
+}
+@media (min-width: 768px) {
+  .feature img {
+    aspect-ratio: 16 / 9;
+  }
+}
+.feature figcaption {
+  margin-block-start: var(--space-sm);
+}
+
+/* --- Packages (§7.4) — the only Asymmetrical Bento ----------------------- */
+.bento {
+  display: grid;
+  gap: var(--space-md);
+}
+@media (min-width: 768px) {
+  .bento {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .bento__item {
+    grid-column: span 3;
+  }
+  .bento__item--wide {
+    grid-column: span 6;
+  }
+}
+@media (min-width: 1024px) {
+  .bento {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .bento__item {
+    grid-column: span 5;
+  }
+  .bento__item--wide {
+    grid-column: span 7;
+    grid-row: span 2;
+  }
+}
+
+/* Double-Bezel: outer shell + concentric inner core. Never a naked box (§5). */
+.bezel {
+  background: var(--l91-surface);
+  border: 1px solid var(--l91-rule);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+.bezel__core {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: calc(var(--radius-lg) - 6px);
+  background: var(--l91-surface);
+}
+@media (hover: hover) and (pointer: fine) {
+  /* On a charcoal canvas depth reads as light, not occlusion (D-19) — the
+     card itself brightens a step, plus a soft glow from --l91-shadow. */
+  .bezel:hover {
+    border-color: var(--l91-rule-strong);
+    background: var(--l91-surface-hi);
+    box-shadow: var(--l91-shadow);
+  }
+  .bezel:hover .bezel__core {
+    background: var(--l91-surface-hi);
+  }
+}
+.card__meta {
+  margin: 0;
+}
+.card__list {
+  display: grid;
+  gap: var(--space-sm);
+  width: 100%;
+}
+/* Push the CTA to the foot of the card so it aligns across a row, and so the
+   flagship's extra height reads as breathing room rather than a dead void. */
+.bezel__core > .link {
+  margin-block-start: auto;
+}
+
+/* --- Gallery (§7.5) — the one deliberate break from the grid ------------- */
+.section--gallery {
+  padding-block-end: var(--section-pad);
+}
+.strip {
+  display: flex;
+  align-items: flex-end; /* mixed sizes, shared baseline (§7.5) */
+  gap: var(--space-md);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; /* §5.2 */
+  -webkit-overflow-scrolling: touch;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left));
+  padding-block-end: var(--space-md);
+}
+/* The strip is full-bleed by design (§7.5) but must still start clear of the sidebar */
+@media (min-width: 1024px) {
+  .strip {
+    padding-inline-start: calc(var(--nav-rail-w) + var(--gutter));
+  }
+}
+.strip__frame {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  margin: 0;
+}
+.frame {
+  width: 260px;
+  height: 300px; /* explicit dimensions — zero CLS */
+  overflow: hidden; /* clips the photo to the radius */
+  border: 1px solid var(--l91-rule);
+  border-radius: var(--radius-md);
+  background: var(--l91-surface);
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.strip__frame--tall .frame {
+  width: 260px;
+  height: 380px;
+}
+.strip__frame--wide .frame {
+  width: 420px;
+  height: 300px;
+}
+.strip__frame figcaption {
+  margin-block-start: var(--space-sm);
+}
+@media (min-width: 768px) {
+  .frame {
+    width: 320px;
+    height: 380px;
+  }
+  .strip__frame--tall .frame {
+    width: 320px;
+    height: 480px;
+  }
+  .strip__frame--wide .frame {
+    width: 540px;
+    height: 380px;
+  }
+}
+
+/* --- Visit (§7.6) -------------------------------------------------------- */
+.visit__address {
+  font-style: normal;
+  margin-block-start: var(--space-lg);
+  font-size: var(--fs-lead);
+  line-height: var(--lh-head);
+}
+/* Two-line address: block, not inline-flex, so the <br> survives. Its natural
+   height already clears 44px — verified, not assumed. */
+.visit__address .link {
+  display: inline-block;
+}
+.visit__social {
+  margin-block-start: var(--space-lg);
+}
+/* Wayfinding image. Capped rather than full-column: at 5/12 of a 1440 shell
+   an unbounded portrait photo would tower over the hours table beside it. */
+.visit__find {
+  margin-block-start: var(--space-xl);
+}
+.visit__find img {
+  width: 100%;
+  max-width: 20rem;
+  height: auto;
+  border: 1px solid var(--l91-rule);
+  border-radius: var(--radius-md);
+}
+.visit__find figcaption {
+  margin-block-start: var(--space-sm);
+}
+.visit__label {
+  margin-block-end: var(--space-md);
+}
+.visit__label--spaced {
+  margin-block-start: var(--space-2xl);
+}
+
+.hours {
+  border-block-start: 1px solid var(--l91-rule);
+  max-width: 28rem;
+}
+.hours__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding-block: var(--space-sm);
+  border-block-end: 1px solid var(--l91-rule);
+}
+.hours__row dt {
+  color: var(--l91-ink-2);
+}
+.hours__row dd {
+  margin: 0;
+  color: var(--l91-ink);
+}
+.hours__row--gap dd {
+  color: var(--l91-ink-3);
+}
+
+/* --- Footer (§7.7) — one hairline row ----------------------------------- */
+.footer {
+  border-block-start: 1px solid var(--l91-rule);
+  padding-block: var(--space-xl);
+}
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md) var(--space-lg);
+  justify-content: space-between;
+  padding-block-end: max(0px, env(safe-area-inset-bottom));
+}
+
+/* --- Film grain (§5) — fixed top layer, never on a scrolling container --- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  /* overlay, not multiply. Multiply was correct for the old warm-white
+     canvas — it darkened paper. On charcoal it has almost nothing left to
+     darken, so the texture simply vanished; overlay lifts and drops around
+     the mid-point instead, which is what reads as grain on a dark page and
+     over the hero photograph. */
+  mix-blend-mode: overlay;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --- Scroll reveals (§6.4) ---------------------------------------------- */
+/* Gated on .js so a no-JS visitor never gets a page stuck at opacity: 0. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--dur-mid) var(--ease-out),
+    transform var(--dur-mid) var(--ease-out);
+}
+.js .reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Reduced motion — a first-class mode, not a fallback (§10) ----------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .loader {
+    display: none;
+  } /* no loader at all */
+  .grain {
+    display: none;
+  }
+  .strip {
+    scroll-behavior: auto;
+  }
+
+  .js .reveal {
+    transform: none;
+    transition: opacity 150ms var(--ease-out);
+  }
+  .js .reveal.is-in {
+    transform: none;
+  }
+
+  /* No hero entrance at all — the composition is simply there. Killing the
+     animation outright (rather than shortening it) is what guarantees the
+     `both` fill can never hold an element at opacity 0. */
+  .hero__eyebrow,
+  .hero__mark,
+  .hero__wordline,
+  .hero__base,
+  .hero__media img {
+    animation: none;
+  }
+
+  .nav-overlay__links a > span {
+    transform: none;
+    transition: opacity 150ms var(--ease-out);
+  }
+  .btn:active {
+    transform: none;
+  }
+}

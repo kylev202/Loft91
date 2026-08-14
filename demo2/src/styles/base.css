@@ -1,0 +1,368 @@
+/* ==========================================================================
+   base.css — reset, platform rules, the type voices, and the four
+   compositions that are not utility work: the ink block, the plate, the
+   loader and the [TBC] marker. Consumes theme.css only.
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  * {
+    margin: 0;
+  }
+
+  html {
+    color-scheme: light; /* native scrollbars, caret, controls on paper */
+    -webkit-tap-highlight-color: transparent;
+    /* Anchor scrolling is driven explicitly (Lenis when running, native when
+       not) — the CSS keyword fights a smooth-scroll library for the same
+       scroll. */
+    scroll-behavior: auto;
+  }
+
+  a,
+  button,
+  [role='button'],
+  summary {
+    touch-action: manipulation; /* kills the 300ms double-tap delay */
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink-2);
+    font-family: var(--font-interface);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden; /* no horizontal page overflow, ever */
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* The nav is a sticky hairline bar, so a deep link must land clear of it. */
+  section[id] {
+    scroll-margin-top: 4.5rem;
+  }
+
+  /* `:focus-visible`, never `:focus` — a ring on every mouse click trains
+     people to read it as noise. The 2px offset shows whatever is underneath,
+     so over a bright patch of a photograph the ring would vanish; the
+     paper-coloured inner ring is what keeps it legible on any backdrop. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-paper);
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Type voices. Two are styles rather than families, so they are declared once
+   here instead of being retyped as five utilities at every usage.
+   -------------------------------------------------------------------------- */
+
+/* The small voice: eyebrows, captions, spec-sheet labels, hours. */
+@utility label {
+  font-family: var(--font-interface);
+  font-weight: 400;
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* The section title. Deliberately 13px: the structure whispers. */
+@utility title {
+  font-family: var(--font-interface);
+  font-weight: 500;
+  font-size: var(--text-title);
+  line-height: var(--text-title--line-height);
+  letter-spacing: var(--tracking-title);
+  text-transform: uppercase;
+}
+
+/* The page's horizontal frame. Safe-area aware — the arrival path is a phone,
+   and a notch eats the left inset. */
+@utility shell {
+  width: 100%;
+  max-width: var(--container-shell);
+  margin-inline: auto;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left), env(safe-area-inset-right));
+}
+
+@utility section-pad {
+  padding-block: var(--section-pad);
+}
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     The ink block — this system's only emphasis device.
+
+     There is no accent hue to reach for, so a section that needs to carry
+     weight inverts instead. Every semantic token is redeclared inside the
+     scope, which means the Tailwind utilities already written inside it
+     (`text-ink`, `border-rule`, `bg-card`) flip on their own: they compile to
+     `var(--color-ink)` and friends, and this is where those get their other
+     value. Nothing in the markup knows it is on ink.
+
+     Ratios recomputed against `#141310`: 16.50 / 9.33 / 6.48 — the same three
+     AA-at-any-size levels the paper side has, not a darker approximation.
+     ------------------------------------------------------------------------ */
+  .on-ink {
+    --color-paper: #141310;
+    --color-paper-2: #1d1c17;
+    --color-card: #1d1c17;
+    --color-ink: #f3f1ec;
+    --color-ink-2: rgb(243 241 236 / 0.74);
+    --color-ink-3: rgb(243 241 236 / 0.6);
+    --color-ink-4: rgb(243 241 236 / 0.16);
+    --color-rule: rgb(243 241 236 / 0.16);
+    --color-rule-strong: rgb(243 241 236 / 0.32);
+    --color-outline: rgb(243 241 236 / 0.55);
+    --color-focus: #f3f1ec;
+    background-color: #141310;
+    color: var(--color-ink-2);
+  }
+
+  /* ------------------------------------------------------------------------
+     A plate. Photographs are printed onto the page, not floated above it: no
+     radius, no shadow, no frame — the paper margin around them is the frame.
+     ------------------------------------------------------------------------ */
+  .plate {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-paper-2);
+  }
+  .plate > picture > img,
+  .plate > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* A transition, not a keyframe, so a pointer leaving mid-move retargets
+       from where it is instead of restarting. */
+    transition: scale var(--dur-long) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    a:hover > .plate > picture > img,
+    figure:hover .plate > picture > img {
+      scale: 1.025;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Line mask. A line of display type sitting in an `overflow: hidden` box and
+     rising from 100% of its own height — so it arrives from *behind* the rule
+     above it rather than fading up out of nothing.
+
+     This is the one place the page is allowed a flourish, and it is still only
+     transform and opacity. GSAP drives it in the hero (which must wait for the
+     loader); CSS drives it in the mobile menu (which must not wait for
+     anything).
+     ------------------------------------------------------------------------ */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding-block-end: 0.08em; /* descenders must not be clipped */
+  }
+
+  /* ------------------------------------------------------------------------
+     The band. The venue's own facts, repeated, moving slowly between the cover
+     and the menu — the strip of type that runs along the top of a printed
+     programme. Two identical copies translate by exactly half the track, so
+     the loop has no seam.
+
+     `linear`, because constant motion takes linear: easing it makes the band
+     visibly accelerate and stall, at which point it stops being a moving strip
+     and starts being an animation. Non-interactive, `aria-hidden`, and every
+     fact in it is stated properly elsewhere on the page.
+     ------------------------------------------------------------------------ */
+  .band {
+    display: flex;
+    width: max-content;
+    animation: band 48s var(--ease-constant) infinite;
+  }
+  @keyframes band {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     The mark, filled with the room.
+
+     The wordmark is black artwork on transparency, which makes it usable as an
+     alpha mask — so the closing of the page is the venue's own letterforms with
+     the magenta stairwell showing through the strokes. It is the one moment of
+     saturated colour in the entire interface, it is the brand rather than an
+     ornament, and it costs nothing in legibility because it is decorative and
+     `alt=""`: the venue name is already set as text three lines above it.
+
+     Browsers without mask support get the plain black mark, which is what the
+     footer had before.
+     ------------------------------------------------------------------------ */
+  .mark-fill {
+    display: none;
+    width: 100%;
+    aspect-ratio: 6303 / 1365;
+    -webkit-mask-image: url('/img/wordmark-black-1920.png');
+    mask-image: url('/img/wordmark-black-1920.png');
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+  .mark-fill > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Without mask support the plain black mark is shown instead — which is
+     exactly what the footer had before this existed. */
+  @supports (mask-image: url('/img/wordmark-black-1920.png')) {
+    .mark-fill {
+      display: block;
+    }
+    .mark-fill-fallback {
+      display: none;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Loader. Paper, the client's black wordmark, one rule drawing beneath it,
+     then the whole sheet lifts. 1080ms end to end.
+
+     CSS keyframes, not GSAP: this runs while the browser is at its busiest —
+     parsing, fetching, mounting React — and CSS animation runs off the main
+     thread where a rAF timeline drops frames. It also means the overlay's
+     disappearance never depends on a JS timer firing; the keyframes end on a
+     state that is invisible and non-interactive.
+     ------------------------------------------------------------------------ */
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-loader);
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    background-color: var(--color-paper);
+    animation: loader-lift var(--dur-short) var(--ease-move) 820ms forwards;
+  }
+  .loader__mark {
+    display: grid;
+    gap: var(--spacing-sm);
+    width: min(340px, 56vw);
+    animation: loader-mark-out var(--dur-short) var(--ease-move) 820ms forwards;
+  }
+  /* The real mark, not a text stand-in, wiping in left to right — which reads
+     as the letters arriving in sequence. A true per-letter animation needs a
+     vector with per-letter paths (MEMORY.md Q2). */
+  .loader__wordmark {
+    width: 100%;
+    height: auto;
+    clip-path: inset(0 100% 0 0);
+    animation: loader-wipe var(--dur-long) var(--ease-out) 100ms forwards;
+  }
+  .loader__rule {
+    height: 1px;
+    width: 100%;
+    background-color: var(--color-ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: loader-rule var(--dur-mid) var(--ease-out) 520ms forwards;
+  }
+
+  @keyframes loader-wipe {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes loader-rule {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes loader-mark-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes loader-lift {
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  /* Mobile menu — the section list arrives one line at a time. `--index` is
+     set on the line itself, never on the parent: a custom property on a parent
+     recalculates styles for every child. */
+  .menu-line {
+    display: block;
+    animation: menu-line var(--dur-mid) var(--ease-out) calc(var(--index) * 55ms) both;
+  }
+  @keyframes menu-line {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     [TBC] — the most-used component on day one.
+
+     MEMORY.md §5 still lists package tiers, capacity, the enquiry channel and
+     the venue story as Missing, and D-05 requires the gap to be *visible*: a
+     plausible-looking placeholder published on a real bar's site sends real
+     people to a closed door. It says what is missing and who owns it, in plain
+     words, so a reviewer never has to open MEMORY.md to find out.
+
+     A single dashed underline rather than a dashed box — a box is a component,
+     and a placeholder should not look like one. Dashed is reserved: nothing
+     else on this site uses it, so the marker is unmistakable in a screenshot.
+     ------------------------------------------------------------------------ */
+  .tbc {
+    display: inline;
+    font-family: var(--font-interface);
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: var(--color-ink-3);
+    text-decoration: underline dashed var(--color-rule-strong);
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — a first-class mode, not a fallback. No loader, no smooth
+   scroll, no reveals. The JS layer refuses to start Lenis or build any
+   ScrollTrigger; this is the belt to that braces, and it also catches the
+   CSS-only motion above.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .band {
+    animation: none !important;
+    transform: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Zoom is never disabled: no user-scalable=no, no maximum-scale. -->
+    <meta name="theme-color" content="#F3F1EC" />
+    <title>Loft 91 — a bar and function space in Footscray</title>
+    <meta
+      name="description"
+      content="Loft 91 — a bar and function space upstairs on Nicholson Street, Footscray."
+    />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon-180.png" />
+
+    <!--
+      The hero photograph is the LCP element once the loader lifts (DESIGN.md §6.3).
+
+      Preloaded as AVIF, with the same `sizes` the <picture> declares, so the
+      preload and the element resolve to one candidate. Pointing this at the
+      JPEG set instead — which is what it did first — made the browser fetch
+      event-1600.jpg (237 KB) for the preload and event-1600.avif (102 KB) for
+      the actual <source>: the largest single asset on the site, downloaded
+      twice, on a phone, on mobile data, and the preloaded copy never painted.
+
+      `type` means a browser without AVIF skips this hint rather than fetching a
+      file it cannot use; it still gets the image from <picture>, just without
+      the head start.
+    -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/img/event-800.avif 800w, /img/event-1600.avif 1600w, /img/event-2200.avif 2200w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <!-- The two faces that render above the fold: the hero statement is set in
+     Switzer Medium and the loader mark is an image, so Light is not needed
+     first. Zodiak appears at the first section head, one screen down. -->
+    <link rel="preload" href="/fonts/Switzer-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Switzer-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!--
+      Loader gate — inline and first, before any stylesheet, so a repeat visitor or
+      a reduced-motion user never sees a frame of it. Reads as a synchronous
+      attribute on <html>, which both the CSS and React branch on.
+    -->
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem('l91-loaded') === '1';
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) skip = true;
+        if (skip) document.documentElement.setAttribute('data-loader', 'skip');
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

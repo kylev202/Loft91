@@ -1,0 +1,61 @@
+/* ==========================================================================
+   fonts.css — the four self-hosted faces (DESIGN.md §4.4, MEMORY.md D-11).
+   Licence: Fontshare Free Font EULA, at assets/fonts/LICENCE-fontshare-ffl.txt.
+   Commercial use is granted; the delivery-method question is MEMORY.md Q9 and
+   is unresolved — it bites at production deploy, not here.
+
+   Files come from assets/fonts/ via scripts/sync-assets.mjs. Unsubsetted, as in
+   `demo/`. Subsetting to `latin` is a build-time task for the real build.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Zodiak';
+  src: url('/fonts/Zodiak-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-matched fallbacks so `swap` costs no layout shift (§4.4, §11 CLS).
+   These percentages are DESIGN.md's stated STARTING POINT and have NOT been
+   measured against the real faces — same honest caveat `demo/` carries. */
+@font-face {
+  font-family: 'Zodiak Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 96%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+/* Donor limited to one non-banned face: the obvious cross-platform grotesk
+   donors are all on the §9 banned-font list, which is greppable with zero
+   tolerance. */
+@font-face {
+  font-family: 'Switzer Fallback';
+  src: local('Segoe UI');
+  size-adjust: 100%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}

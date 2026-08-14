@@ -1,0 +1,204 @@
+/* ==========================================================================
+   tokens.css — the single source of colour, type, space and motion.
+   Mirrors DESIGN.md §3–§6. Nothing else in this codebase declares a colour,
+   a duration, an easing curve or a font family. A missing token is a design
+   decision — escalate, don't improvise. (CLAUDE.md §4.3)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Faces — self-hosted, 4 files (DESIGN.md §4.4 / MEMORY.md D-06).
+   Licence: Fontshare Free Font EULA, bundled at assets/fonts/LICENCE-fontshare-ffl.txt
+   NOTE: unsubsetted here. Production must subset to `latin` (§11 font budget).
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Zodiak';
+  src: url('../../assets/fonts/Zodiak-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('../../assets/fonts/Switzer-Light.woff2') format('woff2');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('../../assets/fonts/Switzer-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('../../assets/fonts/Switzer-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+
+/* Metric-matched fallbacks so `swap` costs no layout shift (§4.4, §11 CLS).
+   ⚠ These percentages are DESIGN.md's stated STARTING POINT and have NOT yet
+   been measured against the real faces. Measure and tune before production. */
+@font-face {
+  font-family: 'Zodiak Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 96%; ascent-override: 90%; descent-override: 22%; line-gap-override: 0%;
+}
+/* Donor deliberately limited to one non-banned face: the obvious cross-platform
+   grotesk donors are all on the §9 banned-font list, which is greppable with zero
+   tolerance. Choosing safe per-platform donors is part of the same build-time
+   measuring task as the percentages above. */
+@font-face {
+  font-family: 'Switzer Fallback';
+  src: local('Segoe UI');
+  size-adjust: 100%; ascent-override: 96%; descent-override: 24%; line-gap-override: 0%;
+}
+
+:root {
+  /* --- Colour (§3) — CHARCOAL + WHITE (D-20, supersedes D-19) -------------
+     User instruction: "focus on charcoal and white, not hot pink". The pink
+     is gone from the system entirely, not merely used less — a scarce
+     accent that is still the loudest hue on the page is not scarce.
+
+     What replaces it is deliberately almost-not-a-colour. The venue's own
+     photography is the only saturated thing on this site now: warm brass
+     backlight at the bar, magenta LED in the lounge, a blue screen wall.
+     A charcoal-and-white shell lets those read as the venue's colour; a
+     pink UI competed with them. Ratios below are computed against the
+     canvas, alpha-composited, not estimated. */
+
+  /* Canvas — charcoal, never pure #000 (a true black gives shadows nothing
+     to read against and clips OLED near-black banding). Deepened one step
+     from the previous #1A1A1A so full-bleed photography sits ON the page
+     rather than in a lighter box, and so the two raised tones above it have
+     somewhere to go. */
+  --l91-void:        #131313;   /* page canvas                            */
+  --l91-surface:     #1C1C1C;   /* raised surface: cards                  */
+  --l91-surface-hi:  #262626;   /* hover / active surface, nav panel      */
+
+  /* Ink — white. Levels 1–3 are AA-safe for text at ANY size, including
+     11px Signal, on BOTH the canvas and the raised surface. Level 4 is
+     never text. */
+  --l91-ink:         #FFFFFF;                   /* primary type   18.58:1 */
+  --l91-ink-2:       rgba(255, 255, 255, 0.78); /* secondary/body 11.45:1 */
+  --l91-ink-3:       rgba(255, 255, 255, 0.60); /* meta, Signal    7.16:1 */
+  --l91-ink-4:       rgba(255, 255, 255, 0.13); /* decorative      1.46:1 */
+
+  /* Structure — hairlines, never solid grey borders */
+  --l91-rule:        rgba(255, 255, 255, 0.10);
+  --l91-rule-strong: rgba(255, 255, 255, 0.20);
+  /* A hairline states an edge; this one DRAWS it. For containers whose
+     boundary is itself the affordance — the nav panel edge. */
+  --l91-outline:     rgba(255, 255, 255, 0.38);
+
+  /* Accent — bone. Sampled from the venue's own bar: the ribbed counter and
+     the arched back-shelves are lit warm-champagne, and it is the only
+     colour the room repeats in every photograph. Held at near-white
+     saturation on purpose — at a glance it reads as warm white, so the
+     charcoal/white reading survives; side by side with `--l91-ink` it is
+     unmistakably a second, warmer voice. 13.79:1 on the canvas and 12.65:1
+     on `--l91-surface`, so it can carry text anywhere, and inverted (dark
+     charcoal type on a bone CTA) it clears the same 13.79:1 the other way.
+     Still scarce by contract: max THREE roles per viewport — (1) active nav
+     indicator, (2) one primary CTA, (3) section numerals and rules. */
+  --l91-accent:      #E6DCCB;
+  --l91-accent-hi:   #FFFFFF;                    /* hover — bone lifts to white */
+  --l91-accent-dim:  rgba(230, 220, 203, 0.50);
+  --l91-accent-wash: rgba(230, 220, 203, 0.07);
+
+  /* Scrim — the canvas itself, semi-opaque, laid over full-bleed
+     photography so white type keeps its contrast without the photo turning
+     into wallpaper. Three densities, applied as a DIRECTIONAL grade rather
+     than a flat veil (site.css `.hero__media::after`): soft across the whole
+     frame so the page stays charcoal, ramping to `scrim` and then `deep`
+     down the bottom of the frame, which is where every line of hero type
+     lands.
+     `--l91-scrim-soft` is new: 0.74 applied flat across the whole hero left
+     the room at roughly a quarter of its real luminance — the brass backlight
+     and the ribbed counter, which are the only reason to photograph this
+     venue at all, read as grey-brown. Density is now spent where type needs
+     it and withheld where it does not, so the picture survives at the top of
+     the frame while the type gains contrast, not loses it, at the foot. */
+  --l91-scrim-soft:  rgba(19, 19, 19, 0.30);
+  --l91-scrim:       rgba(19, 19, 19, 0.74);
+  --l91-scrim-deep:  rgba(19, 19, 19, 0.94);
+
+  /* Elevation. On a charcoal canvas depth reads as light, not occlusion —
+     shadow alone won't show against near-black, so hover states lean on
+     lightening (surface → surface-hi, rule → rule-strong) with a soft glow
+     underneath rather than a dark drop-shadow. */
+  --l91-shadow:      0 8px 28px rgba(0, 0, 0, 0.55);
+  --l91-highlight:   rgba(255, 255, 255, 0.08);
+
+  /* Focus — pure white. With the accent now sitting near white itself, a
+     tinted ring would be indistinguishable from it; the ring instead wins
+     on absolute brightness plus a canvas-coloured inner halo (site.css),
+     which is what keeps it visible over photography. 18.58:1 on canvas. */
+  --l91-focus:       #FFFFFF;
+
+  /* --- Type (§4.1) ------------------------------------------------------ */
+  --font-display:   'Zodiak', 'Zodiak Fallback', Georgia, serif;
+  --font-interface: 'Switzer', 'Switzer Fallback', 'Cabinet Grotesk', system-ui, sans-serif;
+  /* Signal is --font-interface at 300 / uppercase / 0.28em — a style, not a family */
+
+  --fs-display: clamp(3.25rem, 9vw, 8.5rem);     /* hero wordline            */
+  /* Section headlines carry the page below the hero, where there is no
+     photograph doing it for them. At 4.5rem they were smaller than a single
+     line of the drinks list is wide, and the eye read the page as one long
+     undifferentiated column. 6.5rem gives the Zodiak display face somewhere
+     to actually be a display face. */
+  --fs-h1:      clamp(2.75rem, 7vw, 6.5rem);     /* section headline         */
+  --fs-h2:      clamp(1.75rem, 3vw, 2.75rem);    /* sub-head                 */
+  /* The section numerals were set at --fs-signal (11px), which made the
+     page's own index the smallest type on it. They are structure, not a
+     caption. */
+  --fs-numeral: clamp(1.25rem, 2vw, 1.75rem);    /* section numerals         */
+  --fs-brand:   clamp(1.125rem, 2.2vw, 1.375rem);/* nav wordmark             */
+  --fs-lead:    clamp(1.05rem, 1.4vw, 1.375rem); /* intro paragraph          */
+  --fs-body:    1rem;                            /* 16px floor — never below */
+  --fs-small:   0.875rem;
+  --fs-signal:  0.6875rem;                       /* 11px, uppercase, 0.28em  */
+
+  --lh-display: 1.05;
+  --lh-head:    1.25;
+  --lh-body:    1.6;
+  --track-display: -0.02em;
+  --track-signal:   0.28em;
+  /* Signal's 0.28em is calibrated for 11px labels; at nav size it reads as a
+     gap, not as tracking. This is the same uppercase voice, set for 16px. */
+  --track-nav:      0.12em;
+
+  /* --- Space and structure (§5) ----------------------------------------- */
+  --space-2xs: 0.5rem;  --space-xs: 0.75rem; --space-sm: 1rem;  --space-md: 1.5rem;
+  --space-lg:  2.5rem;  --space-xl: 4rem;    --space-2xl: 6rem; --space-3xl: 10rem;
+  --radius-sm: 4px;  --radius-md: 10px;  --radius-lg: 20px;  /* nothing larger */
+  --gutter:    clamp(1.25rem, 5vw, 5rem);
+  /* Desktop sidebar width. Was 15rem (240px): minus the panel's 2×--space-lg
+     padding that left a 160px content box for a 150px wordmark — 5px of air
+     either side, which read as the mark being jammed into the rail rather
+     than sitting in it. 19rem gives a 224px box for a 180px mark: 22px of
+     air, and the mark is 20% larger. */
+  --nav-rail-w: 19rem;
+  --measure:   68ch;
+  --shell-max: 1440px;
+  --section-pad: clamp(6rem, 14vh, 10rem);
+
+  /* --- Motion (§6.1) ---------------------------------------------------- */
+  --ease-out:     cubic-bezier(0.16, 1, 0.30, 1);  /* entrances, reveals, exits  */
+  --ease-move:    cubic-bezier(0.32, 0.72, 0, 1);  /* moves, morphs, overlay lift */
+  --ease-ambient: linear;                          /* constant motion ONLY — §6.7 */
+  --dur-press:   140ms;   /* :active feedback on a pressable */
+  --dur-micro:   180ms;   /* hover, focus, state flip        */
+  --dur-short:   320ms;   /* small element transitions       */
+  --dur-mid:     620ms;   /* section reveals                 */
+  --dur-long:    900ms;   /* hero and loader beats           */
+  /* One beat longer than anything else on the site, and deliberately so: it
+     drives a single element, the hero photograph settling out of a 1.04
+     scale as the loader lifts. At --dur-long the move is quick enough to
+     read as a glitch rather than as a camera coming to rest. Nothing else
+     may use it. */
+  --dur-settle: 1800ms;
+  /* The hero entrance must not play underneath the loader. The loader lifts
+     at 1080ms + --dur-short, so this is that sum, held as one value rather
+     than restated per element. Overridden to --dur-micro when the loader is
+     skipped (repeat visit), so a returning visitor waits for nothing. */
+  --delay-hero:  1400ms;
+
+  /* --- Layer scale (§6.6) — no arbitrary z-index ------------------------ */
+  --z-base: 0; --z-nav: 100; --z-overlay: 200; --z-loader: 300; --z-grain: 400;
+}

@@ -1,0 +1,914 @@
+﻿<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#131313" />
+    <title>Loft 91</title>
+    <meta
+      name="description"
+      content="Loft 91 — a bar and function space upstairs on Nicholson Street, Footscray."
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../assets/img/opt/favicon-32.png"
+    />
+    <link rel="icon" type="image/x-icon" href="../assets/img/opt/favicon.ico" />
+
+    <!-- The hero photograph is the LCP element. Preloaded with the same
+     `sizes` the <img> declares, so the preload and the element resolve to
+     the identical candidate rather than downloading two. -->
+    <link
+      rel="preload"
+      as="image"
+      href="../assets/img/opt/event-1600.jpg"
+      imagesrcset="../assets/img/opt/event-800.jpg 800w, ../assets/img/opt/event-1600.jpg 1600w, ../assets/img/opt/event-2200.jpg 2200w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <link
+      rel="preload"
+      href="../assets/fonts/Zodiak-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="../assets/fonts/Switzer-Light.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/site.css" />
+
+    <!-- Loader gate, inline and first: a repeat visitor or a reduced-motion user must
+     never see a frame of the loader. DESIGN.md §6.3. -->
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem("l91-loaded") === "1";
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          skip = true;
+        if (skip) document.documentElement.setAttribute("data-loader", "skip");
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ── Loader — DESIGN.md §6.3 ───────────────────────────────────────────────
+     CSS-driven end to end, so it dismisses itself even if JS never runs.
+     inert + aria-hidden for its whole life; JS removes the node afterwards. -->
+    <div class="loader" id="loader" aria-hidden="true" inert>
+      <div class="loader__mark">
+        <!-- The client's actual wordmark, not a text stand-in set in the
+         interface face. It wipes in left-to-right, which reads as the
+         letters arriving in sequence — the same beat the per-letter version
+         had, on the real mark. -->
+        <img
+          class="loader__wordmark"
+          src="../assets/img/opt/wordmark-white-640.png"
+          alt=""
+          width="640"
+          height="139"
+          translate="no"
+        />
+        <span class="loader__rule"></span>
+      </div>
+    </div>
+
+    <!-- ── Nav — DESIGN.md §7.1 ──────────────────────────────────────────────── -->
+    <header class="nav" id="nav">
+      <div class="nav__inner">
+        <a class="nav__home" href="#hero" aria-label="Loft 91 — back to top">
+          <img
+            class="mark"
+            src="../assets/img/opt/wordmark-white-320.png"
+            alt=""
+            width="320"
+            height="69"
+            translate="no"
+          />
+        </a>
+
+        <nav class="nav__links" aria-label="Sections">
+          <a href="#menu">Menu</a>
+          <a href="#packages">Packages</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#faq">FAQ</a>
+          <a href="#visit">Visit</a>
+        </nav>
+
+        <a class="btn btn--primary nav__cta" href="#visit">Enquire</a>
+
+        <button
+          class="nav__burger"
+          id="navBurger"
+          type="button"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="navOverlay"
+        >
+          <span class="nav__burger-bar"></span>
+          <span class="nav__burger-bar"></span>
+        </button>
+      </div>
+    </header>
+
+    <div
+      class="nav-overlay"
+      id="navOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu"
+      hidden
+    >
+      <nav class="nav-overlay__links" aria-label="Sections">
+        <a href="#menu"><span>Menu</span></a>
+        <a href="#packages"><span>Packages</span></a>
+        <a href="#gallery"><span>Gallery</span></a>
+        <a href="#faq"><span>FAQ</span></a>
+        <a href="#visit"><span>Visit</span></a>
+      </nav>
+      <a class="btn btn--primary nav-overlay__cta" href="#visit">Enquire</a>
+    </div>
+
+    <main id="main">
+      <!-- ── Hero — §7.2 · centred composition over full-bleed photography ─── -->
+      <section class="hero" id="hero" aria-labelledby="hero-h">
+        <!-- The room is the argument. Decorative here (alt=""): the same
+         photograph is described in the Gallery, and a screen-reader user
+         gains nothing from hearing it twice. -->
+        <!-- The room lit for a function, not the empty bar. D-21 chose the bar
+         to keep the venue's coloured light off the top of the page, one
+         decision after D-20 took the pink out of the UI — but the two are
+         not the same thing, and D-20's own argument is that a neutral shell
+         exists so the ROOM can supply the colour. With a neutral shell over
+         a neutral photograph the page had no colour at all, which is what
+         reads as dull. This frame also does the commercial job: it is the
+         function space (R7), which is what the site is mainly here to let. -->
+        <div class="hero__media">
+          <img
+            src="../assets/img/opt/event-1600.jpg"
+            srcset="
+              ../assets/img/opt/event-800.jpg   800w,
+              ../assets/img/opt/event-1600.jpg 1600w,
+              ../assets/img/opt/event-2200.jpg 2200w
+            "
+            sizes="100vw"
+            alt=""
+            width="1600"
+            height="1200"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+
+        <div class="shell hero__inner">
+          <!-- Mark, then label, then sentence — a tight lockup under the
+           wordmark, then a long break to the practical row. The label is the
+           smallest type in the hero and it sits ON a photograph, so where it
+           lands is a contrast decision, not a taste one: above the mark it
+           fell across the lit arch behind the bar, the brightest thing in
+           the frame, and measured 3.34:1. Below the mark it sits inside the
+           part of the grade that is already dense for the wordline, and
+           measures 12.9:1. -->
+          <img
+            class="mark hero__mark"
+            src="../assets/img/opt/wordmark-white-640.png"
+            srcset="
+              ../assets/img/opt/wordmark-white-640.png   640w,
+              ../assets/img/opt/wordmark-white-1280.png 1280w,
+              ../assets/img/opt/wordmark-white-1920.png 1920w
+            "
+            sizes="(min-width: 1024px) 46vw, (min-width: 768px) 52vw, 84vw"
+            alt="Loft 91"
+            width="640"
+            height="139"
+            translate="no"
+          />
+
+          <p class="signal hero__eyebrow">
+            Bar &middot; Function space &middot; Footscray
+          </p>
+
+          <h1 class="hero__wordline" id="hero-h">
+            An upstairs bar in Footscray.
+          </h1>
+
+          <!-- The practical row, on one hairline across the foot of the
+           frame. This wrapper is what `.hero__base` has been styling since
+           the composition was reworked; without it the facts and the actions
+           were loose children of a COLUMN flex container, where
+           `.hero__facts { flex: 1 1 22rem }` resolves against the main axis
+           and stretched the facts to 352px tall — the hole in the middle of
+           the hero. -->
+          <div class="hero__base">
+            <dl class="hero__facts">
+              <div class="hero__fact">
+                <dt class="signal">Location</dt>
+                <dd>
+                  <a
+                    class="link"
+                    href="https://maps.app.goo.gl/S3cpVjSk9qNEjWpd7"
+                    target="_blank"
+                    rel="noopener"
+                    >Upstairs, 91&nbsp;Nicholson&nbsp;Street, Footscray</a
+                  >
+                </dd>
+              </div>
+              <div class="hero__fact">
+                <dt class="signal">Open</dt>
+                <dd class="nums" data-venue="hours-short">
+                  Fri&nbsp;&amp;&nbsp;Sat 5&nbsp;PM&nbsp;– late &middot; Sun
+                  1&nbsp;PM&nbsp;– 8&nbsp;PM
+                </dd>
+              </div>
+            </dl>
+
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#visit"
+                >Enquire about functions</a
+              >
+              <a class="link link--quiet" href="#menu">See the menu</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Menu — §7.3 ────────────────────────────────────────────────────
+       Real content, transcribed from the venue's own printed menu
+       (assets/img/MENU.png) and the two happy-hour posters. Nothing here is
+       invented: every line and every price traces to one of those three
+       client-supplied assets. Set as text rather than shown as the poster
+       image — the poster is 2480px of black-background type that a phone
+       can only read by pinch-zooming, and it is not selectable, not
+       searchable and not readable by a screen reader.                    -->
+      <section class="section" id="menu" aria-labelledby="menu-h">
+        <div class="shell">
+          <div class="section__head">
+            <p class="signal numeral">01</p>
+            <h2 class="h-display" id="menu-h">Menu</h2>
+            <p class="lead">Drinks, poured upstairs.</p>
+          </div>
+
+          <!-- The drinks list runs ~2,400px of type on a flat charcoal ground
+           with nothing to break it. This is the bar the list is poured at,
+           reusing the `.feature` component Packages already uses — the only
+           colour and the only image between the hero and the Gallery. -->
+          <figure class="feature">
+            <img
+              src="../assets/img/opt/taps-1600.jpg"
+              srcset="
+                ../assets/img/opt/taps-800.jpg   800w,
+                ../assets/img/opt/taps-1600.jpg 1600w
+              "
+              sizes="(min-width: 1024px) calc(100vw - 20rem), 100vw"
+              alt="The tap bank seen across the stone counter, arched spirit shelves lit behind."
+              width="1600"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption class="signal">The bar, upstairs at 91 Nicholson</figcaption>
+          </figure>
+
+          <!-- Happy hour leads the section: it is the one thing on this page
+           that changes what time someone leaves the house. -->
+          <div class="happy">
+            <div class="happy__head">
+              <p class="signal">Happy hour</p>
+              <p class="happy__when">
+                Fri &amp; Sat 5&nbsp;–&nbsp;8&nbsp;PM&nbsp;&middot; All day
+                Sunday
+              </p>
+            </div>
+            <ul class="happy__list nums">
+              <li><span>Pots</span><span>$4</span></li>
+              <li><span>Schooners</span><span>$6</span></li>
+              <li><span>Beer jugs, 2&nbsp;L</span><span>$22</span></li>
+              <li><span>Basic spirits</span><span>$9</span></li>
+              <li><span>Premix &amp; stubbies</span><span>$8</span></li>
+              <li>
+                <span
+                  >Cocktails
+                  <span class="happy__note">Fri &amp; Sat only</span></span
+                ><span>$16</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="menu-cols">
+            <div class="menu-col">
+              <section class="menu-group" aria-labelledby="mg-draught">
+                <h3 class="menu-group__h" id="mg-draught">Draught beers</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row"><span>Carlton Dry</span></li>
+                  <li class="menu-row"><span>Balter XPA</span></li>
+                </ul>
+                <p class="menu-group__note nums">$6 pot &middot; $8 schooner</p>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-bottle">
+                <h3 class="menu-group__h" id="mg-bottle">Bottle beers</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row">
+                    <span>Asahi Dry</span><span class="nums">$10</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>Corona Extra</span><span class="nums">$11</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>Cass</span><span class="nums">$10</span>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-premix">
+                <h3 class="menu-group__h" id="mg-premix">Pre-mixes</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row">
+                    <span>Hard Rated Lemon</span><span class="nums">$14</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>Vodka Cruiser Watermelon</span
+                    ><span class="nums">$14</span>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-vodka">
+                <h3 class="menu-group__h" id="mg-vodka">Vodka &amp; gin</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row">
+                    <span>Vodka O</span><span class="nums">$11</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>Absolut</span><span class="nums">$12</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>Grey Goose</span><span class="nums">$14</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>Tanqueray</span><span class="nums">$14</span>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-tequila">
+                <h3 class="menu-group__h" id="mg-tequila">Tequila</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row">
+                    <span>Espolon Blanco</span><span class="nums">$12</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>1800 Reposado</span><span class="nums">$14</span>
+                  </li>
+                  <li class="menu-row">
+                    <span>1800 Cristalino</span><span class="nums">$16</span>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-whiskey">
+                <h3 class="menu-group__h" id="mg-whiskey">
+                  Whiskey &amp; scotch
+                </h3>
+                <ul class="menu-rows">
+                  <li class="menu-row"><span>Canadian Club</span></li>
+                  <li class="menu-row"><span>Johnnie Walker Black</span></li>
+                  <li class="menu-row"><span>Jack Daniels</span></li>
+                </ul>
+                <!-- "$12" alone under three unpriced rows reads as a stray
+                 figure rather than as the group's price. Same claim, said
+                 properly; still inside the Q11 transcription sign-off. -->
+                <p class="menu-group__note nums">$12 each</p>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-cognac">
+                <h3 class="menu-group__h" id="mg-cognac">Cognac</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row">
+                    <span>Martell Blue Swift</span
+                    ><span class="nums">$16 &middot; $240 bottle</span>
+                  </li>
+                </ul>
+              </section>
+            </div>
+
+            <div class="menu-col">
+              <section class="menu-group" aria-labelledby="mg-soju">
+                <h3 class="menu-group__h" id="mg-soju">Soju</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Soju</span><span class="nums">$15</span>
+                    </div>
+                    <p class="menu-row__desc">Original, green grape, lychee</p>
+                  </li>
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Soju somaek</span><span class="nums">$30</span>
+                    </div>
+                    <p class="menu-row__desc">2&times; Cass + 1 soju</p>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-cocktails">
+                <h3 class="menu-group__h" id="mg-cocktails">Cocktails</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Espresso martini</span><span class="nums">$24</span>
+                    </div>
+                    <p class="menu-row__desc">Kahlúa, vodka, espresso</p>
+                  </li>
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Japanese slipper</span><span class="nums">$22</span>
+                    </div>
+                    <p class="menu-row__desc">
+                      Midori, triple sec, lemon juice
+                    </p>
+                  </li>
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Long Island iced tea</span
+                      ><span class="nums">$22</span>
+                    </div>
+                    <p class="menu-row__desc">
+                      Vodka, tequila, white rum, triple sec, gin, lemon juice,
+                      cola
+                    </p>
+                  </li>
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Margarita</span><span class="nums">$22</span>
+                    </div>
+                    <p class="menu-row__desc">
+                      Tequila, triple sec, fresh lime juice
+                    </p>
+                  </li>
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Spicy margarita</span><span class="nums">$22</span>
+                    </div>
+                    <p class="menu-row__desc">
+                      Tequila, triple sec, fresh lime juice, Tajín salt,
+                      jalapeños
+                    </p>
+                  </li>
+                  <li class="menu-row menu-row--desc">
+                    <div class="menu-row__main">
+                      <span>Lychee martini</span><span class="nums">$22</span>
+                    </div>
+                    <p class="menu-row__desc">
+                      Lychee liqueur, vodka, lychee syrup
+                    </p>
+                  </li>
+                </ul>
+              </section>
+
+              <section class="menu-group" aria-labelledby="mg-snacks">
+                <h3 class="menu-group__h" id="mg-snacks">Snacks</h3>
+                <ul class="menu-rows">
+                  <li class="menu-row">
+                    <span>Chips, crackling, nuts</span
+                    ><span class="nums">$4</span>
+                  </li>
+                </ul>
+              </section>
+            </div>
+          </div>
+
+          <p class="tbc tbc--note">
+            [TBC — transcribed from the venue's printed menu &amp; happy-hour
+            posters; prices and spelling to be confirmed by client before
+            launch]
+          </p>
+        </div>
+      </section>
+
+      <!-- ── Packages — §7.4 · Asymmetrical Bento, the only one ─────────────── -->
+      <section class="section" id="packages" aria-labelledby="packages-h">
+        <div class="shell">
+          <div class="section__head">
+            <p class="signal numeral">02</p>
+            <h2 class="h-display" id="packages-h">Packages</h2>
+            <p class="lead">The room, for whatever you are putting in it.</p>
+          </div>
+
+          <!-- The one thing this section CAN show honestly while every tier,
+           capacity and price is still outstanding: the room, laid out for a
+           function. -->
+          <!-- `room`, not `event`: the hero is `event` now, and the same
+           photograph opening the page and then illustrating Packages 4,000px
+           later reads as a shortage of pictures rather than as a motif. -->
+          <figure class="feature">
+            <img
+              src="../assets/img/opt/room-1600.jpg"
+              srcset="
+                ../assets/img/opt/room-800.jpg   800w,
+                ../assets/img/opt/room-1600.jpg 1600w
+              "
+              sizes="(min-width: 1024px) calc(100vw - 20rem), 100vw"
+              alt="Tables and bentwood chairs along a white brick wall, a planted green column mid-room."
+              width="1600"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption class="signal">The room, set for a function</figcaption>
+          </figure>
+
+          <div class="bento">
+            <article class="bezel bento__item bento__item--wide">
+              <div class="bezel__core">
+                <p class="tbc">[TBC — package name, from client]</p>
+                <p class="card__meta">
+                  <span class="tbc" aria-label="Content to be confirmed"
+                    >[TBC — capacity &amp; duration, from client]</span
+                  >
+                </p>
+                <ul class="card__list" aria-label="Inclusions, to be confirmed">
+                  <li aria-hidden="true"><span class="ph ph--80"></span></li>
+                  <li aria-hidden="true"><span class="ph ph--60"></span></li>
+                  <li aria-hidden="true"><span class="ph ph--70"></span></li>
+                </ul>
+                <a class="link" href="#visit">Enquire for pricing</a>
+              </div>
+            </article>
+
+            <article class="bezel bento__item">
+              <div class="bezel__core">
+                <p class="tbc">[TBC — package name, from client]</p>
+                <p class="card__meta">
+                  <span class="tbc" aria-label="Content to be confirmed"
+                    >[TBC — capacity &amp; duration, from client]</span
+                  >
+                </p>
+                <ul class="card__list" aria-label="Inclusions, to be confirmed">
+                  <li aria-hidden="true"><span class="ph ph--70"></span></li>
+                  <li aria-hidden="true"><span class="ph ph--55"></span></li>
+                </ul>
+                <a class="link" href="#visit">Enquire for pricing</a>
+              </div>
+            </article>
+
+            <article class="bezel bento__item">
+              <div class="bezel__core">
+                <p class="tbc">[TBC — package name, from client]</p>
+                <p class="card__meta">
+                  <span class="tbc" aria-label="Content to be confirmed"
+                    >[TBC — capacity &amp; duration, from client]</span
+                  >
+                </p>
+                <ul class="card__list" aria-label="Inclusions, to be confirmed">
+                  <li aria-hidden="true"><span class="ph ph--65"></span></li>
+                  <li aria-hidden="true"><span class="ph ph--75"></span></li>
+                </ul>
+                <a class="link" href="#visit">Enquire for pricing</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Gallery — §7.5 · the one deliberate break from the grid ─────────── -->
+      <section
+        class="section section--gallery"
+        id="gallery"
+        aria-labelledby="gallery-h"
+      >
+        <div class="shell">
+          <div class="section__head">
+            <p class="signal numeral">03</p>
+            <h2 class="h-display" id="gallery-h">Gallery</h2>
+            <!-- Moved off the hero, where a dashed placeholder box sat over
+             the venue photography. This is where an "about the room"
+             paragraph belongs anyway. -->
+            <p class="tbc tbc--block">
+              [TBC — venue story copy, from client or a copywriting pass]
+            </p>
+          </div>
+        </div>
+
+        <!-- Sequenced as the arrival actually happens: the stairs from the
+         street, up them, then the bar, then the room. Tall frames take the
+         portrait sources, wide frames the landscape ones — so nothing is
+         centre-cropped into an accident. -->
+        <div
+          class="strip"
+          tabindex="0"
+          role="group"
+          aria-label="Venue photography"
+        >
+          <figure class="strip__frame strip__frame--tall">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/stair-800.jpg"
+                srcset="
+                  ../assets/img/opt/stair-800.jpg   800w,
+                  ../assets/img/opt/stair-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 320px, 260px"
+                alt="The street-level entrance: an arched stairwell edged in magenta neon, LOFT91 lit above it."
+                width="800"
+                height="1067"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">The stairs</figcaption>
+          </figure>
+
+          <figure class="strip__frame strip__frame--tall">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/ascent-800.jpg"
+                srcset="
+                  ../assets/img/opt/ascent-800.jpg   800w,
+                  ../assets/img/opt/ascent-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 320px, 260px"
+                alt="Looking up the stairwell, neon strip lighting running the length of both walls."
+                width="800"
+                height="1067"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">Upstairs</figcaption>
+          </figure>
+
+          <figure class="strip__frame strip__frame--wide">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/bar-wide-800.jpg"
+                srcset="
+                  ../assets/img/opt/bar-wide-800.jpg   800w,
+                  ../assets/img/opt/bar-wide-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 540px, 420px"
+                alt="The bar: a backlit ribbed counter, arched marble shelves behind it, white brick either side."
+                width="800"
+                height="600"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">The bar</figcaption>
+          </figure>
+
+          <figure class="strip__frame strip__frame--tall">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/taps-800.jpg"
+                srcset="
+                  ../assets/img/opt/taps-800.jpg   800w,
+                  ../assets/img/opt/taps-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 320px, 260px"
+                alt="The tap bank seen across the stone counter, arched spirit shelves lit behind."
+                width="800"
+                height="1067"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">The taps</figcaption>
+          </figure>
+
+          <figure class="strip__frame strip__frame--wide">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/room-800.jpg"
+                srcset="
+                  ../assets/img/opt/room-800.jpg   800w,
+                  ../assets/img/opt/room-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 540px, 420px"
+                alt="Tables and bentwood chairs along a white brick wall, a planted green column mid-room."
+                width="800"
+                height="600"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">The room</figcaption>
+          </figure>
+
+          <figure class="strip__frame strip__frame--wide">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/lounge-800.jpg"
+                srcset="
+                  ../assets/img/opt/lounge-800.jpg   800w,
+                  ../assets/img/opt/lounge-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 540px, 420px"
+                alt="Banquette seating facing a wall-sized screen, mirrored ceiling above the tables."
+                width="800"
+                height="600"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">The screen wall</figcaption>
+          </figure>
+
+          <figure class="strip__frame strip__frame--tall">
+            <div class="frame">
+              <img
+                src="../assets/img/opt/neon-800.jpg"
+                srcset="
+                  ../assets/img/opt/neon-800.jpg   800w,
+                  ../assets/img/opt/neon-1600.jpg 1600w
+                "
+                sizes="(min-width: 768px) 320px, 260px"
+                alt="A neon sign reading See You Next Time, mounted on steel at the top of the stairs."
+                width="800"
+                height="1067"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption class="signal">On the way out</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ── Visit — §7.6 · Editorial Split 5/7 ─────────────────────────────── -->
+
+      <!-- ── FAQ — Frequently Asked Questions (answers still [TBC]) ------------- -->
+      <section class="section" id="faq" aria-labelledby="faq-h">
+        <div class="shell">
+          <div class="section__head">
+            <p class="signal numeral">04</p>
+            <h2 class="h-display" id="faq-h">FAQ</h2>
+            <p class="lead">Common questions about the venue and functions.</p>
+          </div>
+
+          <div class="faq__list" aria-label="Frequently asked questions">
+            <details class="faq__item">
+              <summary class="faq__q">
+                How do I enquire about hiring the space?
+              </summary>
+              <div class="faq__a">
+                <p class="body tbc">
+                  [TBC — enquiry channel: Instagram DM, email, or form]
+                </p>
+              </div>
+            </details>
+
+            <details class="faq__item">
+              <summary class="faq__q">What is the venue capacity?</summary>
+              <div class="faq__a">
+                <p class="body tbc">
+                  [TBC — capacity and standing/seated numbers, from client]
+                </p>
+              </div>
+            </details>
+
+            <details class="faq__item">
+              <summary class="faq__q">
+                Do you have AV / music options for events?
+              </summary>
+              <div class="faq__a">
+                <p class="body tbc">
+                  [TBC — AV, DJ, and music policy details, from client]
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="visit" aria-labelledby="visit-h">
+        <div class="shell split split--5-7">
+          <div class="split__a">
+            <p class="signal numeral">05</p>
+            <h2 class="h-display" id="visit-h">Visit</h2>
+
+            <address class="visit__address">
+              <a
+                class="link"
+                href="https://maps.app.goo.gl/S3cpVjSk9qNEjWpd7"
+                target="_blank"
+                rel="noopener"
+              >
+                Upstairs, 91&nbsp;Nicholson&nbsp;Street<br />Footscray
+                VIC&nbsp;3011
+              </a>
+            </address>
+            <p class="tbc tbc--note">
+              [TBC — street type &amp; suite format, from client]
+            </p>
+
+            <p class="visit__social">
+              <a
+                class="link"
+                href="https://www.instagram.com/loft_91_bar/"
+                target="_blank"
+                rel="noopener"
+                >@loft_91_bar</a
+              >
+            </p>
+
+            <!-- Wayfinding, not decoration: at street level the venue is an
+             unmarked stairwell next to a deli. This is the thing you
+             actually look for. -->
+            <figure class="visit__find">
+              <img
+                src="../assets/img/opt/entrance-800.jpg"
+                srcset="
+                  ../assets/img/opt/entrance-800.jpg   800w,
+                  ../assets/img/opt/entrance-1600.jpg 1600w
+                "
+                sizes="(min-width: 1024px) 30vw, 100vw"
+                alt="Street level: the LOFT91 stairwell entrance, lit magenta, beside the Crumbz Deli neon sign."
+                width="800"
+                height="1067"
+                loading="lazy"
+                decoding="async"
+              />
+              <figcaption class="signal">
+                Street level &mdash; the stairs are beside the deli
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="split__b">
+            <p class="signal visit__label">Hours</p>
+            <dl class="hours nums" data-venue="hours-table">
+              <div class="hours__row">
+                <dt>Friday</dt>
+                <dd>5&nbsp;PM&nbsp;– late</dd>
+              </div>
+              <div class="hours__row">
+                <dt>Saturday</dt>
+                <dd>5&nbsp;PM&nbsp;– late</dd>
+              </div>
+              <div class="hours__row">
+                <dt>Sunday</dt>
+                <dd>1&nbsp;PM&nbsp;– 8&nbsp;PM</dd>
+              </div>
+              <div class="hours__row hours__row--gap">
+                <dt>Mon&nbsp;– Thu</dt>
+                <dd>Not published</dd>
+              </div>
+            </dl>
+            <p class="tbc tbc--block">
+              [TBC — hours not yet client-confirmed, incl. what “late” means and
+              whether Mon&nbsp;–&nbsp;Thu are open for private hire]
+            </p>
+
+            <p class="signal visit__label visit__label--spaced">Functions</p>
+            <p class="body">
+              Today the only enquiry channel is Instagram&nbsp;DM.
+            </p>
+            <p class="tbc tbc--block">
+              [TBC — functions enquiry channel: form, email or phone, from
+              client]
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── Footer — §7.7 ────────────────────────────────────────────────────── -->
+    <footer class="footer">
+      <div class="shell footer__inner">
+        <p class="signal" translate="no">Loft&nbsp;91</p>
+        <p class="signal">
+          <a
+            class="link link--quiet"
+            href="https://www.instagram.com/loft_91_bar/"
+            target="_blank"
+            rel="noopener"
+            >Instagram</a
+          >
+        </p>
+        <p class="tbc tbc--inline">
+          [TBC — liquor licence &amp; legal line, from client]
+        </p>
+      </div>
+    </footer>
+
+    <div class="grain" aria-hidden="true"></div>
+
+    <script src="js/venue.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

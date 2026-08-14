@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0D0C0A" />
+    <title>Packages — Loft 91</title>
+    <meta
+      name="description"
+      content="Functions and venue hire at Loft 91, an upstairs bar and event space on Nicholson Street, Footscray."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Packages — Loft 91" />
+    <meta
+      property="og:description"
+      content="The upstairs room, available for functions and venue hire in Footscray."
+    />
+    <meta property="og:image" content="/img/event-1600.jpg" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon-180.png" />
+
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/img/event-800.avif 800w, /img/event-1600.avif 1600w, /img/event-2200.avif 2200w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <link rel="preload" href="/fonts/Switzer-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Zodiak-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem('l91-loaded') === '1';
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) skip = true;
+        if (skip) document.documentElement.setAttribute('data-loader', 'skip');
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/pages/packages.tsx"></script>
+  </body>
+</html>
