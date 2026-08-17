@@ -5,7 +5,11 @@ explicit user instruction: *"each nav will have their own page and the index pag
 just show the most stand out and it will links to the according page, you have to use the
 picture more wisely."*
 
-`demo/` and `demo2/` are untouched. All three now sit side by side for the client.
+This is the demo the project is carrying forward. The two earlier directions have been
+moved to `archive/demo/` and `archive/demo2/` — unchanged, still runnable, kept for the
+record rather than for comparison. References to `demo/` and `demo2/` in the notes below
+and in the source comments are about those two directions as *designs*, and still read
+correctly; only their location changed.
 
 ```bash
 npm install
@@ -55,20 +59,34 @@ rebuilt with an accent that can actually carry text.
 
 Page colour on brass (the one solid fill, on the primary CTA) is 8.08:1 the other way round.
 
-## 3. Five documents, not a router
+## 3. Six documents, not a router
 
-`vite.config.ts` declares five HTML entries. The brief asks for a page per destination and
-the honest way to build that on a static host is five real documents: no router library,
+`vite.config.ts` declares six HTML entries. The brief asks for a page per destination and
+the honest way to build that on a static host is six real documents: no router library,
 each page ships only its own code, every URL is directly crawlable, and the shared
 React/GSAP/Lenis chunk is fetched once and served from cache thereafter.
 
 ```
-/            index.html          home — cover, band, happy hour, four gateways, find us
+/            index.html          the landing page — every section, condensed, each
+                                 one handing off to its own document
 /menu/       menu/index.html     cover, happy hour, the full drinks list
 /packages/   packages/index.html cover, the room, package tiers [TBC], enquiry
 /gallery/    gallery/index.html  cover, seven plates as a monograph sequence
-/visit/      visit/index.html    cover, hours, getting here, questions
+/about/      about/index.html    cover, the venue, hours, getting here
+/faq/        faq/index.html      cover, every question
 ```
+
+The nav carries four of them — Menu, Packages, Gallery, **About us**. `/faq/` is support
+material rather than a destination the venue is sold from, so it is reached from the home
+page's FAQ heading, from About us, and from the footer index, which lists the site in full.
+
+**The home page is the landing page from `demo/`**, section for section: a feature
+photograph, the happy-hour figures, the asymmetrical bento, the gallery strip, the
+disclosure list and the 5/7 editorial split. Each section carries only what earns its place
+above a hand-off — happy hour in full but no drinks list, three boxes but no tiers, three
+questions but not eight — and its heading is the link through to the rest. Visit stays at
+the foot of it as content rather than as a gateway: a visitor who never leaves the index
+page still has to be able to find the door.
 
 Nested paths rather than flat (`menu/index.html`, not `menu.html`) so the built URLs are
 `/menu/` on any static host with no rewrite rules to configure.
@@ -78,9 +96,12 @@ the cover photograph of the page you leave morphs into the cover of the page you
 and the nav and footer hold still instead of cross-fading. Entirely declarative
 (`@view-transition { navigation: auto }` plus `[data-cover] { view-transition-name: cover }`);
 `src/lib/transitions.ts` does one job on top of it — on `pageswap`, hand the `cover` name to
-whichever gateway block was actually pressed, so the morph starts from the photograph the
-visitor touched. A browser without the feature performs an ordinary navigation and loses
-nothing.
+the home-page photograph that depicts the destination (the tap bank for `/menu/`, the lit
+room for `/packages/`, the doorway for `/about/`), so the morph starts from the picture the
+visitor was looking at. It hands the name over only while that picture is on screen;
+otherwise the page's own cover keeps it, because a morph out of a photograph nobody can see
+is a morph out of nothing. A browser without the feature performs an ordinary navigation
+and loses nothing.
 
 ## 4. Photography, assigned by subject
 
@@ -90,7 +111,8 @@ nothing.
 | Menu | `taps` | the tap bank; literally what the page is about, and near-symmetrical so it survives a wide crop |
 | Packages | `event` | the room lit for a function — the commercial frame, on the commercial page |
 | Gallery | `stair` | the magenta neon arch, the venue's signature |
-| Visit | `entrance` | wayfinding: at street level the venue is an unmarked stairwell beside a deli |
+| About us | `entrance` | wayfinding: at street level the venue is an unmarked stairwell beside a deli |
+| FAQ | `neon` | the "See You Next Time" sign — the last thing you read, on the page of last questions |
 
 The home page's four gateway blocks use **the destination's own cover photograph**, which is
 what makes the view transition legible — press the Menu block and that picture expands into
@@ -128,6 +150,14 @@ cases.
 > renders correctly. It cost the nav 1.00:1 over the home cover.
 
 ## 6. Verified
+
+> ⚠ **These figures predate the landing-page rebuild** and were measured on the earlier
+> five-page build, whose index page was a cover plus four gateway blocks. The home page is
+> now a full landing page, `/visit/` has become `/about/` with a section it did not have,
+> and `/faq/` is new. The measurements below are kept as the record of what *was* verified;
+> nothing in them has been re-run against the current build, and the counts that name a
+> page or a total are stale by construction. Re-measure before treating any of it as
+> current.
 
 Measured over HTTP against the real `dist/`, headless Chrome over CDP.
 

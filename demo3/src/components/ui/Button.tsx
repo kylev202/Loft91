@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { withBase } from '../../lib/base';
 
 /**
  * Two buttons, and there is no third.
@@ -37,7 +38,7 @@ export function Button({
 
   return (
     <a
-      href={href}
+      href={withBase(href)}
       className={`${base} ${skin} ${className}`}
       {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
     >

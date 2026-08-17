@@ -24,11 +24,18 @@ export function HomeCover() {
         <img
           src={wordmarkWhite.src}
           srcSet={wordmarkWhite.srcSet}
-          sizes="(min-width: 64rem) 620px, 64vw"
+          sizes="(min-width: 64rem) 400px, 56vw"
           width={wordmarkWhite.w}
           height={wordmarkWhite.h}
           alt={venue.name}
-          className="w-[min(540px,58vw)] short:w-[min(400px,52vw)]"
+          /* The home page's h1 is the mark rather than a line of type, so it has
+             to be sized against `--text-display` by eye rather than by token: at
+             540px wide the mark stood 117px tall, which matched the old 152px
+             title's cap height and now badly overshoots the 96px one. 400px
+             holds it just above an interior page title — correct for the
+             landing page, which is the whole first impression — instead of
+             leaving the one heading on the site that did not come down. */
+          className="w-[min(400px,52vw)] short:w-[min(300px,46vw)]"
           translate="no"
         />
       </h1>

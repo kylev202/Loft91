@@ -1,13 +1,17 @@
 /* ==========================================================================
    site.ts — the page model.
 
-   demo3 is five real documents rather than one scrolling page (a reversal of
-   D-04, on explicit user instruction: "each nav will have their own page and
-   the index page will just show the most stand out"). That makes the set of
-   pages a piece of *data*, not something each file restates: the nav, the home
-   page's gateway blocks, the footer index and the cross-document view
-   transition all read from this one list, so a destination cannot exist in one
-   of them and be missing from another.
+   demo3 is six real documents rather than one scrolling page (a reversal of
+   D-04, on explicit user instruction: "each nav will have their own page").
+   That makes the set of pages a piece of *data*, not something each file
+   restates: the nav, the home page's sections, the footer index and the
+   cross-document view transition all read from this one list, so a destination
+   cannot exist in one of them and be missing from another.
+
+   The home page is now the full landing page from `demo/` — every section is
+   present, condensed, and each one hands off to its own document. So the list
+   below is read twice on the index page: once for the nav, once for the
+   section that previews it.
 
    ⚠ Copy discipline (CLAUDE.md §4.1, MEMORY.md D-05). Every line below either
    describes what is *on the page* — which is ours to write — or restates a fact
@@ -84,19 +88,47 @@ export const pages = [
       'Photographs of Loft 91: the neon stairwell, the backlit bar, the upstairs room and the screen wall.',
   },
   {
-    id: 'visit',
+    id: 'about',
     index: '04',
-    name: 'Visit',
-    href: '/visit/',
-    eyebrow: 'Finding us',
-    statement: 'Upstairs, 91 Nicholson Street — the stairs are beside the deli.',
-    blurb: 'Hours, the address, and what the doorway looks like from the street.',
+    name: 'About us',
+    href: '/about/',
+    eyebrow: 'The venue',
+    // Composed only from §1 confirmed facts — the category, the position and
+    // the street. The venue's own story copy is Missing in §5 and is marked
+    // [TBC] on the page itself rather than written for them.
+    statement: 'A bar and function space, one flight up from Nicholson Street.',
+    blurb: 'What the place is, when it is open, and how to find the door.',
     photo: photos.entrance,
-    title: 'Visit — Loft 91',
+    title: 'About us — Loft 91',
     description:
-      'Loft 91 is upstairs at 91 Nicholson Street, Footscray. Opening hours, the map, and how to find the entrance.',
+      'Loft 91 is a bar and function space upstairs at 91 Nicholson Street, Footscray. Hours, the address, and how to find the entrance.',
   },
 ] as const satisfies readonly PageDef[];
+
+/** The FAQ, which is a real document but NOT a nav destination.
+ *
+ *  The nav carries the four places the venue is being sold from; the questions
+ *  page is support material reached from the home page's FAQ heading and from
+ *  the footer index. Keeping it out of `pages` is what stops it appearing as a
+ *  fifth gateway and a fifth nav item — the user's instruction was that the
+ *  fourth nav slot goes to About us instead of Visit, not that the nav grows. */
+export const faqPage = {
+  id: 'faq',
+  index: '05',
+  name: 'FAQ',
+  href: '/faq/',
+  eyebrow: 'Questions',
+  statement: 'What people ask before they come up — and what is still to confirm.',
+  blurb: 'Hiring, capacity, hours, food and where the door actually is.',
+  photo: photos.neon,
+  title: 'FAQ — Loft 91',
+  description:
+    'Frequently asked questions about Loft 91, Footscray: venue hire enquiries, capacity, opening hours, food and finding the entrance.',
+} as const satisfies PageDef;
+
+/** Everything with a URL, for the footer index. The nav deliberately shows a
+    subset; the footer is where the site lists itself in full. */
+export const allPages = [...pages, faqPage] as const satisfies readonly PageDef[];
 
 export type PageId = (typeof pages)[number]['id'];
 

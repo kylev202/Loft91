@@ -10,6 +10,8 @@
    Every alt describes the room, not the file.
    ========================================================================== */
 
+import { withBase } from '../lib/base';
+
 export interface Photo {
   /** Base filename in /img — `stair` resolves to stair-800.avif|webp|jpg etc. */
   readonly name: string;
@@ -136,9 +138,9 @@ export const gallery: readonly Photo[] = [
 ];
 
 export const srcSet = (photo: Photo, ext: string) =>
-  photo.widths.map((w) => `/img/${photo.name}-${w}.${ext} ${w}w`).join(', ');
+  photo.widths.map((w) => `${withBase(`/img/${photo.name}-${w}.${ext}`)} ${w}w`).join(', ');
 
-export const fallbackSrc = (photo: Photo) => `/img/${photo.name}-${photo.widths[0]}.jpg`;
+export const fallbackSrc = (photo: Photo) => withBase(`/img/${photo.name}-${photo.widths[0]}.jpg`);
 
 /** The wordmark lockup — a transparent PNG, not a vector. A true per-letter
     loader animation is still blocked on MEMORY.md Q2.
@@ -151,9 +153,9 @@ const lockup = (colour: 'black' | 'white') => ({
   w: 640,
   h: 139,
   srcSet: [320, 640, 1280, 1920]
-    .map((w) => `/img/wordmark-${colour}-${w}.png ${w}w`)
+    .map((w) => `${withBase(`/img/wordmark-${colour}-${w}.png`)} ${w}w`)
     .join(', '),
-  src: `/img/wordmark-${colour}-640.png`,
+  src: withBase(`/img/wordmark-${colour}-640.png`),
 });
 
 export const wordmarkWhite = lockup('white');

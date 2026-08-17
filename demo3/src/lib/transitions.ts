@@ -8,18 +8,20 @@
  * of the next. This file exists for one case that CSS cannot express.
  *
  * On the home page there are two candidates for the same name: the page's own
- * cover, and the gateway block the visitor just pressed. A view-transition name
- * must be unique in a document — two elements claiming `cover` makes the
- * browser skip the transition entirely — so exactly one of them can hold it,
- * and which one depends on where the visitor is going. Pressing the Menu block
- * should expand *that photograph* into the Menu cover; using the nav instead
- * should carry the cover already on screen.
+ * cover, and the section photograph depicting where the visitor is going — the
+ * tap bank in the Menu section, the lit room in Packages, the doorway in Visit.
+ * A view-transition name must be unique in a document — two elements claiming
+ * `cover` makes the browser skip the transition entirely — so exactly one of
+ * them can hold it, and which one depends on where the visitor is going and on
+ * what is actually on screen when they go.
  *
  * Runs on `pageswap`, which fires on the outgoing document once the destination
  * is known and before the snapshot is taken — the one moment where that is
  * decidable. Everything here is progressive: a browser without cross-document
  * view transitions never fires the event and performs an ordinary navigation.
  */
+
+import { stripBase } from './base';
 
 /** Not in the DOM lib yet; only the two fields this file reads are declared. */
 interface PageSwapEventLike extends Event {
@@ -36,13 +38,26 @@ export function initTransitions() {
     // reload) — leave the DOM exactly as it is.
     if (!viewTransition || !activation) return;
 
-    const destination = new URL(activation.entry.url, location.href).pathname;
+    // `stripBase` because `data-cover-for` is authored as the site-root path
+    // (`/menu/`) while the real pathname carries the deployment base — on GitHub
+    // Pages the destination is `/Loft91/menu/`, which matches no card, and every
+    // home-page morph would silently fall back to the page's own cover.
+    const destination = stripBase(new URL(activation.entry.url, location.href).pathname);
     const card = document.querySelector<HTMLElement>(
       `[data-cover-for="${CSS.escape(destination)}"]`,
     );
     // Nothing on this page depicts where we are going — the page's own cover
     // keeps the name, which is the right answer for every nav-driven move.
     if (!card) return;
+
+    // …and so is the page's own cover when the matching photograph is off
+    // screen. The home page is a long scroll now, and the nav reaches every
+    // destination from anywhere on it: handing the name to a picture nobody can
+    // see makes the next cover grow out of an empty patch of page, or out of a
+    // plate still shut at `clip-path: inset(46% 0 46% 0)` waiting for its
+    // reveal — which is a morph out of a slot.
+    const box = card.getBoundingClientRect();
+    if (box.bottom <= 0 || box.top >= window.innerHeight) return;
 
     document
       .querySelectorAll<HTMLElement>('[data-cover]')

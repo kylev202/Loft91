@@ -1,9 +1,17 @@
 import { pages } from '../data/site';
+import { withBase } from '../lib/base';
 import { Frame } from './ui/Frame';
 
 /**
  * The home page's four gateway blocks — the whole reason the index page exists
  * now that each destination has its own document.
+ *
+ * ⚠ **Currently unused, and left in place rather than deleted.** The home page
+ * was rebuilt away from the four-gateway front door — see the note at the head
+ * of `pages/home.tsx` — and nothing imports this file any more. Flagged here so
+ * the next reader knows the component is dormant rather than wired up; whether
+ * it goes is a call for whoever owns the home page, not a tidy-up to make in
+ * passing.
  *
  * Each block is the destination's *own cover photograph*, not a generic tile.
  * That is what makes the cross-document view transition legible: press the Menu
@@ -32,13 +40,28 @@ export function Gateways() {
         {pages.map(({ id, index, name, href, blurb, photo }, i) => (
           <a
             key={id}
-            href={href}
-            data-plate
+            href={withBase(href)}
             className={`group relative block ${
               i % 2 === 0 ? 'md:col-span-7' : 'md:col-span-5'
             }`}
           >
+            {/* `data-plate` belongs on the plate, not on the link that wraps it.
+                The reveal it drives is a `clip-path`, and a clip-path clips the
+                element's entire rendering — outline and box-shadow included — so
+                on the link it threw that link's focus ring away, and did so
+                permanently: the reveal settles on `inset(0% 0% 0% 0%)`, still a
+                clip at exactly the border box, so the ring stayed gone long
+                after the animation finished. Moved one level in: the plate is
+                what is being revealed, the animation is pixel-identical, and the
+                ring is drawn on an unclipped element again.
+
+                ⚠ Latent, not live — see the note on the component above: nothing
+                imports `Gateways`, so this never reached a rendered page. It is
+                fixed here so that re-mounting the component cannot reintroduce
+                it, and it is the same defect class the mobile menu had for real
+                (`focus-inset`, base.css). */}
             <div
+              data-plate
               data-cover-for={href}
               className="plate grade-card aspect-[4/5] w-full sm:aspect-[16/10]"
             >

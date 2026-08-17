@@ -1,4 +1,5 @@
-import { pages, home } from '../data/site';
+import { allPages, home } from '../data/site';
+import { withBase } from '../lib/base';
 import { venue } from '../data/venue';
 import { photos, wordmarkWhite } from '../data/photos';
 import { Frame } from '../components/ui/Frame';
@@ -57,13 +58,17 @@ export function Footer({ current }: { current: string }) {
             </p>
           </div>
 
-          {/* --- The index ------------------------------------------------ */}
+          {/* --- The index ------------------------------------------------
+              `allPages`, not `pages`: the nav shows the four destinations, and
+              this is the one place the site lists itself in full — which is
+              what makes the FAQ, which is deliberately not in the nav, reachable
+              from every page rather than only from the home page's heading. */}
           <nav aria-label="All pages" className="lg:col-span-3 lg:col-start-7">
             <h2 className="label text-ink-3">Pages</h2>
             <ul className="mt-md">
               <li className="border-t border-rule">
                 <a
-                  href={home.href}
+                  href={withBase(home.href)}
                   aria-current={current === 'home' ? 'page' : undefined}
                   className="flex min-h-11 items-center gap-md text-body text-ink-2 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
                 >
@@ -73,10 +78,10 @@ export function Footer({ current }: { current: string }) {
                   Home
                 </a>
               </li>
-              {pages.map(({ id, index, name, href }) => (
+              {allPages.map(({ id, index, name, href }) => (
                 <li key={id} className="border-t border-rule">
                   <a
-                    href={href}
+                    href={withBase(href)}
                     aria-current={current === id ? 'page' : undefined}
                     className="flex min-h-11 items-center gap-md text-body text-ink-2 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
                   >

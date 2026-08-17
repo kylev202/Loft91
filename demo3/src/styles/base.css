@@ -109,6 +109,29 @@
   padding-block: var(--section-pad);
 }
 
+/* A focus ring drawn *inside* the element instead of around it.
+
+   The base ring is two layers sitting outside the border box — a 2px brass
+   outline at +2px, and a 4px page-coloured halo behind it. That is the right
+   ring everywhere it can actually be seen, and there is one place on this site
+   where it cannot: the mobile menu's links each sit inside an `overflow:
+   hidden` box, because that box is what makes the line-by-line entrance
+   possible. Clipping applies to the element's whole rendering, and outline and
+   box-shadow are part of that rendering — so the ring was being drawn and then
+   thrown away, on every destination in the phone navigation.
+
+   The overflow cannot be removed without removing the animation, so where the
+   ring cannot go outside it goes inside: `outline-offset` negative by the ring's
+   own width lands it just within the edge. The halo goes with it, and loses
+   nothing — its only job is keeping brass legible where a ring falls on a bright
+   patch of a photograph, and the overlay's ground is solid `--color-page`. */
+@utility focus-inset {
+  &:focus-visible {
+    outline-offset: -4px;
+    box-shadow: none;
+  }
+}
+
 @layer components {
   /* ------------------------------------------------------------------------
      THE COVER GRADE.
@@ -268,6 +291,17 @@
     position: relative;
     overflow: hidden;
     background-color: var(--color-panel);
+  }
+  /* `picture` is the element the reveal transforms — it settles the photograph
+     into its frame, and it carries the gallery's drift (useReveal.ts). It has
+     to be a block to do either: `transform` does not apply to a non-replaced
+     inline box, and `picture` is inline by default, so the settle would
+     silently do nothing at all. Sized to the plate so a fixed-height or
+     aspect-ratio plate still resolves the img's own `height: 100%`. */
+  .plate > picture {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   .plate > picture > img,
   .plate > img {
@@ -554,5 +588,148 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   INCREASED CONTRAST — the third display mode, alongside reduced motion.
+
+   Requested by the OS ("Increase contrast" on macOS and iOS, "Contrast themes"
+   on Windows), and until now this site did not answer it at all. The palette is
+   AA everywhere by construction, but AA is a floor for people with ordinary
+   vision, and a warm off-white held at 0.55 alpha for meta text is precisely the
+   thing somebody turns this setting on to escape.
+
+   Only the tokens move. Nothing is restyled, no layout changes, and no new
+   colour enters the system — the ramp is the same off-white and the same brass,
+   composited harder. Every figure below is computed against `--color-page`
+   (#0D0C0A) by the same method that produced the numbers in theme.css, and that
+   method was checked against theme.css's own published values first:
+
+     ink-2        8.97:1  →  14.39:1     body copy
+     ink-3        5.59:1  →  10.95:1     meta, labels, captions
+     ink-4        1.49:1  →   2.43:1     decorative numerals — still never text
+     rule         1.40:1  →   3.45:1     now clears the 3:1 non-text UI floor
+     rule-strong  2.11:1  →   6.47:1
+     outline      3.45:1  →   8.97:1     the button boundary that IS the affordance
+     brass        8.08:1  →  12.01:1     promoted to the value brass-hi already held
+
+   Brass promoting to its own bright value is the one that matters most: brass is
+   this system's "the thing that is lit" signal — the current page, the price,
+   the primary action — so under a contrast request it should be the first thing
+   to ring out, not the last.
+
+   Declared unlayered so it beats `@theme`, which emits into the `theme` layer.
+   -------------------------------------------------------------------------- */
+@media (prefers-contrast: more) {
+  :root {
+    --color-ink-2: rgb(242 239 232 / 0.92);
+    --color-ink-3: rgb(242 239 232 / 0.8);
+    --color-ink-4: rgb(242 239 232 / 0.32);
+    --color-rule: rgb(242 239 232 / 0.4);
+    --color-rule-strong: rgb(242 239 232 / 0.6);
+    --color-outline: rgb(242 239 232 / 0.72);
+    --color-brass: #e8c86a;
+  }
+
+  /* The one part of the page whose contrast is not a token: type set over a
+     photograph, where the guarantee comes from the grade rather than the
+     palette. Both ramps go to effectively opaque at the plateau, so under a
+     contrast request the picture yields to the words rather than the other way
+     round. The photographic window above the ramp is untouched. */
+  .grade-base::before {
+    background: linear-gradient(
+      to bottom,
+      rgb(13 12 10 / 0) 0,
+      rgb(13 12 10 / 0.72) 1rem,
+      rgb(13 12 10 / 0.92) 2rem,
+      rgb(13 12 10 / 0.98) 3rem,
+      var(--color-page) 60%
+    );
+  }
+  .grade-caption::before {
+    background: linear-gradient(
+      to bottom,
+      rgb(13 12 10 / 0) 0,
+      rgb(13 12 10 / 0.78) 1rem,
+      rgb(13 12 10 / 0.96) 2.5rem,
+      rgb(13 12 10 / 0.99) 100%
+    );
+  }
+  /* The nav's own band, held dense across its full height rather than fading
+     from 0.86 — same reasoning as the original scrim, one step harder. */
+  .grade-cover::before {
+    background: linear-gradient(
+      to bottom,
+      rgb(13 12 10 / 0.97) 0,
+      rgb(13 12 10 / 0.95) var(--nav-h),
+      rgb(13 12 10 / 0) 7.5rem
+    );
+  }
+  /* Mood tint. Its whole purpose is to seat the photograph in the palette, and
+     under a contrast request a decorative veil over the picture is the wrong
+     trade — the room is clearer without it. */
+  .grade-cover::after {
+    background: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   FORCED COLOURS — Windows High Contrast, and the mode this build broke in.
+
+   Forced colours is not "more contrast". The OS replaces the entire palette
+   with its own, and the page has no say in it: `color`, `background-color` and
+   `border-color` are overridden wholesale. A design whose depth is *only* one
+   step of surface tone and a 1px rule has more riding on that than most.
+
+   Three things break, and none of them are visible in any other mode:
+
+   1. **The decorative tints turn opaque and eat the photographs.** `.grade-cover
+      ::after` and `.grade-card::after` are near-transparent veils — 0.06 and
+      0.12 — laid across the full frame at `z-index: 1`. Their alpha is not
+      preserved when the colour is forced, so a 6% wash becomes a solid panel
+      sitting on top of the picture. They are decoration with no legibility duty
+      at all, so they are removed outright rather than re-coloured.
+
+   2. **Every brass hairline disappears.** `.rule-brass` is the system's one
+      ornament and `.loader__rule` is the whole of the loader's second beat, and
+      both are 1px elements drawn with nothing but `background-color`. Forced to
+      the system background, they become the page drawn on the page. They are
+      re-pointed at `CanvasText`, which is the one colour guaranteed to be
+      visible against it.
+
+   3. **The cover grades stop being reliable.** The legibility ramps are
+      `background-image`, which forced colours leaves alone — so a dark gradient
+      survives while the type over it is forced to `CanvasText`. Under a *light*
+      forced-colours theme that is black type on a dark ramp. The ramps become
+      flat `Canvas` instead: the title, the eyebrow and the caption sit on solid
+      system ground, and the photograph keeps the frame above them.
+
+   System colour keywords authored inside this query are honoured rather than
+   forced, which is what makes the repairs stick.
+   -------------------------------------------------------------------------- */
+@media (forced-colors: active) {
+  .grade-cover::after,
+  .grade-card::after {
+    display: none;
+  }
+
+  .grade-cover::before,
+  .grade-base::before,
+  .grade-caption::before {
+    background: Canvas;
+  }
+
+  .rule-brass,
+  .loader__rule {
+    background-color: CanvasText;
+  }
+
+  /* The `[TBC]` marker's dashed underline is the only thing distinguishing an
+     unconfirmed fact from a confirmed one, and D-05 makes that distinction
+     non-negotiable — so it is pinned rather than left to the forced palette,
+     which would otherwise render it identically to ordinary body copy. */
+  .tbc {
+    text-decoration-color: CanvasText;
   }
 }

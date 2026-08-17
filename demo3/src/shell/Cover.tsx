@@ -73,8 +73,9 @@ export function CoverFrame({
            height is left over, so cover height is directly how much of the room
            is visible. At 74svh the Visit cover — whose content block carries two
            CTAs as well as a title — had 64px of photograph left and read as a
-           black rectangle. */
-        tall ? 'min-h-[max(34rem,88svh)]' : 'min-h-[max(32rem,80svh)]'
+           black rectangle. Both heights are tokens (theme.css) because the
+           type band below is defined as a fraction of this one. */
+        tall ? 'min-h-(--cover-h-tall)' : 'min-h-(--cover-h)'
       }`}
     >
       <div data-cover className="grade-cover absolute inset-0">
@@ -84,8 +85,25 @@ export function CoverFrame({
       {/* `.grade-base` is full width and carries the legibility grade, which is
           why it wraps `.shell` rather than being applied to it: the gradient
           has to reach the edges of the viewport, the content does not. */}
+      {/* The type band. Reserving a constant height here is what stops the page
+          title moving between pages: the block is bottom-anchored, so without a
+          floor its top is set by however much content sits under the title, and
+          `/menu/` (statement only) ended up 112px lower than `/packages/` (a CTA
+          row as well) at 1440px. With the floor the lockup starts at the same
+          height on every cover and the variable content extends downward into
+          space that is already reserved. See theme.css `--cover-band`.
+
+          The home page keeps its own proportions: it is a taller cover carrying
+          a different lockup — the mark rather than a line of type, plus a facts
+          row — and it is one page, so it has nothing to be inconsistent with. */}
       <div className="grade-base relative w-full">
-        <div className="shell relative pt-(--nav-h) pb-2xl short:pb-xl">{children}</div>
+        <div
+          className={`shell relative pt-(--nav-h) pb-2xl short:pb-xl ${
+            tall ? '' : 'min-h-[calc(var(--cover-h)*var(--cover-band))]'
+          }`}
+        >
+          {children}
+        </div>
       </div>
     </header>
   );

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { withBase } from '../lib/base';
 
 /**
  * The head of a section inside a page: a brass rule across the full column, the
@@ -14,13 +15,20 @@ export function SectionHead({
   index,
   label,
   heading,
+  href,
   standfirst,
 }: {
-  /** Omitted on the home page, where the `01`…`04` numerals belong to the four
+  /** Omitted on the home page, where the `01`…`05` numerals belong to the
       destinations and reusing them for a section would name two things once. */
   index?: string;
   label: string;
   heading: ReactNode;
+  /** Where the heading goes. On the home page every section is a condensed
+      preview of a document, and pressing its title is the way through — so the
+      heading itself is the link rather than a "read more" bolted underneath.
+      The arrow is `aria-hidden` decoration on a link whose accessible name is
+      already the heading text. */
+  href?: string;
   standfirst?: ReactNode;
 }) {
   return (
@@ -35,7 +43,22 @@ export function SectionHead({
         className="mt-lg max-w-(--container-measure) font-display text-heading font-medium tracking-tight text-ink"
         data-reveal
       >
-        {heading}
+        {href ? (
+          <a
+            href={withBase(href)}
+            className="group inline-flex flex-wrap items-baseline gap-x-md transition-colors duration-(--dur-micro) ease-out hover:text-brass"
+          >
+            {heading}
+            <span
+              aria-hidden="true"
+              className="text-brass transition-transform duration-(--dur-short) ease-out group-hover:translate-x-2"
+            >
+              →
+            </span>
+          </a>
+        ) : (
+          heading
+        )}
       </h2>
 
       {standfirst && (

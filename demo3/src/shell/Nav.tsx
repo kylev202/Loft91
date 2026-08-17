@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { ScrollTrigger, useGSAP } from '../lib/gsap';
 import { pages, home } from '../data/site';
+import { withBase } from '../lib/base';
 import { wordmarkWhite } from '../data/photos';
 
 /**
@@ -47,7 +48,7 @@ export function Nav({ current }: { current: string }) {
       >
         <div className="shell flex h-(--nav-h) items-center justify-between gap-md">
           <a
-            href={home.href}
+            href={withBase(home.href)}
             aria-current={current === 'home' ? 'page' : undefined}
             className="flex h-full shrink-0 items-center pr-md"
           >
@@ -69,7 +70,7 @@ export function Nav({ current }: { current: string }) {
               return (
                 <a
                   key={id}
-                  href={href}
+                  href={withBase(href)}
                   aria-current={active ? 'page' : undefined}
                   className="group relative flex items-center gap-2xs px-md"
                 >
@@ -88,11 +89,15 @@ export function Nav({ current }: { current: string }) {
                   >
                     {name}
                   </span>
+                  {/* `.rule-brass` rather than `h-px bg-brass`: this is the
+                      system's one ornament, and routing it through the component
+                      class means the forced-colours repair in base.css reaches
+                      it. Drawn with nothing but a background colour, it would
+                      otherwise be forced to the system background and mark the
+                      current page in page-on-page — `aria-current` would survive
+                      but the visual state would not. */}
                   {active && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-x-md bottom-0 h-px bg-brass"
-                    />
+                    <span aria-hidden="true" className="rule-brass absolute inset-x-md bottom-0" />
                   )}
                 </a>
               );
@@ -100,7 +105,7 @@ export function Nav({ current }: { current: string }) {
           </nav>
 
           <a
-            href="/packages/#enquire"
+            href={withBase('/packages/#enquire')}
             className="hidden h-11 shrink-0 items-center bg-brass px-md text-small text-on-brass transition-colors duration-(--dur-micro) ease-out hover:bg-brass-hi active:duration-(--dur-press) lg:inline-flex"
           >
             Enquire
@@ -210,10 +215,14 @@ function NavOverlay({
       <nav aria-label="Pages" className="shell flex flex-1 flex-col justify-center">
         {pages.map(({ id, index, name, href }, i) => (
           <span key={id} className="block overflow-hidden border-b border-rule">
+            {/* `focus-inset` because the parent's `overflow: hidden` — the box
+                that makes the line-by-line entrance possible — clips this
+                link's focus ring away entirely. The ring is drawn inside the
+                edge instead of outside it; see the utility in base.css. */}
             <a
-              href={href}
+              href={withBase(href)}
               aria-current={current === id ? 'page' : undefined}
-              className="flex min-h-16 items-baseline py-sm"
+              className="focus-inset flex min-h-16 items-baseline py-sm"
             >
               <span className="menu-line" style={{ ['--index' as string]: i }}>
                 <span
@@ -233,7 +242,7 @@ function NavOverlay({
 
       <div className="shell">
         <a
-          href="/packages/#enquire"
+          href={withBase('/packages/#enquire')}
           className="flex min-h-14 items-center justify-center bg-brass px-md text-small text-on-brass active:duration-(--dur-press)"
         >
           Enquire about functions

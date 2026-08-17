@@ -1,0 +1,82 @@
+# Publish the demo3 build to GitHub Pages.
+#
+# The site is a static multi-page Vite build, so there is nothing to run on the
+# host — Pages serves the six documents in `demo3/dist/` as files. That output is
+# gitignored and generated, so it is built here on every push rather than
+# committed: `assets/` at the repo root is the tracked source of truth, and
+# `npm run build` regenerates `demo3/public/` from it (via the `prebuild`
+# sync-assets step) before Vite runs.
+#
+# The base path is NOT hardcoded. `configure-pages` reports where the site is
+# actually served from — `/Loft91` for a project page, empty for a custom domain
+# — and `vite.config.ts` normalises that into Vite's `base`. Add a custom domain
+# later and the URLs re-resolve on the next deploy with no edit here.
+
+name: Deploy demo3 to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # So the demo can be republished without an empty commit — useful the first
+  # time, when Pages has just been switched on.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. A newer push supersedes an in-flight run instead of
+# racing it to the same URL; for a demo the latest commit is the one worth
+# publishing, so the older run is cancelled rather than queued.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: demo3/package-lock.json
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          # Turns Pages on for the repo if it is not on already, so the first
+          # run does not need a manual visit to Settings.
+          enablement: true
+
+      # `npm ci` rather than `npm install`: the lockfile decides, and a demo
+      # being shown to a client should build from the versions that were tested.
+      - name: Install
+        run: npm ci
+        working-directory: demo3
+
+      # `npm run build` is `tsc --noEmit && vite build` — the typecheck is part
+      # of the gate, so a type error fails the deploy instead of shipping.
+      - name: Build
+        run: npm run build
+        working-directory: demo3
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo3/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -23,7 +23,10 @@ export function Page({ current, children }: { current: string; children: ReactNo
 
   // Desktop only, never under reduced motion — both hard gates.
   useSmoothScroll(fine && !reduced);
-  useReveal(main, reduced);
+  // The gallery's parallax rides the same gate, for the same reason: a scrubbed
+  // transform is smooth where Lenis drives the scroll, and stutters on a phone,
+  // where scroll events stop arriving during a momentum flick.
+  useReveal(main, reduced, fine && !reduced);
 
   useEffect(initTransitions, []);
 

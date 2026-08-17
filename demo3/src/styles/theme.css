@@ -21,9 +21,10 @@
       lit function room for hire, the neon arch for the gallery, the street
       doorway for directions. The picture is structure, not garnish.
 
-   3. **Nothing floats, nothing glows.** Radius 0, zero shadow, zero blur. On a
-      near-black page a drop shadow is invisible and a glow is a nightclub
-      flyer. Depth is one step of surface tone and a 1px rule.
+   3. **Nothing floats, nothing glows.** A soft radius on boxed surfaces, but
+      zero shadow and zero blur. On a near-black page a drop shadow is
+      invisible and a glow is a nightclub flyer. Depth is one step of surface
+      tone and a 1px rule, not elevation.
 
    ── Why not the previous two systems ──────────────────────────────────────
    `demo/` is charcoal + white + bone; `demo2/` is warm paper + ink with no
@@ -121,18 +122,46 @@
   --font-editorial: 'Zodiak', 'Zodiak Fallback', Georgia, serif;
   --font-interface: 'Switzer', 'Switzer Fallback', 'Cabinet Grotesk', system-ui, sans-serif;
 
-  /* The page title, set into the bottom of the cover photograph. */
-  --text-display: clamp(2.75rem, 10.5vw, 9.5rem);
+  /* ── The three display levels, and why they share one ramp ───────────────
+     Every level below is `clamp(min, rem + vw, max)` anchored to the SAME two
+     viewports — 360px and 1440px — so the whole lockup grows on one continuous
+     curve. That is the fix for a real defect, not a preference:
+
+     The previous scale used a bare `vw` middle term with a high floor, which
+     produced two regimes rather than one. Measured on the built site, the title
+     sat flat at 44px from 320px to 419px, the statement flat at 26px and the
+     section heading flat at 24px all the way from 320px to ~800px — and then
+     every level sprinted. The title-to-statement ratio came out at 1.7:1 on a
+     phone, 3.1:1 at 768px and 3.3:1 at 1440px, so the same three elements read
+     as three different designs depending on the window. Anchoring all three to
+     one ramp holds that ratio between 1.8:1 and 2.7:1 across the entire range,
+     and removes the flat middle where nothing responded to width at all.
+
+     The top end came down with it. The title measured 152px at 1920px, which is
+     a poster set into a photograph of a small upstairs room; the cap is now
+     96px, and because the cover grade is anchored to the content block rather
+     than the frame (base.css), a shorter lockup gives the photograph back the
+     height it loses — the room is more visible on every page, not less.
+
+     The `rem + vw` form rather than bare `vw` is deliberate: a pure-viewport
+     size ignores the reader's own font-size setting entirely, so the rem term
+     is what keeps these levels responsive to browser text zoom. */
+
+  /* The page title, set into the bottom of the cover photograph.
+     38px @320 · 40px @360 · 61px @768 · 96px @1440 and above. */
+  --text-display: clamp(2.375rem, 1.35rem + 5.15vw, 6rem);
   --text-display--line-height: 0.86;
   --text-display--letter-spacing: -0.045em;
 
-  /* The statement — Zodiak, one sentence, the editorial voice. */
-  --text-statement: clamp(1.625rem, 3.2vw, 3.125rem);
+  /* The statement — Zodiak, one sentence, the editorial voice.
+     21px @320 · 22px @360 · 27px @768 · 36px @1440 and above. */
+  --text-statement: clamp(1.3125rem, 1.075rem + 1.3vw, 2.25rem);
   --text-statement--line-height: 1.18;
   --text-statement--letter-spacing: -0.02em;
 
-  /* A section heading inside a page. Below the page title, above everything. */
-  --text-heading: clamp(1.5rem, 3vw, 2.5rem);
+  /* A section heading inside a page. Below the page title, above everything.
+     22px @320 · 22px @360 · 27px @768 · 34px @1440 and above. */
+  --text-heading: clamp(1.375rem, 1.15rem + 1.1vw, 2.125rem);
   --text-heading--line-height: 1.05;
   --text-heading--letter-spacing: -0.03em;
 
@@ -172,10 +201,16 @@
   --spacing-2xl: 6rem;
   --spacing-3xl: 9rem;
 
-  /* Radius 0 is the system, not an omission — sharp edges are what make a
-     block read as architecture rather than as a UI card. The token exists so
-     nothing has to write a literal. */
+  /* Photographs (`.plate`) and hairline dividers stay sharp — a radius on a
+     full-bleed frame or a rule line reads as a UI chrome accident, not a
+     choice. Boxed surfaces (the bento, the happy-hour panel) round instead,
+     so a bordered block reads as a soft object set into the page rather
+     than a sharp-edged card. `--radius-md` is `--radius-lg` minus the
+     double-bezel's 6px (`p-1.5`) reveal, so the two curves stay concentric. */
   --radius-none: 0px;
+  --radius-md: 0.625rem; /* 10px — the bezel's inner core         */
+  --radius-lg: 1rem; /* 16px — the bezel's outer shell, and the
+                         happy-hour panel                         */
 
   /* Content widths, each named for what it is. ⚠ Tailwind resolves `max-w-*`
      from `--container-*` first and the spacing scale second, so a t-shirt name
@@ -227,4 +262,50 @@
   --gutter: clamp(1.25rem, 4vw, 4.5rem);
   --section-pad: clamp(4.5rem, 10vh, 7.5rem);
   --nav-h: 4.25rem;
+
+  /* --- The cover, and the band its type sits in --------------------------
+     Both halves live here rather than as literals in `Cover.tsx`, because the
+     second is defined as a fraction of the first and the two drifting apart is
+     exactly the bug this fixes.
+
+     The cover's type block is bottom-anchored, so its title is positioned by
+     whatever sits BELOW it — and that differs per page: `/packages/`,
+     `/about/` and `/faq/` carry a CTA row under the statement and `/menu/`
+     and `/gallery/` do not, and the statements themselves wrap to different
+     line counts. Measured on the built site, the block occupied 49–55% of the
+     cover on the pages with no CTA row and 67–74% on the pages with one, which
+     put the page title **112px lower on Menu than on Packages at 1440px**. The
+     title visibly jumped as you moved between pages — and the cross-document
+     view transition (D-46) morphs one cover into the next, so the jump is the
+     one thing on screen that does not hold still.
+
+     `--cover-band` reserves a constant band at the foot of every cover, so the
+     lockup starts at the same height whatever follows it. 74% is the largest
+     band any page needs at any width from 390px up (worst case 73.5%, `/faq/`
+     at 390px), so nothing overflows and every title lands identically. Below
+     390px the CTA pages genuinely do not fit and grow past it, which is the
+     correct degradation: at that width the cover is full and there is no slack
+     left to distribute.
+
+     The cost, stated plainly: Menu and Gallery give up ~112px of visible
+     photograph to sit where the CTA pages already sat. That is unavoidable —
+     the two can only meet by the shorter page yielding — and every cover now
+     shows the same 26% of room above the grade instead of 45% on some and 30%
+     on others. */
+  --cover-h: max(32rem, 80svh);
+  --cover-h-tall: max(34rem, 88svh);
+  --cover-band: 0.74;
+}
+
+/* Below ~368px the CTA row wraps to two lines and the statements take an extra
+   line each, so what the CTA pages need jumps from ~70% of the cover to 83% —
+   measured at 82.1% (320px) and 82.6% (360px), against 73.3% at 375px. Held as
+   a second value rather than raising the single one, because 83% everywhere
+   would spend another 9% of every cover on slack that only the two narrowest
+   phone widths ever use. 23rem sits in the gap the measurements found: it
+   catches 320 and 360 and leaves 375 (iPhone SE) on the ordinary band. */
+@media (max-width: 23rem) {
+  :root {
+    --cover-band: 0.83;
+  }
 }

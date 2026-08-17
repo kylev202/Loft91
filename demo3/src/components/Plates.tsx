@@ -13,8 +13,10 @@ import { Frame } from './ui/Frame';
  * The plates sit on a twelve-column grid at uneven widths and vertical offsets,
  * numbered and captioned, sequenced the way the arrival actually happens: the
  * stairs from the street, up them, the bar, the taps, the room, the screen wall,
- * and the sign you read on the way out. Each one develops upward on a
- * `clip-path` as it enters — the same gesture as the loader's wipe.
+ * and the sign you read on the way out. Each one opens from a lit band and its
+ * photograph settles into the frame behind it, then drifts inside that frame as
+ * the plate crosses the viewport — the aperture, the settle and the drift, all
+ * three defined in `useReveal.ts`.
  */
 
 /** Column span and offset per plate. Hand-set rather than generated: the shape
@@ -41,7 +43,13 @@ export function Plates() {
       <div className="grid gap-x-lg gap-y-3xl lg:grid-cols-12">
         {gallery.map((photo, i) => (
           <figure key={photo.name} className={layout[i] ?? 'lg:col-span-6'}>
-            <div className="plate w-full" data-plate>
+            {/* `data-drift` is the gallery's own extra: on a pointer device the
+                photograph parallaxes inside its frame as the plate crosses the
+                viewport. It is opt-in per plate rather than global because this
+                is the one page that is nothing but photographs — on a page
+                where a plate sits beside type, a drifting picture pulls the eye
+                off the words next to it. */}
+            <div className="plate w-full" data-plate data-drift>
               <Frame
                 photo={photo}
                 sizes="(min-width: 48rem) 55vw, 100vw"
