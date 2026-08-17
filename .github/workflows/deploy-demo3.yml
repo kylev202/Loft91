@@ -45,13 +45,18 @@ jobs:
           cache: npm
           cache-dependency-path: demo3/package-lock.json
 
+      # Reads where Pages serves this repo from, which becomes Vite's `base`.
+      #
+      # This step does NOT enable Pages. It was written with `enablement: true`
+      # so the first run would not need a visit to Settings, and that failed:
+      # creating a Pages site is an admin-scope write the default GITHUB_TOKEN
+      # is not granted, so the call returned "Resource not accessible by
+      # integration" while the preceding read returned a plain 404. Pages has to
+      # be switched on once by hand — Settings > Pages > Source: GitHub Actions —
+      # after which this step only reads the existing config and succeeds.
       - name: Configure Pages
         id: pages
         uses: actions/configure-pages@v5
-        with:
-          # Turns Pages on for the repo if it is not on already, so the first
-          # run does not need a manual visit to Settings.
-          enablement: true
 
       # `npm ci` rather than `npm install`: the lockfile decides, and a demo
       # being shown to a client should build from the versions that were tested.
