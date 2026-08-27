@@ -170,6 +170,16 @@ export const pageById = (id: PageId) => {
     height, which left the photograph — the backlit bar this whole palette is
     sampled from — with nowhere to be seen. A line of display type is ~59px, and
     that is 59px of room back. */
+/* ⚠ `home.title` is NOT the browser tab title, despite having been the same
+   string until 2026-08-27. The tab is set in `index.html`, and the user
+   shortened it to "Loft 91" (commit b05514b, made against demo3 and carried
+   across when demo4 took over the Pages URL).
+
+   This one is rendered by `HomeCover` as the page's visually-hidden `<h1>`,
+   and since D-58 removed the hero headline and D-59 removed the wordmark, it
+   is the *only* heading a screen reader gets on the landing page. Shortened to
+   "Loft 91" it would say the venue's name and nothing about what it is. So the
+   two are allowed to differ: short in the tab, descriptive in the heading. */
 export const home = {
   href: '/',
   statementLines: ['An upstairs bar', 'in Footscray.'] as const,
