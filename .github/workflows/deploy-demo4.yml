@@ -1,10 +1,14 @@
-# Publish the demo3 build to GitHub Pages.
+# Publish the demo4 build to GitHub Pages.
+#
+# Repointed from demo3 when the design was reset: demo3 moved to archive/demo3
+# and demo4 is the live direction. The build itself is unchanged — same Vite
+# multi-page output, same base-path handling, same six documents.
 #
 # The site is a static multi-page Vite build, so there is nothing to run on the
-# host — Pages serves the six documents in `demo3/dist/` as files. That output is
+# host — Pages serves the six documents in `demo4/dist/` as files. That output is
 # gitignored and generated, so it is built here on every push rather than
 # committed: `assets/` at the repo root is the tracked source of truth, and
-# `npm run build` regenerates `demo3/public/` from it (via the `prebuild`
+# `npm run build` regenerates `demo4/public/` from it (via the `prebuild`
 # sync-assets step) before Vite runs.
 #
 # The base path is NOT hardcoded. `configure-pages` reports where the site is
@@ -12,7 +16,7 @@
 # — and `vite.config.ts` normalises that into Vite's `base`. Add a custom domain
 # later and the URLs re-resolve on the next deploy with no edit here.
 
-name: Deploy demo3 to GitHub Pages
+name: Deploy demo4 to GitHub Pages
 
 on:
   push:
@@ -43,7 +47,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: demo3/package-lock.json
+          cache-dependency-path: demo4/package-lock.json
 
       # Reads where Pages serves this repo from, which becomes Vite's `base`.
       #
@@ -62,19 +66,19 @@ jobs:
       # being shown to a client should build from the versions that were tested.
       - name: Install
         run: npm ci
-        working-directory: demo3
+        working-directory: demo4
 
       # `npm run build` is `tsc --noEmit && vite build` — the typecheck is part
       # of the gate, so a type error fails the deploy instead of shipping.
       - name: Build
         run: npm run build
-        working-directory: demo3
+        working-directory: demo4
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: demo3/dist
+          path: demo4/dist
 
   deploy:
     needs: build

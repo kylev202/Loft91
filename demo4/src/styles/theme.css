@@ -1,0 +1,291 @@
+/* ==========================================================================
+   theme.css — the token layer for demo4.
+
+   ── The thesis: ATELIER ───────────────────────────────────────────────────
+   **The page is a gallery wall; the room is what hangs on it.** This is a
+   complete reset of the Nocturne direction (archive/demo3), taken on user
+   instruction from the visual language of a high-end furniture retailer:
+   warm white, near-black type, zero accent hue, generous margins, and
+   photography carried at full bleed with the words set beside it rather than
+   burned into it.
+
+   Three rules resolve every argument about a detail:
+
+   1. **There is no brand colour.** Restraint is the strategy. Every hue on
+      this site arrives from the venue's own photographs — the magenta neon,
+      the brass counter, the green column — and the page around them is warm
+      paper and ink. Nothing else competes. Where the previous system used
+      brass to mark "this one is live", this one uses weight, position and a
+      1px rule.
+
+   2. **Type sits on paper, never on a photograph.** The old covers set a page
+      title into the bottom of its own cover shot behind a grade. A grade is a
+      dark-page device; on warm white it is a smear. So the photograph runs
+      full bleed and finishes, and the title begins underneath it on clean
+      paper. That is what makes this read as editorial retail rather than as a
+      nightclub flyer inverted.
+
+   3. **Nothing rounds, nothing floats, nothing glows.** Radius is zero
+      everywhere, on every surface. A rounded corner on a full-bleed plate or
+      a hairline rule reads as UI chrome, and this page has no chrome. Depth
+      is one step of surface tone and a 1px rule. There are no shadows to
+      build an elevation system from, so there is no elevation system.
+
+   ── Why the reset ─────────────────────────────────────────────────────────
+   `archive/demo3` (Nocturne) is deep warm near-black with brass as its single
+   accent. It is not wrong — MEMORY.md §1.2 reads the venue as night-weighted
+   and that reasoning still stands — but the user asked for the reference
+   site's language, and that language is the exact inverse: white ground, no
+   accent, image-led, quiet. Both cannot be true at once. This file is the
+   second one.
+
+   ── How this file works ───────────────────────────────────────────────────
+   A Tailwind v4 `@theme` block, so it emits every token as a custom property
+   *and* generates the utility vocabulary from them. The `--namespace-*: initial`
+   lines clear Tailwind's own defaults first, so the framework can only express
+   what this system declares — which is what makes `bg-blue-500`, `shadow-lg`,
+   `ease-in-out` and `rounded-3xl` compile to nothing at all.
+   ========================================================================== */
+
+/* Whether the hero clears the fold on a phone is decided by viewport HEIGHT,
+   not width. 45rem = 720px. */
+@custom-variant short (@media (max-height: 45rem));
+
+@theme {
+  /* --- Namespace resets ------------------------------------------------- */
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+  --breakpoint-*: initial;
+  --container-*: initial;
+
+  /* --- Surfaces ---------------------------------------------------------
+     Warm white, never #FFF: a pure white ground next to warm photography
+     reads as blue, and this is a room full of brick and brass. Three steps —
+     the page, one inset for a block that must sit apart from it, and one
+     more for the rare case of a block inside that block. */
+  --color-page: #fbfaf8; /* the page                         */
+  --color-panel: #f2efea; /* an inset block                   */
+  --color-panel-2: #e8e4dc; /* the step above that, rarely used */
+
+  /* --- Type levels ------------------------------------------------------
+     Near-black, warm, alpha-composited over `--color-page`. Ratios below are
+     computed against #FBFAF8, not guessed. Levels 1–3 clear AA at any size;
+     level 4 is decorative and is NEVER text.
+
+     Level 3 is 0.62 rather than the 0.55 that looked right, because 0.55
+     composites to 3.97:1 — under the 4.5:1 floor. That is the same defect
+     D-07 found in the dark ramp, and this system is not shipping it a second
+     time on the light one. */
+  --color-ink: #16150f; /* primary type            17.38:1 */
+  --color-ink-2: rgb(22 21 15 / 0.7); /* body                     6.57:1 */
+  --color-ink-3: rgb(22 21 15 / 0.62); /* meta, labels             4.99:1 */
+  --color-ink-4: rgb(22 21 15 / 0.14); /* decorative — NEVER text  1.34:1 */
+
+  /* --- The one fill -----------------------------------------------------
+     With no accent hue, the primary action is the ink itself: a solid
+     near-black block with paper-coloured type, at 17.38:1 the other way
+     round. That is the whole button system. */
+  --color-fill: #16150f;
+  --color-on-fill: #fbfaf8;
+
+  /* --- Rules ------------------------------------------------------------
+     This system draws in 1px lines and almost nothing else. Three weights:
+     `rule` and `rule-strong` are structure and never carry meaning alone;
+     `outline` is a boundary that is itself the affordance, and it clears the
+     3:1 UI floor at 3.97:1. */
+  --color-rule: rgb(22 21 15 / 0.12);
+  --color-rule-strong: rgb(22 21 15 / 0.24);
+  --color-outline: rgb(22 21 15 / 0.55);
+
+  /* Focus. The ink, at full strength — on a page with no accent hue it is
+     both the most contrasting thing available (17.38:1) and the only honest
+     one. The paper-coloured outer ring in base.css keeps it legible where a
+     ring lands on a dark patch of a photograph. */
+  --color-focus: #16150f;
+
+  /* --- Type -------------------------------------------------------------
+     Two families, four faces, four jobs — and the roles are the INVERSE of
+     Nocturne's, which is the loudest single signal that this is a different
+     design and not a recolour of the last one.
+
+       Zodiak Regular    display. Every page title and section heading. A
+                         serif at size on warm paper is the retail-editorial
+                         register in one decision.
+       Switzer Light     the statement voice, and large quiet type
+       Switzer Regular   body, drinks list, tables
+       Switzer Medium    labels, nav, buttons — the small wide-tracked
+                         uppercase voice that echoes the wordmark's own thin
+                         geometric construction */
+  --font-display: 'Zodiak', 'Zodiak Fallback', Georgia, serif;
+  --font-interface: 'Switzer', 'Switzer Fallback', 'Cabinet Grotesk', system-ui, sans-serif;
+
+  /* ── The display ramp ───────────────────────────────────────────────────
+     Every clamp below is `rem + vw` anchored to the SAME two viewports —
+     360px and 1440px — so the whole lockup grows on one continuous curve
+     with no flat middle where nothing responds to width. That engineering
+     carries over from Nocturne because the reasoning was sound; the values
+     are all new, and the top end is much lower.
+
+     It is lower on purpose. A 96px title was a poster set into a photograph
+     of a small upstairs room. Here the title sits on paper under the
+     photograph, where a serif at 76px is already the largest thing on the
+     page by a wide margin — and the reference language is quiet.
+
+     The `rem + vw` form rather than bare `vw` keeps these levels responsive
+     to the reader's own browser text-zoom setting. */
+
+  /* The page title, set on paper beneath the cover photograph.
+     40px @360 · 54px @768 · 76px @1440 and above. */
+  --text-display: clamp(2.5rem, 1.75rem + 3.333vw, 4.75rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.02em;
+
+  /* A section heading inside a page. Below the page title, above everything.
+     26px @360 · 31px @768 · 40px @1440 and above. */
+  --text-heading: clamp(1.625rem, 1.333rem + 1.296vw, 2.5rem);
+  --text-heading--line-height: 1.1;
+  --text-heading--letter-spacing: -0.015em;
+
+  /* The statement — Switzer Light, one sentence, the quiet voice under a
+     serif title. 19px @360 · 22px @768 · 26px @1440 and above. */
+  --text-statement: clamp(1.1875rem, 1.042rem + 0.648vw, 1.625rem);
+  --text-statement--line-height: 1.42;
+  --text-statement--letter-spacing: -0.005em;
+
+  /* ⚠ There is deliberately NO `--text-figure` level in this system, and its
+     absence is a decision rather than an omission.
+
+     Nocturne carried one — a headline size for the happy-hour prices, on the
+     argument that in a bar the happy-hour price is the loudest fact there is.
+     That argument was already losing there: `HappyHour.tsx` had stopped using
+     it, because prominence in this design comes from the panel, the rule
+     weight and the position rather than from making six list rows enormous.
+     Nothing on the site referenced it, so it is gone rather than left as a
+     token whose own documentation describes a usage that does not exist.
+
+     If a figure level is ever wanted back, it is a design decision to be taken
+     deliberately (CLAUDE.md §4.3), not a value to reintroduce by reflex. */
+
+  --text-lead: clamp(1.0625rem, 1.2vw, 1.1875rem);
+  --text-lead--line-height: 1.6;
+
+  /* The drinks list is the largest sustained type after the headings,
+     because in a bar the list is the thing you came to read. */
+  --text-item: 1.0625rem;
+  --text-item--line-height: 1.45;
+
+  --text-body: 1rem; /* 16px floor — never below */
+  --text-body--line-height: 1.65;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.55;
+  --text-label: 0.6875rem; /* 11px, uppercase, 0.18em */
+  --text-label--line-height: 1.4;
+
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.08em;
+  --tracking-label: 0.18em;
+  --tracking-mark: 0.28em; /* the wordmark's own tracking */
+
+  /* --- Space ------------------------------------------------------------
+     Retuned upward from Nocturne. The reference language's defining move is
+     the amount of nothing around each block, so the top of this scale is
+     where most of the design lives. */
+  --spacing: 0.25rem;
+  --spacing-2xs: 0.5rem;
+  --spacing-xs: 0.75rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2.5rem;
+  --spacing-xl: 4.5rem;
+  --spacing-2xl: 7rem;
+  --spacing-3xl: 10rem;
+
+  /* --- Radius -----------------------------------------------------------
+     Zero. Not "small" — zero, everywhere, on every surface. Declared as a
+     token rather than left implicit so a stray `rounded-*` in a component
+     has a named thing to be wrong about. There is deliberately no
+     `--radius-md` or `--radius-lg`: a token named for a curve this system
+     does not contain is an invitation to use one. */
+  --radius-none: 0px;
+
+  /* Content widths, each named for what it is. ⚠ Tailwind resolves `max-w-*`
+     from `--container-*` first and the spacing scale second, so a t-shirt
+     name like `max-w-md` silently resolves to `--spacing-md` — 24px, not
+     28rem (D-39). Nothing here is t-shirt-named, which is the point. */
+  --container-narrow: 26rem;
+  --container-measure: 62ch;
+  --container-shell: 1600px;
+  /* The gallery wall — the landing page's 2 x 2 grid of frames, which is capped
+     rather than run to the full shell. At 1600px a two-up 4:5 frame is 875px
+     tall, so a desktop screen holds one and a half pictures; at 68rem it is
+     ~660px and the pair reads as a pair. */
+  --container-wall: 68rem;
+
+  /* --- Motion -----------------------------------------------------------
+     Two curves, and nothing bounces. The reference language has no parallax
+     and no dramatic entrances — movement here is a fade and a few pixels of
+     rise, and that is the entire vocabulary. Anything more would be this
+     design arguing with itself. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* entrances, reveals  */
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1); /* on-screen movement */
+
+  --dur-press: 120ms;
+  --dur-micro: 180ms;
+  --dur-short: 280ms;
+  --dur-mid: 480ms;
+  --dur-long: 720ms;
+  --dur-settle: 900ms; /* an image coming to rest */
+
+  /* The loader lifts at 760ms + --dur-short. Held as one value so the hero's
+     entrance and the loader's exit can never drift apart. */
+  --delay-hero: 1040ms;
+
+  /* --- Breakpoints — 480 / 768 / 1024 / 1440 ---------------------------- */
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 90rem;
+
+  /* --- Framework defaults, re-pointed at the tokens ---------------------
+     Tailwind's own `--default-transition-timing-function` is an ease-in-out,
+     which this system does not contain; pointing it at `--ease-out` means the
+     sanctioned curve is what you get by forgetting, not only by remembering. */
+  --default-transition-timing-function: var(--ease-out);
+  --default-transition-duration: var(--dur-micro);
+  --default-font-family: var(--font-interface);
+
+  /* --- Layer scale — no arbitrary z-index -------------------------------- */
+  --z-nav: 100;
+  --z-overlay: 200;
+  --z-loader: 300;
+}
+
+:root {
+  /* The page margin. 24px on a phone, 88px on a wide desktop — the reference
+     language's 60–90px gutter, floored at something a 360px screen can
+     actually afford. */
+  --gutter: clamp(1.5rem, 5vw, 5.5rem);
+  --section-pad: clamp(5rem, 11vh, 9rem);
+  --nav-h: 4.5rem;
+
+  /* --- The cover photograph ---------------------------------------------
+     A full-bleed plate that ENDS, with the page title on paper beneath it.
+     There is no type over the image, so there is no grade, no scrim, and none
+     of Nocturne's `--cover-band` machinery — that band existed to stop a title
+     jumping between pages because it was bottom-anchored inside the
+     photograph, and a title on paper cannot jump.
+
+     Two heights: the home page's hero, the largest thing on the site, and the
+     shorter band every interior page opens on. */
+  --hero-h: max(26rem, 72svh);
+  --cover-h: max(18rem, 46svh);
+}

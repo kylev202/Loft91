@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Zoom is never disabled: no user-scalable=no, no maximum-scale. -->
+    <!-- The page ground. Flipped with the palette: a dark theme-color on a
+         warm-white site paints the phone browser chrome near-black above a
+         page that is not. -->
+    <meta name="theme-color" content="#FBFAF8" />
+    <title>Loft 91 — an upstairs bar &amp; function space in Footscray</title>
+    <meta
+      name="description"
+      content="Loft 91 is a bar and function space upstairs at 91 Nicholson Street, Footscray. Open Friday and Saturday from 5 PM, and Sunday 1 PM to 6 PM."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Loft 91 — an upstairs bar in Footscray" />
+    <meta
+      property="og:description"
+      content="A bar and function space upstairs on Nicholson Street, Footscray."
+    />
+    <meta property="og:image" content="/img/bar-wide-1600.jpg" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon-180.png" />
+
+    <!--
+      The cover photograph is this page's LCP element once the loader lifts.
+
+      Preloaded as AVIF with the same `sizes` the <picture> declares, so the
+      preload and the element resolve to one candidate. Pointing a preload at
+      the JPEG set instead makes the browser fetch the JPEG for the hint and the
+      AVIF for the actual <source> — the largest asset on the page, downloaded
+      twice, on a phone, with the preloaded copy never painting (D-38).
+
+      `type` means a browser without AVIF skips the hint rather than fetching a
+      file it cannot use; it still gets the image from <picture>, just without
+      the head start.
+    -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/img/bar-wide-800.avif 800w, /img/bar-wide-1600.avif 1600w, /img/bar-wide-2200.avif 2200w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <!-- The faces that render above the fold. Zodiak carries the cover
+         statement here, so unlike the interior pages it is needed first. -->
+    <link rel="preload" href="/fonts/Switzer-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Zodiak-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!--
+      Loader gate — inline and first, before any stylesheet, so a repeat visitor
+      or a reduced-motion user never sees a frame of it. Reads as a synchronous
+      attribute on <html>, which both the CSS and React branch on. On a
+      multi-page site this is what stops the loader replaying on every internal
+      navigation.
+    -->
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem('l91-loaded') === '1';
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) skip = true;
+        if (skip) document.documentElement.setAttribute('data-loader', 'skip');
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/pages/home.tsx"></script>
+  </body>
+</html>

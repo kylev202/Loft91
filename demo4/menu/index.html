@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The page ground. Flipped with the palette: a dark theme-color on a
+         warm-white site paints the phone browser chrome near-black above a
+         page that is not. -->
+    <meta name="theme-color" content="#FBFAF8" />
+    <title>Menu — Loft 91</title>
+    <meta
+      name="description"
+      content="The drinks list at Loft 91, Footscray: draught and bottled beer, spirits, soju, cocktails, snacks, and happy-hour pricing."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Menu — Loft 91" />
+    <meta
+      property="og:description"
+      content="Draught and bottled beer, spirits, soju, cocktails and snacks, plus happy-hour pricing."
+    />
+    <meta property="og:image" content="/img/taps-1600.jpg" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon-180.png" />
+
+    <!-- This page's cover is the LCP element. See index.html for why the
+         preload declares the AVIF set and its type. -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/img/taps-800.avif 800w, /img/taps-1600.avif 1600w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <link rel="preload" href="/fonts/Switzer-Medium.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Zodiak-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem('l91-loaded') === '1';
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) skip = true;
+        if (skip) document.documentElement.setAttribute('data-loader', 'skip');
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/pages/menu.tsx"></script>
+  </body>
+</html>

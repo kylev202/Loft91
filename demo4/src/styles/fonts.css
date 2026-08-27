@@ -1,0 +1,71 @@
+/* ==========================================================================
+   fonts.css — the four self-hosted faces (MEMORY.md D-11).
+   Licence: Fontshare Free Font EULA, at assets/fonts/LICENCE-fontshare-ffl.txt.
+   Commercial use is granted; the delivery-method question is MEMORY.md Q9 and
+   is unresolved — it bites at production deploy, not here.
+
+   Files come from assets/fonts/ via scripts/sync-assets.mjs. Unsubsetted.
+   Subsetting to `latin` is a build-time task for the real build.
+
+   ⚠ The four files are the same four Nocturne used; their ROLES are swapped.
+   Zodiak was the one-sentence editorial voice and is now the display face on
+   every heading; Switzer was the display face and is now the interface voice.
+   Nothing here needed re-licensing or re-sourcing — the reset is a decision
+   about which face does which job, not about which faces exist.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Zodiak';
+  src: url('/fonts/Zodiak-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-matched fallbacks so `swap` costs no layout shift (§11 CLS).
+   These percentages are DESIGN.md's stated STARTING POINT and have NOT been
+   measured against the real faces — the same honest caveat the previous builds
+   carry, and it matters more here than it did there: Zodiak now sets every
+   page title at up to 76px, so a metric mismatch on the serif is a shift on
+   the largest element on the page rather than on one sentence. Measuring these
+   four numbers is a production-build task and is still outstanding. */
+@font-face {
+  font-family: 'Zodiak Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 96%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+/* Donor limited to one non-banned face: the obvious cross-platform grotesk
+   donors are all on the DESIGN.md §9 banned-font list, which is greppable with
+   zero tolerance. */
+@font-face {
+  font-family: 'Switzer Fallback';
+  src: local('Segoe UI');
+  size-adjust: 100%;
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
