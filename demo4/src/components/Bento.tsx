@@ -46,7 +46,7 @@ export function BentoBox({
     <a
       href={withBase(href)}
       data-reveal
-      className={`group flex flex-col items-start gap-md border border-rule bg-panel p-lg transition-colors duration-(--dur-short) ease-out hover:border-rule-strong hover:bg-panel-2 ${
+      className={`group flex flex-col items-start gap-md rounded-plate border border-rule bg-panel p-lg transition-colors duration-(--dur-short) ease-out hover:border-rule-strong hover:bg-panel-2 ${
         wide ? 'md:col-span-6 lg:col-span-7 lg:row-span-2' : 'md:col-span-3 lg:col-span-5'
       }`}
     >

@@ -7,11 +7,16 @@
    Files come from assets/fonts/ via scripts/sync-assets.mjs. Unsubsetted.
    Subsetting to `latin` is a build-time task for the real build.
 
-   ⚠ The four files are the same four Nocturne used; their ROLES are swapped.
-   Zodiak was the one-sentence editorial voice and is now the display face on
-   every heading; Switzer was the display face and is now the interface voice.
-   Nothing here needed re-licensing or re-sourcing — the reset is a decision
-   about which face does which job, not about which faces exist.
+   ⚠ ZODIAK IS DECLARED BUT UNUSED, as of 2026-08-31. The client asked for the
+   page to be set in the nav bar's font, so `--font-display` in theme.css now
+   points at Switzer and nothing on the site references the serif — including
+   the mobile menu overlay, which was the last holdout. An `@font-face` nobody
+   references is never fetched, so this costs a visitor nothing; the six
+   documents no longer preload it either. It stays declared because the whole
+   route back to a serif display face is one line in theme.css, and deleting
+   this block would turn that into a re-sourcing job.
+
+   The metric-matched `Zodiak Fallback` below is unused for the same reason.
    ========================================================================== */
 
 @font-face {

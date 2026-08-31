@@ -54,12 +54,12 @@ export const venue = {
     { day: 'Sunday', opens: `1${NB}PM`, closes: `6${NB}PM` },
   ] as readonly OpeningHours[],
   hoursConfirmed: true, // ⚠ D-60: demo only. The real answer is still Q1.
-  /* ⚠ PLACEHOLDER (D-60). MEMORY.md Q1 asks whether Mon – Thu are closed or
-     available for private hire, and nobody has answered it. The demo prints the
-     second reading so the week has no blank row. 'Not published' is the only
-     statement that is actually true — restore it before this goes anywhere
-     real. */
-  hoursGap: { days: `Mon${NB}– Thu`, state: 'Private hire only' },
+  /* MEMORY.md Q1 asks whether Mon – Thu are closed or available for private
+     hire, and nobody has answered it. D-60 printed the second reading as if it
+     were settled; that row (`hoursGap`) is deleted (D-65) and the week now
+     states the three days that are known and says nothing about the other
+     four, which is the only true statement available. `hoursTbc` below is the
+     record of what is still unanswered — it has no caller. */
   hoursTbc:
     'hours not yet client-confirmed, incl. what “late” means and whether Mon – Thu open for private hire',
 

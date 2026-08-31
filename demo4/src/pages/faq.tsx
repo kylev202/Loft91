@@ -1,6 +1,5 @@
 import { mount } from '../lib/mount';
 import { Cover } from '../shell/Cover';
-import { SectionHead } from '../components/SectionHead';
 import { FaqList } from '../components/FaqList';
 import { Button } from '../components/ui/Button';
 import { faqs } from '../data/faq';
@@ -22,6 +21,18 @@ import { venue } from '../data/venue';
  * copy on user instruction, so the page now reads as finished. What it no
  * longer does is show a reader which four answers nobody has confirmed;
  * `data/faq.tsx` names them at the top of the file instead.
+ *
+ * ── The section head is gone (client instruction, 2026-08-31) ─────────────
+ * It read "01 · Questions · Before you come up", with "Hiring, capacity, hours,
+ * food, and where the door actually is" under it — four pieces of text opening
+ * a document whose cover, one screen above, already says "05 · Questions ·
+ * FAQ", and whose standfirst was a list of the eight questions printed
+ * immediately below it. This page now works the way `/menu/` does: a cover and
+ * the list, with nothing in between restating either.
+ *
+ * The heading is kept as visually-hidden text rather than deleted, so the
+ * section still has an accessible name and the document still has an `h2`
+ * between its `h1` and the questions' own headings.
  */
 mount(
   'faq',
@@ -30,7 +41,6 @@ mount(
       index={faqPage.index}
       eyebrow={faqPage.eyebrow}
       name={faqPage.name}
-      statement={faqPage.statement}
       photo={faqPage.photo}
     >
       <div className="mt-xl flex flex-wrap gap-sm" data-cover-tail>
@@ -44,12 +54,15 @@ mount(
     </Cover>
 
     <section aria-labelledby="questions" className="shell section-pad">
-      <SectionHead
-        index="01"
-        label="Questions"
-        heading={<span id="questions">Before you come up</span>}
-        standfirst="Hiring, capacity, hours, food, and where the door actually is."
-      />
+      <h2 id="questions" className="sr-only">
+        Questions
+      </h2>
+
+      {/* The list opened under the section head's own rule. With the head gone
+          the rule stays — it is how this system marks the top of a group, and
+          `FaqList` draws a border under each question but none above the
+          first. Held to the same measure as the questions below it. */}
+      <div className="rule-ink mb-sm max-w-(--container-measure)" data-reveal />
 
       <FaqList items={faqs} />
     </section>

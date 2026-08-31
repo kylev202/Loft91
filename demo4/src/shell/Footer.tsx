@@ -48,10 +48,6 @@ export function Footer({ current }: { current: string }) {
                   </dd>
                 </div>
               ))}
-              <div className="col-span-2 grid grid-cols-subgrid">
-                <dt className="text-ink-3">{venue.hoursGap.days}</dt>
-                <dd className="text-ink-3">{venue.hoursGap.state}</dd>
-              </div>
             </dl>
 
             {/* ⚠ This used to be a [TBC] on the hours (MEMORY.md Q1, still
@@ -158,12 +154,26 @@ export function Footer({ current }: { current: string }) {
           </div>
         </div>
 
-        {/* --- The mark, filled with the room ---------------------------- */}
-        <div className="mt-3xl" aria-hidden="true">
+        {/* --- The mark, filled with the room ----------------------------
+            Capped at `--container-mark` rather than run to the full shell
+            (client, 2026-08-31: *"on the desktop, make the loft picture in the
+            footer smaller"*). The cap sits on this wrapper so it governs the
+            masked version and the no-mask fallback with one declaration and
+            they cannot drift apart.
+
+            Centred (client, same day). It is the one element in the system
+            not drawn from the left edge — every rule, title and column is —
+            and that is the point once the mark is capped: a 960px block held
+            against the left of a 1424px footer reads as a column that ran out
+            of room, where the same block on the page's own centre line reads
+            as a sign-off under the three columns above it. Centring a
+            full-bleed element would have meant nothing; centring a capped one
+            is the whole reason the cap and this instruction arrived together. */}
+        <div className="mx-auto mt-3xl max-w-(--container-mark)" aria-hidden="true">
           <div className="mark-fill">
             <Frame
               photo={photos.ascent}
-              sizes="100vw"
+              sizes="(min-width: 68rem) 960px, 92vw"
               alt=""
               className="h-full w-full object-cover"
             />
@@ -172,7 +182,7 @@ export function Footer({ current }: { current: string }) {
             className="mark-fill-fallback w-full"
             src={wordmarkBlack.src}
             srcSet={wordmarkBlack.srcSet}
-            sizes="100vw"
+            sizes="(min-width: 68rem) 960px, 92vw"
             width={wordmarkBlack.w}
             height={wordmarkBlack.h}
             alt=""

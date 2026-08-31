@@ -24,6 +24,6 @@ export function markLoaded() {
   }
 }
 
-/** Loader lift (760ms) + `--dur-short` (280ms), mirroring `--delay-hero`.
+/** Loader lift (2720ms) + `--dur-short` (280ms), mirroring `--delay-hero`.
     Seconds, for GSAP. */
-export const COVER_DELAY = loaderSkipped ? 0 : 1.04;
+export const COVER_DELAY = loaderSkipped ? 0 : 3.0;

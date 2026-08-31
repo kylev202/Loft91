@@ -8,9 +8,10 @@ import type { Photo } from '../data/photos';
 /**
  * THE COVER — the one structural idea this design is built on, rebuilt.
  *
- * Every page still opens on a full-bleed photograph of the real room. What
- * changed is where the words go: the photograph **ends**, and the title begins
- * underneath it on clean paper.
+ * Every page still opens on a photograph of the real room. What changed is
+ * where the words go: the photograph **ends**, and the title begins underneath
+ * it on clean paper. (It is no longer full bleed either — see the plate
+ * below — but that is a later, separate instruction.)
  *
  * That is the whole reset in one component. Nocturne set the title into the
  * foot of the frame, which meant three content-anchored gradient systems, a
@@ -47,7 +48,12 @@ export function CoverFrame({
   photo,
   children,
   tall = false,
-  sizes = '100vw',
+  /* The plate is the shell minus its gutter, so `100vw` would now over-request
+     the picture at every width. The three stops below are `--gutter`'s own
+     clamp read back as widths: it is flat at 24px until 480px, tracks 5vw
+     through the middle, and pins at 88px once `.shell` stops growing at
+     1600px — which leaves 1424px of plate. */
+  sizes = '(min-width: 110rem) 1424px, (min-width: 30rem) 90vw, calc(100vw - 3rem)',
 }: {
   photo: Photo;
   children: ReactNode;
@@ -67,8 +73,8 @@ export function CoverFrame({
 
       /* Every beat below is OPTIONAL, and that is the point of the helper.
          The home hero is now the photograph and one hairline — no title lines
-         and no tail (D-59) — while every interior page still carries an
-         eyebrow, a title and a statement. GSAP warns to the console for a tween
+         and no tail (D-59); an interior page carries an eyebrow and a title,
+         and three of the five carry buttons. GSAP warns to the console for a tween
          whose target list is empty, so a beat is added only when its selector
          actually matches something inside this cover. Scoped to `scope.current`
          rather than the document, so a cover can never animate another one's
@@ -105,15 +111,25 @@ export function CoverFrame({
 
   return (
     <header ref={scope}>
-      {/* The photograph. Full bleed, edge to edge, and it finishes.
+      {/* The photograph — mounted, not bled. Client instruction, 2026-08-31.
 
-          No top offset of any kind: the running head is `position: sticky`, so
-          it occupies real space in the flow above this and the picture simply
-          starts underneath it. A fixed nav would have needed the offset — and
-          would have put the running head over a photograph, which is the exact
-          contrast problem this redesign exists to delete. */}
-      <div data-cover className={`plate w-full ${tall ? 'h-(--hero-h)' : 'h-(--cover-h)'}`}>
-        <Frame photo={photo} sizes={sizes} priority className="h-full w-full object-cover" />
+          It sits in the same `.shell` as the words underneath it, so its left
+          and right edges land on exactly the same line as the page title and
+          every heading below. That alignment is the whole point
+          of the change: an image inset to an arbitrary amount is a banner with
+          a page under it, and an image inset to the text margin is the page's
+          own first block.
+
+          `pt-(--gutter)` closes the third side. The running head is
+          `position: sticky` so it occupies real space in the flow above this,
+          and the picture used to start immediately underneath it; now the same
+          white that runs down both sides runs across the top too, and the
+          plate is framed evenly on three sides. (Not the fourth — the words
+          are what sits below it, and their own `pt-xl` is the gap there.) */}
+      <div className="shell pt-(--gutter)">
+        <div data-cover className={`plate w-full ${tall ? 'h-(--hero-h)' : 'h-(--cover-h)'}`}>
+          <Frame photo={photo} sizes={sizes} priority className="h-full w-full object-cover" />
+        </div>
       </div>
 
       {/* The words, on paper. */}
@@ -124,30 +140,35 @@ export function CoverFrame({
 
 /**
  * The interior-page cover: an index and eyebrow, a hairline across the full
- * measure, then the page name at display size on the left with the page's one
- * written sentence set against it on the right.
+ * measure, and the page name at display size beneath it.
  *
- * The two-column split at `lg` is the editorial move the whole design turns on
- * — a serif title and a short sans paragraph holding opposite ends of a wide
- * rule is what a high-end retail page looks like, and it is what stops a
- * generous gutter from reading as an empty one. Below `lg` it stacks, because
- * on a phone there is one column and pretending otherwise costs the title its
- * size.
+ * ── The statement is gone (client instruction, 2026-08-31) ────────────────
+ * Every cover used to set the page's one written sentence against the title,
+ * holding the opposite end of the rule. It was the editorial move the design
+ * turned on, and losing it is a real cost to the lockup — but all five of them
+ * restated the eyebrow printed three lines above ("Behind the bar" over "The
+ * list behind the bar."; "Functions & venue hire" over "The upstairs room,
+ * available for functions and venue hire."), and a subtitle that says the
+ * label again is the first thing to go when the instruction is to cut text.
+ *
+ * The twelve-column split survives, because on About, Packages and FAQ the
+ * right-hand column still holds something real — the page's buttons, which is
+ * what the statement used to sit above. Where a page passes no children
+ * (Gallery) the column is not rendered at all and the title runs alone, so the
+ * grid never leaves an empty cell beside a heading.
  */
 export function Cover({
   index,
   eyebrow,
   name,
-  statement,
   photo,
   children,
 }: {
   index: string;
   eyebrow: string;
   name: string;
-  statement: string;
   photo: Photo;
-  /** A meta row under the statement — hours, a CTA, a count of plates. */
+  /** The page's buttons, set against the title on the right from `lg`. */
   children?: ReactNode;
 }) {
   return (
@@ -164,18 +185,23 @@ export function Cover({
           background and become the page drawn on the page. */}
       <div className="rule-ink mt-sm w-full" data-cover-rule />
 
-      <div className="mt-lg grid gap-lg lg:grid-cols-12 lg:gap-x-xl">
-        <h1 className="line-mask lg:col-span-7" data-cover-line>
-          <span className="block font-display text-display text-ink">{name}</span>
-        </h1>
+      {/* The grid exists to hold the title against something. With no children
+          there is nothing to hold it against, so the title is laid out by
+          ordinary flow — a lone `<h1>` in a twelve-column grid with no span
+          would be one column wide. */}
+      {children ? (
+        <div className="mt-lg grid gap-lg lg:grid-cols-12 lg:gap-x-xl">
+          <h1 className="line-mask lg:col-span-7" data-cover-line>
+            <span className="block font-display text-display uppercase text-ink">{name}</span>
+          </h1>
 
-        <div className="lg:col-span-5 lg:self-end lg:pb-2xs">
-          <p className="max-w-(--container-measure) text-statement font-light text-ink-2" data-cover-tail>
-            {statement}
-          </p>
-          {children}
+          <div className="lg:col-span-5 lg:col-start-8 lg:self-end lg:pb-2xs">{children}</div>
         </div>
-      </div>
+      ) : (
+        <h1 className="line-mask mt-lg" data-cover-line>
+          <span className="block font-display text-display uppercase text-ink">{name}</span>
+        </h1>
+      )}
     </CoverFrame>
   );
 }

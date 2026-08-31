@@ -130,6 +130,43 @@
   padding-block: var(--section-pad);
 }
 
+/* ── The frame ────────────────────────────────────────────────────────────
+   A pair, and they are only ever used together: `frame` on the outside of a
+   block that would otherwise run to the edge of the screen, `shell-inset` on
+   the container of its content.
+
+   The client's instruction was that the site should sit inside a white frame,
+   which means a tinted section can no longer bleed. The obvious fix — give the
+   section the page gutter — does not work, because the tint then needs its own
+   padding on the inside and the heading within it lands at gutter + padding
+   while the heading in the plain section above it is still at gutter. A panel
+   whose type is 24px to the right of every other block on the page is a worse
+   defect than the bleed was.
+
+   So the inset is split. `frame` takes `--frame` off the outside; `shell-inset`
+   takes the remaining `--gutter - --frame` off the inside. The content lands at
+   `--gutter`, the same as `.shell`, and the tint stops `--frame` short of the
+   edge.
+
+   `shell-inset`'s max-width is the shell's own minus the frame it is sitting
+   inside, and that subtraction is load-bearing rather than cosmetic. Above
+   `--container-shell` both blocks stop growing and start centring, and the two
+   caps have to differ by exactly the frame or the alignment that holds on a
+   laptop breaks on a wide monitor. */
+@utility frame {
+  width: 100%;
+  max-width: var(--container-shell);
+  margin-inline: auto;
+  padding-inline: max(var(--frame), env(safe-area-inset-left), env(safe-area-inset-right));
+}
+
+@utility shell-inset {
+  width: 100%;
+  max-width: calc(var(--container-shell) - 2 * var(--frame));
+  margin-inline: auto;
+  padding-inline: calc(var(--gutter) - var(--frame));
+}
+
 /* A focus ring drawn *inside* the element instead of around it.
 
    The base ring is two layers sitting outside the border box — a 2px ink
@@ -153,15 +190,21 @@
 
 @layer components {
   /* ------------------------------------------------------------------------
-     A plate. A photograph printed onto the page — no radius, no shadow, no
-     frame, no tint. The page margin around it is the frame, and the paper it
-     sits on is the mount. This is the single most important object in the
-     system: the reference language is image-led, and a plate is what "image"
-     means here.
+     A plate. A photograph printed onto the page — no shadow, no border, no
+     tint. The page margin around it is the frame, and the paper it sits on is
+     the mount. This is the single most important object in the system: the
+     reference language is image-led, and a plate is what "image" means here.
+
+     It carries a radius as of 2026-08-31, on client instruction. Every plate,
+     not only the cover: the corner is a property of "a picture mounted on this
+     page", so a rounded hero above square gateway frames would read as two
+     systems. `overflow: hidden` was already here for the hover scale, and it
+     is what clips the photograph to the curve — nothing else is needed.
      ------------------------------------------------------------------------ */
   .plate {
     position: relative;
     overflow: hidden;
+    border-radius: var(--radius-plate);
     /* The panel tone, not the page tone, so a photograph that has not decoded
        yet reads as a reserved frame rather than as a hole in the page. */
     background-color: var(--color-panel);
@@ -200,9 +243,13 @@
   .line-mask {
     display: block;
     overflow: hidden;
-    /* A serif at display size has deeper descenders than the grotesk this was
-       tuned for — 0.09em clipped the tail of every `g` in a page title. */
-    padding-block-end: 0.14em;
+    /* Was 0.14em, for a serif's descenders. Page titles are uppercase Switzer
+       since 2026-08-31, so the lowest ink in the box is the baseline and there
+       is no tail to clear — 0.14em was 7px of dead space under a title the
+       client had just asked to make smaller. What is left is a margin against
+       the font's own overshoot on round caps (O, C, G), not a descender
+       allowance. Put it back if lowercase display type ever returns. */
+    padding-block-end: 0.04em;
   }
 
   /* ------------------------------------------------------------------------
@@ -265,7 +312,7 @@
 
   /* ------------------------------------------------------------------------
      Loader. Paper ground, the client's black wordmark wiping in, one ink rule
-     drawing beneath it, then the whole sheet lifts. 1040ms end to end, once
+     drawing beneath it, then the whole sheet lifts. 3000ms end to end, once
      per session.
 
      CSS keyframes, not GSAP: this runs while the browser is at its busiest —
@@ -288,13 +335,13 @@
     place-items: center;
     pointer-events: none;
     background-color: var(--color-page);
-    animation: loader-lift var(--dur-short) var(--ease-move) 760ms forwards;
+    animation: loader-lift var(--dur-short) var(--ease-move) 2720ms forwards;
   }
   .loader__mark {
     display: grid;
     gap: var(--spacing-sm);
     width: min(320px, 54vw);
-    animation: loader-mark-out var(--dur-short) var(--ease-move) 760ms forwards;
+    animation: loader-mark-out var(--dur-short) var(--ease-move) 2720ms forwards;
   }
   /* The real mark, not a text stand-in, wiping in left to right — which reads
      as the letters arriving in sequence. A true per-letter animation needs a

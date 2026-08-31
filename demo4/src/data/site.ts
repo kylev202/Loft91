@@ -27,6 +27,16 @@
    it as invented, and the footer of every page says the build is placeheld.
    The [TBC] markers that used to carry those gaps are gone from the pages, so
    MEMORY.md §5 and §6 are now the only record of what is actually unknown.
+
+   ── The copy fields are gone (client instruction, 2026-08-31) ─────────────
+   A page used to carry two written lines here on top of its name: `statement`,
+   the sentence set beside the cover title, and `blurb`, one line under the
+   home page's gateway card. `blurb` stopped rendering when the landing page was
+   cut to four captioned frames, and `statement` is now removed everywhere —
+   every one of the five restated the eyebrow directly above it ("Behind the
+   bar" over "The list behind the bar."). A page is now its index, its eyebrow,
+   its name and its picture. The old wording is in git if any of it is wanted
+   back; nothing else read either field.
    ========================================================================== */
 
 import { photos, type Photo } from './photos';
@@ -41,11 +51,6 @@ export interface PageDef {
   readonly href: string;
   /** The small line above the cover title. */
   readonly eyebrow: string;
-  /** The one written sentence on the page, set in Zodiak. Describes what the
-      page contains — never what the venue promises. */
-  readonly statement: string;
-  /** One line on the home page's gateway block. */
-  readonly blurb: string;
   /** The cover photograph. Chosen because it carries that page's subject, not
       because it looked good: brass counter for the front door, tap bank for
       the drinks, the lit room for hire, the neon arch for the gallery, the
@@ -62,12 +67,10 @@ export const pages = [
     name: 'Menu',
     href: '/menu/',
     eyebrow: 'Behind the bar',
-    statement: 'The list behind the bar, and what happy hour costs.',
-    blurb: 'Draught and bottled beer, spirits, soju, cocktails and snacks.',
     photo: photos.taps,
     title: 'Menu — Loft 91',
     description:
-      'The drinks list at Loft 91, Footscray: draught and bottled beer, spirits, soju, cocktails, snacks, and happy-hour pricing.',
+      'The drinks list at Loft 91, Footscray: draught and bottled beer, spirits, soju, cocktails and snacks.',
   },
   {
     id: 'packages',
@@ -75,8 +78,6 @@ export const pages = [
     name: 'Packages',
     href: '/packages/',
     eyebrow: 'Functions & venue hire',
-    statement: 'The upstairs room, available for functions and venue hire.',
-    blurb: 'The room, the screen wall, and how to start an enquiry.',
     photo: photos.event,
     title: 'Packages — Loft 91',
     description:
@@ -88,8 +89,6 @@ export const pages = [
     name: 'Gallery',
     href: '/gallery/',
     eyebrow: 'The room',
-    statement: 'Eight frames of the room, and of the way up to it.',
-    blurb: 'The neon stairwell, the bar, the room and the screen wall.',
     photo: photos.stair,
     title: 'Gallery — Loft 91',
     description:
@@ -101,12 +100,6 @@ export const pages = [
     name: 'About us',
     href: '/about/',
     eyebrow: 'The venue',
-    // Composed only from §1 confirmed facts — the category, the position and
-    // the street. The venue's own story copy is still Missing in §5; the About
-    // page now prints invented placeholder copy in its place (D-60, and see
-    // `venue.story`) rather than a [TBC].
-    statement: 'A bar and function space, one flight up from Nicholson Street.',
-    blurb: 'What the place is, when it is open, and how to find the door.',
     photo: photos.entrance,
     title: 'About us — Loft 91',
     description:
@@ -127,8 +120,6 @@ export const faqPage = {
   name: 'FAQ',
   href: '/faq/',
   eyebrow: 'Questions',
-  statement: 'What people ask before they come up — and what is still to confirm.',
-  blurb: 'Hiring, capacity, hours, food and where the door actually is.',
   photo: photos.neon,
   title: 'FAQ — Loft 91',
   description:

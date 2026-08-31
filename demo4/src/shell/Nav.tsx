@@ -238,7 +238,7 @@ function NavOverlay({
                 >
                   {index}
                 </span>
-                <span className="font-display text-[2.5rem] leading-none tracking-tight text-ink">
+                <span className="font-display text-display uppercase text-ink">
                   {name}
                 </span>
               </span>

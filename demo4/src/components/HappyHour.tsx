@@ -56,7 +56,7 @@ export function HappyHourPanel({
   return (
     <div
       data-reveal
-      className={`border border-rule-strong p-lg md:p-xl ${
+      className={`rounded-plate border border-rule-strong p-lg md:p-xl ${
         onPanel ? 'bg-panel-2' : 'bg-panel'
       } ${head ? 'md:grid md:grid-cols-[1fr_1.4fr] md:items-start md:gap-xl' : ''}`}
     >
@@ -91,19 +91,33 @@ export function HappyHourPanel({
 
 export function HappyHour({ index, heading }: { index?: string; heading: string }) {
   return (
-    <section aria-labelledby="happy-hour" className="bg-panel">
-      <div className="shell section-pad">
-        <SectionHead
-          index={index}
-          label="Happy hour"
-          heading={<span id="happy-hour">{heading}</span>}
-          standfirst={happyHour.when}
-        />
+    /* `frame` + `shell-inset`, like every other tinted ground since
+       2026-08-31 — the tint stops short of the screen and the content inside
+       still lands on the page's own left edge. This section is not mounted
+       anywhere today (see the note at the top of home.tsx); it is kept in step
+       so reinstating it does not reintroduce the one full-bleed band on an
+       otherwise framed site. */
+    <section aria-labelledby="happy-hour" className="frame">
+      <div className="rounded-plate bg-panel">
+        <div className="shell-inset section-pad">
+          {/* ⚠ The trading window used to be this head's standfirst.
+              `SectionHead` no longer takes one (2026-08-31, the site-wide copy
+              cut), and this section passes `head={false}` below, so as it
+              stands the window is stated nowhere in it. Nothing renders this
+              component today; if it is ever reinstated, drop the `head={false}`
+              so the panel states the window itself — that is the only thing
+              this edit took out of it. */}
+          <SectionHead
+            index={index}
+            label="Happy hour"
+            heading={<span id="happy-hour">{heading}</span>}
+          />
 
-        {/* The head is already above it, so the panel drops its own; and this
-            section's ground is `--color-panel`, so the block takes the step
-            above rather than vanishing into it. */}
-        <HappyHourPanel head={false} onPanel />
+          {/* The head is already above it, so the panel drops its own; and this
+              section's ground is `--color-panel`, so the block takes the step
+              above rather than vanishing into it. */}
+          <HappyHourPanel head={false} onPanel />
+        </div>
       </div>
     </section>
   );

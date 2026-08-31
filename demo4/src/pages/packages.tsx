@@ -32,6 +32,28 @@ const page = pageById('packages');
  * client's own photographs — white brick, the wall-sized screen, banquette
  * seating, the bar with draught taps. Describing a supplied photograph is
  * reading a source. The two figures beside them are not.
+ *
+ * ── The subtitles are gone (client instruction, 2026-08-31) ───────────────
+ * Four blocks of written copy came off this page, and every one of them was
+ * already stated underneath itself:
+ *
+ *   · The cover statement, "The upstairs room, available for functions and
+ *     venue hire" — under an eyebrow reading "Functions & venue hire".
+ *   · §01's standfirst, "One upstairs room with its own bar, a wall-sized
+ *     screen and seating along the brick" — the four rows of the feature list
+ *     directly beneath it, run together into a sentence.
+ *   · §02's standfirst, which explained that the tiers are a minimum spend
+ *     rather than a per-head price and that they differ in how much of the
+ *     floor is yours. Each tier prints "From $X minimum spend" and a guest
+ *     range of its own, so the section said it four times.
+ *   · §03's "Email reaches the people who run the room…" paragraph, which
+ *     named the same three channels as the two buttons beside it and the
+ *     three-row list opposite.
+ *
+ * What survived is the one line on the page that is an instruction rather than
+ * a description — what to put in an enquiry — moved out of §03's standfirst
+ * into the body, where the paragraph it replaces used to be. It is the only
+ * thing a reader could not have worked out from the section around it.
  */
 const features = [
   { label: 'The space', value: 'One upstairs room, a flight up from Nicholson Street' },
@@ -52,7 +74,6 @@ mount(
       index={page.index}
       eyebrow={page.eyebrow}
       name={page.name}
-      statement={page.statement}
       photo={page.photo}
     >
       <div className="mt-xl flex flex-wrap gap-sm" data-cover-tail>
@@ -67,12 +88,7 @@ mount(
 
     {/* --- 01 The room ---------------------------------------------------- */}
     <section aria-labelledby="the-room" className="shell section-pad">
-      <SectionHead
-        index="01"
-        label="The room"
-        heading={<span id="the-room">What you are hiring</span>}
-        standfirst="One upstairs room with its own bar, a wall-sized screen and seating along the brick."
-      />
+      <SectionHead index="01" label="The room" heading={<span id="the-room">What you are hiring</span>} />
 
       <div className="grid gap-lg xl:gap-2xl lg:grid-cols-12">
         <dl className="lg:col-span-5">
@@ -110,63 +126,68 @@ mount(
         `--text-item` with tabular figures, so the three of them align across
         the row and can be compared at a glance, which is the only job this
         section has. */}
-    <section aria-labelledby="tiers" className="bg-panel">
-      <div className="shell section-pad">
-        <SectionHead
-          index="02"
-          label="Packages"
-          heading={<span id="tiers">Three ways to take the room</span>}
-          standfirst="A minimum spend rather than a per-head price, so the money goes across the bar instead of into a hire fee. Every tier is on the same floor — what changes is how much of it is yours."
-        />
+    <section aria-labelledby="tiers" className="frame">
+      {/* The tinted ground stops short of the screen, on client instruction —
+          nothing on this site touches the edge any more. `frame` + `shell-inset`
+          rather than a single `shell`: the panel takes `--frame` off the outside
+          and gives the remaining `--gutter - --frame` back on the inside, so this
+          heading lands on exactly the same left edge as the ones in the plain
+          sections above and below it. The arithmetic is in base.css. */}
+      <div className="rounded-plate bg-panel">
+        <div className="shell-inset section-pad">
+          <SectionHead
+            index="02"
+            label="Packages"
+            heading={<span id="tiers">Three ways to take the room</span>}
+          />
 
-        <ul className="grid gap-lg md:grid-cols-3 xl:gap-xl">
-          {tiers.map(({ id, name, scale, price, summary, includes }) => (
-            <li key={id} className="border-t border-rule-strong pt-md" data-reveal>
-              <h3 className="font-display text-lead text-ink">{name}</h3>
-              <p className="label mt-2xs text-ink-3">{scale}</p>
-              <p className="mt-sm text-item text-ink tabular-nums">{price}</p>
-              <p className="mt-sm text-body text-ink-2">{summary}</p>
+          <ul className="grid gap-lg md:grid-cols-3 xl:gap-xl">
+            {tiers.map(({ id, name, scale, price, summary, includes }) => (
+              <li key={id} className="border-t border-rule-strong pt-md" data-reveal>
+                <h3 className="font-display text-lead tracking-wide uppercase text-ink">{name}</h3>
+                <p className="label mt-2xs text-ink-3">{scale}</p>
+                <p className="mt-sm text-item text-ink tabular-nums">{price}</p>
+                <p className="mt-sm text-body text-ink-2">{summary}</p>
 
-              <ul className="mt-md">
-                {includes.map((line) => (
-                  <li key={line} className="border-t border-rule py-xs text-small text-ink-2">
-                    {line}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+                <ul className="mt-md">
+                  {includes.map((line) => (
+                    <li key={line} className="border-t border-rule py-xs text-small text-ink-2">
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
 
-        {/* The terms, as one row under the tiers rather than as small print
-            inside each of them — they are identical across all three, and
-            saying them three times would make them the loudest thing in the
-            section. */}
-        <dl className="mt-2xl grid gap-md md:grid-cols-2 lg:grid-cols-4">
-          {terms.map(({ label, value }) => (
-            <div key={label} className="border-t border-rule pt-sm" data-reveal>
-              <dt className="label text-ink-3">{label}</dt>
-              <dd className="mt-2xs text-small text-ink-2">{value}</dd>
-            </div>
-          ))}
-        </dl>
+          {/* The terms, as one row under the tiers rather than as small print
+              inside each of them — they are identical across all three, and
+              saying them three times would make them the loudest thing in the
+              section. */}
+          <dl className="mt-2xl grid gap-md md:grid-cols-2 lg:grid-cols-4">
+            {terms.map(({ label, value }) => (
+              <div key={label} className="border-t border-rule pt-sm" data-reveal>
+                <dt className="label text-ink-3">{label}</dt>
+                <dd className="mt-2xs text-small text-ink-2">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
     </section>
 
     {/* --- 03 Enquire ----------------------------------------------------- */}
     <section aria-labelledby="enquire-h" id="enquire" className="shell section-pad">
-      <SectionHead
-        index="03"
-        label="Enquiries"
-        heading={<span id="enquire-h">Start an enquiry</span>}
-        standfirst="Send the date, rough numbers and what the night is for, and you get a hold on the room and a written quote back."
-      />
+      <SectionHead index="03" label="Enquiries" heading={<span id="enquire-h">Start an enquiry</span>} />
 
       <div className="grid gap-lg xl:gap-2xl lg:grid-cols-12">
         <div className="lg:col-span-6">
+          {/* The page's one remaining paragraph. It is here rather than in the
+              section head because it is an instruction, not a description of
+              the section — the reader cannot get it from the buttons or the
+              list of addresses opposite. */}
           <p className="max-w-(--container-measure) text-lead text-ink-2" data-reveal>
-            Email reaches the people who run the room. Instagram works too, and the phone is
-            answered from behind the bar on trading nights.
+            Send the date, rough numbers and what the night is for.
           </p>
           <div className="mt-xl flex flex-wrap gap-sm" data-reveal>
             <Button href={mailto} variant="primary">

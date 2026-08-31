@@ -20,6 +20,18 @@ import { withBase } from '../lib/base';
  * than an underlined interactive one, and the way onward is stated at the top
  * of the section — where somebody scanning the page is looking — rather than
  * only after they have read to the end of it.
+ *
+ * ── The standfirst is gone (client instruction, 2026-08-31) ───────────────
+ * A section could set a `--text-lead` paragraph under its heading. Six did, on
+ * About, Packages and FAQ, and each one restated what was immediately below
+ * it: the feature list as a sentence, the tier prices as a sentence, the eight
+ * questions as a list of topics. The prop is removed rather than left unused,
+ * so the component cannot quietly grow them back one page at a time; the one
+ * paragraph that survived the cut is set in its section's own body, which is
+ * where a paragraph that is content rather than chrome belongs.
+ *
+ * A head is now four things at most: the rule, the index, the label, and the
+ * heading — plus the optional way onward.
  */
 export function SectionHead({
   index,
@@ -27,7 +39,6 @@ export function SectionHead({
   heading,
   href,
   linkLabel = 'View all',
-  standfirst,
 }: {
   /** Omitted on the home page, where the `01`…`05` numerals belong to the
       destinations and reusing them for a section would name two things once. */
@@ -38,7 +49,6 @@ export function SectionHead({
       preview of a document, and this is the way through. */
   href?: string;
   linkLabel?: string;
-  standfirst?: ReactNode;
 }) {
   return (
     <header className="mb-xl">
@@ -69,17 +79,11 @@ export function SectionHead({
       </div>
 
       <h2
-        className="mt-lg max-w-(--container-measure) font-display text-heading tracking-tight text-ink"
+        className="mt-lg max-w-(--container-measure) font-display text-heading uppercase text-ink"
         data-reveal
       >
         {heading}
       </h2>
-
-      {standfirst && (
-        <p className="mt-md max-w-(--container-measure) text-lead text-ink-2" data-reveal>
-          {standfirst}
-        </p>
-      )}
     </header>
   );
 }

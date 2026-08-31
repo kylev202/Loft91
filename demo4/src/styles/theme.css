@@ -6,8 +6,8 @@
    complete reset of the Nocturne direction (archive/demo3), taken on user
    instruction from the visual language of a high-end furniture retailer:
    warm white, near-black type, zero accent hue, generous margins, and
-   photography carried at full bleed with the words set beside it rather than
-   burned into it.
+   photography mounted inside those margins with the words set beside it
+   rather than burned into it.
 
    Three rules resolve every argument about a detail:
 
@@ -25,11 +25,13 @@
       paper. That is what makes this read as editorial retail rather than as a
       nightclub flyer inverted.
 
-   3. **Nothing rounds, nothing floats, nothing glows.** Radius is zero
-      everywhere, on every surface. A rounded corner on a full-bleed plate or
-      a hairline rule reads as UI chrome, and this page has no chrome. Depth
-      is one step of surface tone and a 1px rule. There are no shadows to
-      build an elevation system from, so there is no elevation system.
+   3. **Nothing floats and nothing glows — but things round now.** Depth is
+      one step of surface tone and a 1px rule. There are no shadows, so there
+      is no elevation system. What changed on 2026-08-31 is the corner: the
+      photography no longer runs to the viewport edge, so a plate has four
+      visible corners on white paper, and those are rounded at
+      `--radius-plate`. A rule and a control are still square — the curve
+      marks a mounted object, not chrome. See the Radius block below.
 
    ── Why the reset ─────────────────────────────────────────────────────────
    `archive/demo3` (Nocturne) is deep warm near-black with brass as its single
@@ -113,19 +115,33 @@
   --color-focus: #16150f;
 
   /* --- Type -------------------------------------------------------------
-     Two families, four faces, four jobs — and the roles are the INVERSE of
-     Nocturne's, which is the loudest single signal that this is a different
-     design and not a recolour of the last one.
+     ONE family, three faces, and the running head is the whole brief.
 
-       Zodiak Regular    display. Every page title and section heading. A
-                         serif at size on warm paper is the retail-editorial
-                         register in one decision.
+     Client instruction, 2026-08-31: *"change the content font to the nav bar
+     font"*, naming the nav's own items — Menu, Packages, Gallery, About us.
+     So the serif is off the site. Every page title and every heading is now
+     the same face, weight and case as a nav item, scaled up: Switzer Medium,
+     uppercase, tracked. The nav is no longer a small voice sitting apart from
+     the page — it is the page's voice, printed small.
+
+       Switzer Medium    the display voice: page titles, section headings,
+                         group headings — uppercase and tracked at every size,
+                         which is the nav's `.label` setting scaled optically
+                         rather than a second idea
        Switzer Light     the statement voice, and large quiet type
        Switzer Regular   body, drinks list, tables
-       Switzer Medium    labels, nav, buttons — the small wide-tracked
-                         uppercase voice that echoes the wordmark's own thin
-                         geometric construction */
-  --font-display: 'Zodiak', 'Zodiak Fallback', Georgia, serif;
+       Switzer Medium    labels, nav, buttons — the 11px original
+
+     `--font-display` survives as a NAME rather than as a second family: it is
+     the *role* ("this is display type"), and it now resolves to the same stack
+     as `--font-interface`. That is deliberate and it is the escape hatch. The
+     `font-display` classes scattered through the components still mark every
+     place the display face is used, so bringing a serif back — this one or
+     another — is one line here rather than an archaeology exercise across a
+     dozen files. Zodiak's `@font-face` stays declared in fonts.css for the
+     same reason; nothing references it, so nothing downloads it, and the six
+     documents no longer preload it. */
+  --font-display: 'Switzer', 'Switzer Fallback', 'Cabinet Grotesk', system-ui, sans-serif;
   --font-interface: 'Switzer', 'Switzer Fallback', 'Cabinet Grotesk', system-ui, sans-serif;
 
   /* ── The display ramp ───────────────────────────────────────────────────
@@ -135,28 +151,73 @@
      carries over from Nocturne because the reasoning was sound; the values
      are all new, and the top end is much lower.
 
-     It is lower on purpose. A 96px title was a poster set into a photograph
-     of a small upstairs room. Here the title sits on paper under the
-     photograph, where a serif at 76px is already the largest thing on the
-     page by a wide margin — and the reference language is quiet.
+     It is lower on purpose, and it has now been lowered three times. The
+     first cut was the redesign's: a 96px title was a poster set into a
+     photograph of a small upstairs room. The second is the client's,
+     2026-08-31 — *"smaller the headings they are quite too big"* — and it is
+     compounded by the switch to uppercase in the same instruction, because
+     caps read larger than the same number of points of lowercase: every glyph
+     is at cap height, and there is no x-height line for the eye to measure the
+     word against. Cutting the numbers by a third while going all-caps lands
+     close to the apparent size of the serif ramp it replaces, which is the
+     point — the request was for the type to stop shouting, not for the page to
+     lose its hierarchy.
+
+     The third cut is the client's too, same day, and it is narrower than the
+     other two: *"in the desktop the menu looks a bit too big"*. Only the wide
+     end moved. Both levels keep their 360px anchor exactly — the phone was not
+     what was too big, and mobile is the primary target (CLAUDE.md §4.5) — so
+     the clamps simply arrive at a lower ceiling: the curve is shallower, not
+     shifted. That is also why nothing else in this file changed. The menu page
+     holds itself to three sizes and the third, `--text-item`, is a FIXED 17px:
+     it renders identically on the phone the client was happy with, so cutting
+     it would have paid for a desktop complaint out of the mobile page.
 
      The `rem + vw` form rather than bare `vw` keeps these levels responsive
      to the reader's own browser text-zoom setting. */
 
   /* The page title, set on paper beneath the cover photograph.
-     40px @360 · 54px @768 · 76px @1440 and above. */
-  --text-display: clamp(2.5rem, 1.75rem + 3.333vw, 4.75rem);
-  --text-display--line-height: 0.98;
-  --text-display--letter-spacing: -0.02em;
+     Was 40 · 54 · 76, then 30 · 38 · 50. Now 30px @360 · 34px @768 · 40px
+     @1440 and above — the phone anchor untouched, the desktop end down 20%.
+
+     Positive tracking, where the serif ramp was tight: -0.02em is a lowercase
+     setting, and uppercase set tight closes the counters and turns a title
+     into a block. 0.04em here rather than the nav's 0.18em because tracking is
+     an optical correction, not a constant — the 11px label needs six times the
+     air a 40px title does to read as the same voice. Unchanged by the cut:
+     40px is still far enough up the ramp that the correction holds. */
+  --text-display: clamp(1.875rem, 1.667rem + 0.926vw, 2.5rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: 0.04em;
+  --text-display--font-weight: 500;
 
   /* A section heading inside a page. Below the page title, above everything.
-     26px @360 · 31px @768 · 40px @1440 and above. */
-  --text-heading: clamp(1.625rem, 1.333rem + 1.296vw, 2.5rem);
-  --text-heading--line-height: 1.1;
-  --text-heading--letter-spacing: -0.015em;
+     Was 26 · 31 · 40, then 20 · 22 · 28. Now 20px @360 · 21px @768 · 23px
+     @1440 and above. This is the level the desktop cut is really about: the
+     menu page repeats it ten times down two columns, so it, not the single
+     page title, is what made that page read loud on a wide screen.
 
-  /* The statement — Switzer Light, one sentence, the quiet voice under a
-     serif title. 19px @360 · 22px @768 · 26px @1440 and above. */
+     More tracking than the title and less than the label, on the same optical
+     curve: 0.08em — which is `--tracking-wide`, written out here because a
+     `--text-*--letter-spacing` sub-property cannot reference another token. */
+  --text-heading: clamp(1.25rem, 1.1875rem + 0.278vw, 1.4375rem);
+  --text-heading--line-height: 1.25;
+  --text-heading--letter-spacing: 0.08em;
+  --text-heading--font-weight: 500;
+
+  /* The statement — Switzer Light, one sentence, the quiet voice under the
+     title. 19px @360 · 22px @768 · 26px @1440 and above.
+
+     ⚠ NO CALLER since 2026-08-31 (D-70): the client asked for the site's
+     subtitles to go, and this level existed for exactly one element — the
+     sentence beside a cover title. Kept rather than deleted, on the same
+     footing as `hoursSummary` in `data/venue.ts`: a size level is a design
+     decision, the ramp reads wrong with a hole in it, and reinstating a
+     statement should not also mean re-deriving its clamp.
+
+     While it has no caller, every visible level on the site is uppercase
+     Medium or the interface face — the "one continuous run of caps" this level
+     was protecting against is now held off by the body sizes alone. */
   --text-statement: clamp(1.1875rem, 1.042rem + 0.648vw, 1.625rem);
   --text-statement--line-height: 1.42;
   --text-statement--letter-spacing: -0.005em;
@@ -210,12 +271,30 @@
   --spacing-3xl: 10rem;
 
   /* --- Radius -----------------------------------------------------------
-     Zero. Not "small" — zero, everywhere, on every surface. Declared as a
-     token rather than left implicit so a stray `rounded-*` in a component
-     has a named thing to be wrong about. There is deliberately no
-     `--radius-md` or `--radius-lg`: a token named for a curve this system
-     does not contain is an invitation to use one. */
+     Two values, and the second one is a client instruction.
+
+     This system shipped at zero radius everywhere, on the argument that a
+     rounded corner on a full-bleed plate reads as UI chrome. That argument
+     depended on *full-bleed* — a picture running off all four edges of the
+     screen has no corners to round in the first place, so squaring it costs
+     nothing. Client instruction, 2026-08-31, removed that premise: the cover
+     photograph no longer runs to the viewport edge, it sits inside the same
+     margin as the words below it and the page is meant to read as a white
+     frame around it. A plate with four visible corners on white paper is a
+     mounted print, and a mounted print has a radius.
+
+     So `--radius-plate` is the one curve this system contains, and it is used
+     on exactly one class of thing: a block that sits *on* the paper — a
+     photograph, a tinted panel, a bordered box. Type, rules, buttons and the
+     running head stay square, because they are lines and controls rather than
+     mounted objects.
+
+     Clamped rather than fixed so the curve stays in proportion to the frame
+     around it: 12px on a phone where the margin is 24px, 20px on a wide
+     desktop where it is 88px. `--radius-none` survives so a component that
+     must be square has a named token to say so with. */
   --radius-none: 0px;
+  --radius-plate: clamp(0.75rem, 1.1vw, 1.25rem);
 
   /* Content widths, each named for what it is. ⚠ Tailwind resolves `max-w-*`
      from `--container-*` first and the spacing scale second, so a t-shirt
@@ -229,6 +308,16 @@
      tall, so a desktop screen holds one and a half pictures; at 68rem it is
      ~660px and the pair reads as a pair. */
   --container-wall: 68rem;
+  /* The footer mark — the wordmark masked over the stairwell, the last thing
+     on every page. Same argument as the wall, one page lower: run to the full
+     shell and at 1600px the mark is 1424px wide and 308px tall, which is a
+     billboard closing a design whose whole thesis is restraint. 60rem lands it
+     at 960 x 208.
+
+     Capped rather than scaled, because a max-width is desktop-only for free —
+     below 60rem the mark is already narrower than the cap, so the phone the
+     client did not complain about renders byte-for-byte as it did before. */
+  --container-mark: 60rem;
 
   /* --- Motion -----------------------------------------------------------
      Two curves, and nothing bounces. The reference language has no parallax
@@ -245,9 +334,9 @@
   --dur-long: 720ms;
   --dur-settle: 900ms; /* an image coming to rest */
 
-  /* The loader lifts at 760ms + --dur-short. Held as one value so the hero's
+  /* The loader lifts at 2720ms + --dur-short. Held as one value so the hero's
      entrance and the loader's exit can never drift apart. */
-  --delay-hero: 1040ms;
+  --delay-hero: 3000ms;
 
   /* --- Breakpoints — 480 / 768 / 1024 / 1440 ---------------------------- */
   --breakpoint-sm: 30rem;
@@ -277,12 +366,48 @@
   --section-pad: clamp(5rem, 11vh, 9rem);
   --nav-h: 4.5rem;
 
+  /* --- The frame --------------------------------------------------------
+     The white margin nothing is allowed to cross. Client instruction,
+     2026-08-31: the site should read as if it sits inside a white frame, so
+     no photograph and no tinted ground touches the edge of the screen any
+     more.
+
+     Two insets do that work, and the difference between them is what kind of
+     object is being inset:
+
+       `--gutter`   a PLATE — the cover photograph. It lines up exactly with
+                    the type below it, because the client's word was "evenly
+                    padding with the content below", and a picture that agrees
+                    with the text margin is what makes the page read as one
+                    framed object rather than a banner with a page under it.
+
+       `--frame`    a GROUND — a tinted section that runs nearly the full
+                    width. It cannot take the gutter: the tint needs its own
+                    internal padding, and gutter-outside plus padding-inside
+                    would push a heading inside a panel well past the heading
+                    in the section above it. So the ground stops just short of
+                    the edge, and `.shell-inset` in base.css takes the
+                    remaining `--gutter - --frame` on the inside — which lands
+                    panel content on exactly the same left edge as everything
+                    else on the page. The arithmetic is written out there.
+
+     12px on a phone, 24px on a wide desktop. Always smaller than `--gutter`
+     at every viewport, which is what keeps that subtraction positive. */
+  --frame: clamp(0.75rem, 1.5vw, 1.5rem);
+
   /* --- The cover photograph ---------------------------------------------
-     A full-bleed plate that ENDS, with the page title on paper beneath it.
-     There is no type over the image, so there is no grade, no scrim, and none
-     of Nocturne's `--cover-band` machinery — that band existed to stop a title
+     A plate that ENDS, with the page title on paper beneath it. There is no
+     type over the image, so there is no grade, no scrim, and none of
+     Nocturne's `--cover-band` machinery — that band existed to stop a title
      jumping between pages because it was bottom-anchored inside the
      photograph, and a title on paper cannot jump.
+
+     Since 2026-08-31 it is no longer full bleed: it sits inside `--gutter` on
+     both sides and the same distance below the running head, so it is framed
+     evenly on three sides. The heights below are unchanged — they were always
+     viewport-relative rather than derived from the width — but the plate is
+     now narrower than the screen, so both read slightly taller in proportion
+     than they did edge to edge.
 
      Two heights: the home page's hero, the largest thing on the site, and the
      shorter band every interior page opens on. */
