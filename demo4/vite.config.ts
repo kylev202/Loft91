@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 /** One HTML document per destination — this is a multi-page app, not a router.
  *
  *  The brief is "each nav item gets its own page", and the honest way to build
- *  that on a static host is six real documents. It costs no router library, it
+ *  that on a static host is a real document each. There are eight now — the six
+ *  the brief asked for, plus `/enquire/` and the venue-only `/admin/` board.
+ *  It costs no router library, it
  *  means a page ships only its own code, every URL is directly crawlable and
  *  cacheable, and the shared React/GSAP/Lenis chunk is fetched once and then
  *  served from cache on every subsequent navigation.
@@ -42,6 +44,14 @@ export default defineConfig({
         // Not a nav destination — reached from the home page's FAQ heading,
         // from About us, and from the footer index. Still a real document.
         faq: page('./faq/index.html'),
+        // Also not a nav destination: the target of every "Enquire" button on
+        // the site, and listed in the footer index.
+        enquire: page('./enquire/index.html'),
+        // The venue's own board. Deliberately not in the nav, not in the footer
+        // index and `noindex` in its own head — see `src/pages/admin.tsx`. It is
+        // built because it has to be reachable by URL, not because it is part
+        // of the site.
+        admin: page('./admin/index.html'),
       },
     },
   },

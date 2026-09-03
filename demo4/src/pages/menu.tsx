@@ -1,5 +1,6 @@
 import { mount } from '../lib/mount';
-import { CoverFrame } from '../shell/Cover';
+import { Cover } from '../shell/Cover';
+import { Button } from '../components/ui/Button';
 import { DrinksList } from '../components/DrinksList';
 import { pageById } from '../data/site';
 
@@ -35,13 +36,22 @@ const page = pageById('menu');
  * eyebrow already reading "Behind the bar". It said the same thing twice, so
  * it went with the rest of the site's cover statements.
  *
- * What is left is short enough that the shared `Cover` would now do: an index,
- * an eyebrow, a rule and the name. It is still composed here because this page
- * passes no buttons, and merging the two is a change to four other pages
- * nobody asked for.
+ * ── The cover is now the shared one, with two buttons (2026-09-03) ───────
+ * The words here used to be composed locally, on the argument that this page
+ * passed no buttons and merging it into `Cover` would have been a change to
+ * four other pages nobody asked for. It passes buttons now — Menu was the one
+ * interior page whose cover ended on the title, so it read as a shorter page
+ * than the rest of the set — which is precisely the case `Cover` already
+ * handles: index, eyebrow, rule, and the title held against the actions from
+ * `lg` up. The local copy went with it, so the lockup can no longer drift from
+ * About, Packages, FAQ and Enquire.
  *
- * `CoverFrame` supplies the plate, the `data-cover` view-transition name and
- * the entrance timeline; the words below it are this page's own.
+ * The pair is the site's standing one — the enquiry as the primary, since a
+ * drinks list is also read by somebody pricing a night here, and beside it the
+ * page's own list. "See all drinks" is an in-page hash rather than a
+ * navigation: the list is directly below, and the cover now stands a full
+ * screen above it on a phone, so the button is the way past the photograph for
+ * anyone who came here to read prices.
  *
  * The page holds itself to three sizes: `--text-display` here, `--text-heading`
  * on a drinks group, `--text-item` on everything else. The first two are
@@ -52,18 +62,16 @@ const page = pageById('menu');
 mount(
   'menu',
   <>
-    <CoverFrame photo={page.photo}>
-      <p className="label flex items-baseline gap-xs text-ink-3" data-cover-tail>
-        <span className="tabular-nums">{page.index}</span>
-        <span className="text-ink">{page.eyebrow}</span>
-      </p>
-
-      <div className="rule-ink mt-sm w-full" data-cover-rule />
-
-      <h1 className="line-mask mt-lg" data-cover-line>
-        <span className="block text-display uppercase text-ink">{page.name}</span>
-      </h1>
-    </CoverFrame>
+    <Cover index={page.index} eyebrow={page.eyebrow} name={page.name} photo={page.photo}>
+      <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
+        <Button href="/enquire/" variant="primary">
+          Start an enquiry
+        </Button>
+        <Button href="#drinks" variant="secondary">
+          See all drinks
+        </Button>
+      </div>
+    </Cover>
 
     <DrinksList />
   </>,

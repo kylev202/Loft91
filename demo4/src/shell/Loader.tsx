@@ -7,7 +7,7 @@ import { wordmarkBlack } from '../data/photos';
  *
  * The client's own wordmark wipes in left to right, an ink rule draws beneath
  * it, and the whole sheet lifts. 3000ms end to end, CSS keyframes only, and
- * **once per session** — not once per page. On a six-document site that
+ * **once per session** — not once per page. On an eight-document site that
  * distinction is the difference between a signature and an obstacle.
  *
  * The sheet is the page colour, which on this design means the loader is the

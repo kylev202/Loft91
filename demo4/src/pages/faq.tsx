@@ -43,7 +43,7 @@ mount(
       name={faqPage.name}
       photo={faqPage.photo}
     >
-      <div className="mt-xl flex flex-wrap gap-sm" data-cover-tail>
+      <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
         <Button href={venue.instagram.url} variant="primary" external>
           Ask on Instagram
         </Button>

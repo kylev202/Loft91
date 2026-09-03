@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FBFAF8" />
+    <title>Enquiries — venue only</title>
+
+    <!-- The venue's own board, not part of the site. It is absent from the nav,
+         the phone menu and the footer index for the same reason it is absent
+         from search: nobody should arrive here by browsing or by searching.
+         `noindex` keeps it out of results; `nofollow` stops the crawler walking
+         back out of it into the public pages as if this were one of them. -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon-180.png" />
+
+    <!-- No image preload: this page has no cover photograph, so the first
+         paint is type and the font is the only thing worth fetching early. -->
+    <link rel="preload" href="/fonts/Switzer-Medium.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem('l91-loaded') === '1';
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) skip = true;
+        if (skip) document.documentElement.setAttribute('data-loader', 'skip');
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/pages/admin.tsx"></script>
+  </body>
+</html>

@@ -57,7 +57,11 @@ import { menuGroups } from '../data/menu';
  */
 export function DrinksList() {
   return (
-    <div className="shell section-pad">
+    /* `id` so the cover's "See all drinks" lands here rather than at the top
+       of a page the visitor is already on. `base.css` gives every `[id]` the
+       sticky running head's height as `scroll-margin-top`, so the first ink
+       rule arrives clear of the nav. */
+    <div id="drinks" className="shell section-pad">
       <div className="grid gap-x-2xl gap-y-xl lg:grid-cols-2">
         {menuGroups.map(({ id, heading, items, note }) => (
           <section key={id} aria-labelledby={`group-${id}`} data-reveal>

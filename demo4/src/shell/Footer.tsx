@@ -5,7 +5,7 @@ import { photos, wordmarkBlack } from '../data/photos';
 import { Frame } from '../components/ui/Frame';
 
 /**
- * The footer is the same on all six pages, which is what makes it the right
+ * The footer is the same on all eight pages, which is what makes it the right
  * place for the site's full index and its one repeated set of facts.
  *
  * Three columns — where and when, the pages, off-site — which is the reference
@@ -140,7 +140,7 @@ export function Footer({ current }: { current: string }) {
             </ul>
 
             <a
-              href={withBase('/packages/#enquire')}
+              href={withBase('/enquire/')}
               className="group label mt-lg flex min-h-11 items-center gap-2xs text-ink-3 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
             >
               Function enquiries

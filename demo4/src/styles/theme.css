@@ -18,6 +18,15 @@
       brass to mark "this one is live", this one uses weight, position and a
       1px rule.
 
+      **One exception exists as of 2026-09-03, and it is a narrowing of this
+      rule rather than an abandonment of it:** `--color-error`, on client
+      instruction, marks a form field the visitor has to go back and fix. It
+      is a *functional* colour, forbidden on every other surface — not a link,
+      not a price, not a heading, not a button, not an emphasis. Nothing here
+      is red because red looks good; one thing is red because it is wrong.
+      Rule 1 still holds for the brand: there is no brand colour. See the
+      token's own block below for the argument and the measurements.
+
    2. **Type sits on paper, never on a photograph.** The old covers set a page
       title into the bottom of its own cover shot behind a grade. A grade is a
       dark-page device; on warm white it is a smear. So the photograph runs
@@ -83,14 +92,73 @@
      computed against #FBFAF8, not guessed. Levels 1–3 clear AA at any size;
      level 4 is decorative and is NEVER text.
 
-     Level 3 is 0.62 rather than the 0.55 that looked right, because 0.55
-     composites to 3.97:1 — under the 4.5:1 floor. That is the same defect
-     D-07 found in the dark ramp, and this system is not shipping it a second
-     time on the light one. */
+     ── The ramp was darkened on 2026-09-03, on client instruction ─────────
+     *"the font color is unclear, too high exposure."* The old ramp was drawn
+     to a **floor**: level 3 sat at 0.62 because 0.55 composites to 3.97:1 and
+     misses the 4.5:1 minimum, and level 2 at 0.70 for the same kind of reason.
+     Both cleared AA and both were, on a #FBFAF8 ground, still grey — AA is a
+     minimum for readers with ordinary vision in good light, not a target, and
+     "passes the check" is not the same claim as "reads as ink". On a page this
+     bright, near-black at 0.62 alpha is what the client saw as washed out, and
+     they are right.
+
+     So the ramp is now drawn to **legibility** instead, and the floors it used
+     to sit on are simply cleared by a wide margin:
+
+       ink-2   0.70 →  0.86    6.63:1 → 11.78:1    body
+       ink-3   0.62 →  0.76    5.04:1 →  8.25:1    meta, labels
+       ink-4   0.14 →  0.32    1.34:1 →  2.06:1    decoration only
+
+     Level 4 moves too, but it does NOT become text by moving: 2.06:1 is still
+     far under any floor, and it is raised only so that a numeral drawn in it
+     is visible as an ornament rather than absent. Anything a reader needs to
+     *read* belongs at level 3 or above — see the note there.
+
+     Nothing else in the system changes. There is still no hue here; this is
+     the same ink, composited harder. */
   --color-ink: #16150f; /* primary type            17.38:1 */
-  --color-ink-2: rgb(22 21 15 / 0.7); /* body                     6.57:1 */
-  --color-ink-3: rgb(22 21 15 / 0.62); /* meta, labels             4.99:1 */
-  --color-ink-4: rgb(22 21 15 / 0.14); /* decorative — NEVER text  1.34:1 */
+  --color-ink-2: rgb(22 21 15 / 0.86); /* body                    11.78:1 */
+  /* The lowest level that may carry information — labels, captions, meta,
+     timestamps, the index numerals in a list a reader is meant to count by. */
+  --color-ink-3: rgb(22 21 15 / 0.76); /* meta, labels             8.25:1 */
+  --color-ink-4: rgb(22 21 15 / 0.32); /* decorative — NEVER text  2.06:1 */
+
+  /* --- The one hue ------------------------------------------------------
+     ⚠ THIS IS THE FIRST COLOUR IN THE SYSTEM, and it is here on an explicit
+     client instruction (2026-09-03): *"error input should appears red to
+     inform retry."*
+
+     It contradicts a rule this design was built on. `theme.css` opens with
+     "There is no brand colour. Restraint is the strategy… Every hue on this
+     site arrives from the venue's own photographs", and until now that held
+     literally — the only saturated colour anywhere was the magenta neon inside
+     a photograph. The client's instruction is a fair one and it wins
+     (CLAUDE.md §2, the user's explicit instruction ranks first), so the
+     honest thing is to define the exception rather than to smuggle a hex in
+     at the point of use.
+
+     **The rule survives in a narrower form, and that is deliberate:** this is
+     a *functional* colour, not an accent. It marks one thing — a field the
+     visitor has to go back and fix — and it is forbidden everywhere else. It
+     is not used for emphasis, for a link, for a price, for a heading or for a
+     button. Nothing on this site is red because red looks good; one thing is
+     red because it is wrong. That is a different claim from having a brand
+     hue, and it leaves the "no accent hue" thesis intact for every other
+     surface.
+
+     The value is chosen to belong to this palette rather than to shout over
+     it. It is warm and dark — closer to the near-black ink than to a signal
+     red — so that it reads as the same family under the same warm-white
+     light, while still being unmistakably red at a glance:
+
+       on --color-page (#FBFAF8)        7.01:1   clears 4.5:1 for the message
+       on --color-panel-2 (#E8E4DC)     5.76:1   the ground inside a list
+       as a 1px rule                    7.01:1   clears 3:1 for non-text UI
+
+     A brighter red (#C22B20) was measured at 5.50:1 and rejected: it clears
+     the floor, but on this ground it reads as a browser warning pasted onto
+     the page rather than as part of it. */
+  --color-error: #a81f17;
 
   /* --- The one fill -----------------------------------------------------
      With no accent hue, the primary action is the ink itself: a solid

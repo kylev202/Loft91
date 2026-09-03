@@ -91,9 +91,9 @@ viewports (360px / 1440px) on one continuous curve, and its top end came **down*
 against Nocturne's 96px — because a title on paper under a photograph does not need to
 compete with one.
 
-## 4. Six documents, not a router
+## 4. Eight documents, not a router
 
-`vite.config.ts` declares six HTML entries. No router library, each page ships only its own
+`vite.config.ts` declares eight HTML entries. No router library, each page ships only its own
 code, every URL is directly crawlable, and the shared React/GSAP/Lenis chunk is fetched once
 and served from cache thereafter.
 
@@ -104,11 +104,25 @@ and served from cache thereafter.
 /gallery/    gallery/index.html  cover, eight plates in two bands by orientation
 /about/      about/index.html    cover, the venue, hours, getting here
 /faq/        faq/index.html      cover, every question
+/enquire/    enquire/index.html  cover, the function enquiry form, how it works
+/admin/      admin/index.html    the venue's board — every enquiry, newest first
 ```
 
-The nav carries four — Menu, Packages, Gallery, **About us**. `/faq/` is support material
-rather than a destination the venue is sold from, so it is reached from About us and from
-the footer index, which lists the site in full and is on every page.
+The nav carries four — Menu, Packages, Gallery, **About us**. `/faq/` and `/enquire/` are
+support material rather than destinations the venue is browsed from, so they are reached
+from the footer index — which lists the site in full and is on every page — and, in the
+form's case, from the four "Enquire" buttons: the running head, the phone menu, the footer
+call to action and both buttons on `/packages/`.
+
+`/admin/` is in neither the nav nor the footer index, and carries `noindex, nofollow`. It is
+the back of the bar, not part of the site.
+
+> **The board is per-device, and unauthenticated.** There is no server behind this build, so
+> a submitted enquiry is recorded in `localStorage` — `/admin/` shows what was submitted in
+> the browser it is opened in and nothing else. The delivery that actually works is the
+> email: the form composes the enquiry and the visitor sends it from Gmail or their own mail
+> app, so it arrives from their address and the owner replies to it directly. Swapping the
+> local record for a real one is two calls in `src/lib/enquiries.ts`. See MEMORY.md Q3.
 
 **Cross-document view transitions** survive the reset unchanged: the cover photograph of
 the page you leave morphs into the cover of the page you arrive at, while the nav and the
@@ -239,7 +253,7 @@ same reason the palette did. The white PNG stays in the pipeline; nothing render
 ## 7. Verified — and what is not
 
 **Verified in this session:** `npm run build` completes, which includes `tsc --noEmit`, so
-the six documents compile and typecheck. Bundle sizes are reported below from that build.
+the eight documents compile and typecheck. Bundle sizes are reported below from that build.
 
 > ⚠ **Nothing else here has been measured.** demo3's README carried a long verification
 > section — contrast sampled off the render, overflow sweeps, touch-target counts, keyboard

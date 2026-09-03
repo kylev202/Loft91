@@ -14,7 +14,7 @@ import { Footer } from './Footer';
  * On a multi-page site this component is what R9 ("one coherent theme across
  * Menu, Packages and Gallery") actually resolves to — the pages cannot drift
  * apart, because the furniture, the smooth scroll, the reveal grammar and the
- * transition wiring are one file rather than six copies.
+ * transition wiring are one file rather than eight copies.
  */
 export function Page({ current, children }: { current: string; children: ReactNode }) {
   const main = useRef<HTMLElement>(null);

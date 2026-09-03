@@ -126,9 +126,44 @@ export const faqPage = {
     'Frequently asked questions about Loft 91, Footscray: venue hire enquiries, capacity, opening hours, food and finding the entrance.',
 } as const satisfies PageDef;
 
+/** The enquiry form — a real document, and like the FAQ deliberately NOT a nav
+ *  destination.
+ *
+ *  It does not need to be. It is the target of the "Enquire" button in the
+ *  running head, the "Enquire about functions" button at the foot of the phone
+ *  menu, both buttons on the Packages page and the footer's own call to
+ *  action — four routes to it from every page on the site, which is more
+ *  prominence than a fifth nav slot would buy it. The nav carries the four
+ *  places the venue is *browsed*; this is where a visit is *asked for*, and it
+ *  is the one page reached by pressing a button rather than by reading a list.
+ *
+ *  It is in `allPages`, so it is listed in the footer index like everything
+ *  else — the site lists itself in full there, and a page reachable from four
+ *  buttons but absent from the index would be the one document the contents
+ *  page does not admit to.
+ *
+ *  `photos.bar` is the only frame in the library no other page had claimed
+ *  (D-61 left it out of the gallery as a second pass at the same counter as
+ *  `barWide`, and it has been unused since). Every page opens on its own
+ *  photograph; this one is now spent. */
+export const enquirePage = {
+  id: 'enquire',
+  index: '06',
+  name: 'Enquire',
+  href: '/enquire/',
+  eyebrow: 'Functions & venue hire',
+  photo: photos.bar,
+  title: 'Enquire — Loft 91',
+  description:
+    'Enquire about hiring Loft 91, an upstairs bar and function space on Nicholson Street, Footscray. Tell us the date, the numbers and what the night is for.',
+} as const satisfies PageDef;
+
 /** Everything with a URL, for the footer index. The nav deliberately shows a
-    subset; the footer is where the site lists itself in full. */
-export const allPages = [...pages, faqPage] as const satisfies readonly PageDef[];
+    subset; the footer is where the site lists itself in full.
+
+    `/admin/` is the one document that is NOT in here and must not be added.
+    It is the venue's own board, not a destination — see `pages/admin.tsx`. */
+export const allPages = [...pages, faqPage, enquirePage] as const satisfies readonly PageDef[];
 
 export type PageId = (typeof pages)[number]['id'];
 

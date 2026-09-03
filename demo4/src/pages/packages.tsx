@@ -76,8 +76,13 @@ mount(
       name={page.name}
       photo={page.photo}
     >
-      <div className="mt-xl flex flex-wrap gap-sm" data-cover-tail>
-        <Button href="#enquire" variant="primary">
+      <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
+        {/* Was `#enquire`, an anchor to §03 at the foot of this page. The
+            enquiry is now its own document (`/enquire/`), so the cover's
+            commercial action goes straight there rather than scrolling past
+            the pricing to a block of addresses. §03 keeps its `id`, so any
+            link already written against `#enquire` still lands correctly. */}
+        <Button href="/enquire/" variant="primary">
           Start an enquiry
         </Button>
         <Button href="/gallery/" variant="secondary">
@@ -189,8 +194,17 @@ mount(
           <p className="max-w-(--container-measure) text-lead text-ink-2" data-reveal>
             Send the date, rough numbers and what the night is for.
           </p>
+          {/* The form is now the primary route and the two addresses are the
+              alternatives, which is a reversal of what stood here: before
+              `/enquire/` existed, emailing *was* the enquiry. The addresses
+              are kept rather than replaced — a form is one more thing to fill
+              in, and somebody who would rather write two lines to a human
+              should not have to. */}
           <div className="mt-xl flex flex-wrap gap-sm" data-reveal>
-            <Button href={mailto} variant="primary">
+            <Button href="/enquire/" variant="primary">
+              Open the enquiry form
+            </Button>
+            <Button href={mailto} variant="secondary">
               Email the venue
             </Button>
             <Button href={venue.instagram.url} variant="secondary" external>

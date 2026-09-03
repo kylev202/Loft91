@@ -28,7 +28,8 @@ import { Gateways } from '../components/Gateways';
  *                            that carried them above the nav is gone (D-62)
  *   Address, the doorway     `/about/`, and the footer on every page
  *   Enquire                  the nav on desktop, the menu overlay on a phone,
- *                            and `/packages/#enquire`
+ *                            the footer, and `/enquire/` — its own document
+ *                            since the form was built
  *
  * Two of those are worth stating plainly rather than burying: the landing page
  * no longer carries a call to action of its own, and it no longer prints the

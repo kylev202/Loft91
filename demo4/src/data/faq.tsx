@@ -31,6 +31,7 @@
 import type { ReactNode } from 'react';
 import { venue } from './venue';
 import { capacity } from './packages';
+import { withBase } from '../lib/base';
 
 export interface FaqItem {
   readonly q: string;
@@ -50,10 +51,23 @@ export const faqs: readonly FaqItem[] = [
     q: 'How do I enquire about hiring the space?',
     standout: true,
     a: (
+      /* Repointed at `/enquire/` when the form was built. The answer used to
+         open on the email address, because emailing was the enquiry; the form
+         now asks the four things the venue would otherwise have to write back
+         for, so it leads — and the address stays, because a question this
+         short should not require a form to ask it. */
       <>
-        Email {venue.contact.email} with your date, rough numbers and what the night is for, and
-        you will get a hold on the room and a written quote back. {venue.contact.phone} reaches the
-        bar on trading nights, and {venue.instagram.handle} on Instagram works for a quick question.
+        Use the{' '}
+        <a
+          href={withBase('/enquire/')}
+          className="underline decoration-rule-strong underline-offset-4 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
+        >
+          enquiry form
+        </a>
+        : it takes the date, rough numbers and what the night is for, then hands you the finished
+        email to send. {venue.contact.phone} reaches the bar on trading nights,{' '}
+        {venue.contact.email} works if you would rather write your own, and{' '}
+        {venue.instagram.handle} on Instagram is fine for a quick question.
       </>
     ),
   },

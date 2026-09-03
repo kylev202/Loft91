@@ -66,7 +66,7 @@ mount(
       name={page.name}
       photo={page.photo}
     >
-      <div className="mt-xl flex flex-wrap gap-sm" data-cover-tail>
+      <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
         <Button href={venue.maps} variant="primary" external>
           Open in Google Maps
         </Button>

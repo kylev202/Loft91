@@ -17,7 +17,31 @@ import { withBase } from '../../lib/base';
  * the button becoming the primary one.
  *
  * Both are 48px tall, above the 44px touch floor, before any padding.
+ *
+ * ── The skin is exported (2026-09-03) ────────────────────────────────────
+ * `Button` renders an `<a>`, because until the enquiry form existed every
+ * commercial action on this site was a navigation. The form's actions are not:
+ * "Send from Gmail" is a link, but "Copy the details", "Start another enquiry"
+ * and the admin board's controls are real `<button>` elements doing work in the
+ * page, and rendering those as anchors would be the exact anti-pattern this
+ * component exists to avoid.
+ *
+ * So the *appearance* is a function anything can call, and `Button` becomes
+ * its first caller. That is the whole change — one source for the two skins,
+ * rather than a second component that looks like this one and drifts from it.
  */
+export function buttonClass(variant: 'primary' | 'secondary' = 'secondary'): string {
+  const base =
+    'label inline-flex min-h-12 items-center justify-center border px-lg text-center transition-colors duration-(--dur-micro) ease-out active:duration-(--dur-press)';
+
+  const skin =
+    variant === 'primary'
+      ? 'border-fill bg-fill text-on-fill hover:bg-transparent hover:text-ink'
+      : 'border-outline text-ink hover:border-fill hover:bg-fill hover:text-on-fill';
+
+  return `${base} ${skin}`;
+}
+
 export function Button({
   href,
   children,
@@ -31,18 +55,10 @@ export function Button({
   className?: string;
   external?: boolean;
 }) {
-  const base =
-    'label inline-flex min-h-12 items-center justify-center border px-lg transition-colors duration-(--dur-micro) ease-out active:duration-(--dur-press)';
-
-  const skin =
-    variant === 'primary'
-      ? 'border-fill bg-fill text-on-fill hover:bg-transparent hover:text-ink'
-      : 'border-outline text-ink hover:border-fill hover:bg-fill hover:text-on-fill';
-
   return (
     <a
       href={withBase(href)}
-      className={`${base} ${skin} ${className}`}
+      className={`${buttonClass(variant)} ${className}`}
       {...(external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
     >
       {children}

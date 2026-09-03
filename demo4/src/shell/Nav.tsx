@@ -112,7 +112,7 @@ export function Nav({ current }: { current: string }) {
           </nav>
 
           <a
-            href={withBase('/packages/#enquire')}
+            href={withBase('/enquire/')}
             className="label hidden h-11 shrink-0 items-center border border-fill bg-fill px-md text-on-fill transition-colors duration-(--dur-micro) ease-out hover:bg-transparent hover:text-ink active:duration-(--dur-press) lg:inline-flex"
           >
             Enquire
@@ -249,7 +249,7 @@ function NavOverlay({
 
       <div className="shell">
         <a
-          href={withBase('/packages/#enquire')}
+          href={withBase('/enquire/')}
           className="label flex min-h-14 items-center justify-center border border-fill bg-fill px-md text-on-fill active:duration-(--dur-press)"
         >
           Enquire about functions

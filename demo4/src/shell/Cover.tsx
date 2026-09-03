@@ -132,8 +132,15 @@ export function CoverFrame({
         </div>
       </div>
 
-      {/* The words, on paper. */}
-      <div className="shell pt-xl pb-lg">{children}</div>
+      {/* The words, on paper.
+
+          The bottom padding is smaller on a phone. Under `lg` the cover's
+          buttons stack beneath the title instead of sitting beside it, so this
+          padding is no longer the gap under a heading — it is the gap under a
+          row of 48px blocks, stacked on top of `--section-pad` below it. Two
+          large vertical rhythms in a row read as a break in the page on a
+          narrow screen; from `lg` the desktop spacing is unchanged. */}
+      <div className="shell pt-xl pb-2xs lg:pb-lg">{children}</div>
     </header>
   );
 }
