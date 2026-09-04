@@ -530,29 +530,6 @@
     }
   }
 
-  /* ------------------------------------------------------------------------
-     [TBC] — still the most-used component on day one.
-
-     MEMORY.md §5 lists package tiers, capacity, the enquiry channel and the
-     venue story as Missing, and D-05 requires the gap to be *visible*: a
-     plausible-looking placeholder published on a real bar's site sends real
-     people to a closed door. It says what is missing and who owns it, in plain
-     words, so a reviewer never has to open MEMORY.md to find out.
-
-     A dashed underline rather than a dashed box — a box is a component, and a
-     placeholder should not look like one. Dashed is reserved: nothing else on
-     this site uses it, so the marker is unmistakable in a screenshot.
-     ------------------------------------------------------------------------ */
-  .tbc {
-    display: inline;
-    font-family: var(--font-interface);
-    font-size: var(--text-small);
-    line-height: 1.55;
-    color: var(--color-ink-3);
-    text-decoration: underline dashed var(--color-rule-strong);
-    text-underline-offset: 0.35em;
-    text-decoration-thickness: 1px;
-  }
 }
 
 /* --------------------------------------------------------------------------
@@ -705,14 +682,6 @@
      that state with it. */
   .rule-sweep {
     background-color: CanvasText;
-  }
-
-  /* The `[TBC]` marker's dashed underline is the only thing distinguishing an
-     unconfirmed fact from a confirmed one, and D-05 makes that distinction
-     non-negotiable — so it is pinned rather than left to the forced palette,
-     which would otherwise render it identically to ordinary body copy. */
-  .tbc {
-    text-decoration-color: CanvasText;
   }
 
   /* The focus ring comes back on the form controls here, and only here.

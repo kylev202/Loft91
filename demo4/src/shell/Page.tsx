@@ -15,8 +15,35 @@ import { Footer } from './Footer';
  * Menu, Packages and Gallery") actually resolves to — the pages cannot drift
  * apart, because the furniture, the smooth scroll, the reveal grammar and the
  * transition wiring are one file rather than eight copies.
+ *
+ * ── `bare` — the shell without the site around it ─────────────────────────
+ * `/admin/` is a tool, not a page of the site, and the furniture that makes the
+ * other seven documents cohere is dead weight on it: a nav offering Menu,
+ * Packages and Gallery to somebody reading a booking; a footer restating the
+ * trading hours, the full page index and a full-width masked wordmark under a
+ * list of customer phone numbers. None of it is anything the owner came here to
+ * use, and all of it is between them and the board.
+ *
+ * So `bare` drops the loader, the nav and the footer, and keeps everything
+ * that is not decoration — the skip link, `<main>`, the smooth scroll and the
+ * reveal grammar — so the page is still the same site, set in the same type,
+ * with its own minimal head instead of the site's.
+ *
+ * The loader goes with them deliberately: it is the front door of the site,
+ * and three seconds of wordmark animation in front of a tool somebody opens
+ * daily is the clearest case of the "signature, not an obstacle" line in
+ * `Loader` itself. A bare page therefore also does not mark the session as
+ * loaded — arriving at the site proper afterwards should still get the door.
  */
-export function Page({ current, children }: { current: string; children: ReactNode }) {
+export function Page({
+  current,
+  children,
+  bare = false,
+}: {
+  current: string;
+  children: ReactNode;
+  bare?: boolean;
+}) {
   const main = useRef<HTMLElement>(null);
   const reduced = usePrefersReducedMotion();
   const fine = useFinePointer();
@@ -43,7 +70,7 @@ export function Page({ current, children }: { current: string; children: ReactNo
 
   return (
     <>
-      <Loader />
+      {!bare && <Loader />}
 
       {/* First tabbable element on the page. Shares the loader's layer, which
           is safe because the loader is `pointer-events: none` and lifts on its
@@ -55,13 +82,13 @@ export function Page({ current, children }: { current: string; children: ReactNo
         Skip to content
       </a>
 
-      <Nav current={current} />
+      {!bare && <Nav current={current} />}
 
       <main id="main" ref={main}>
         {children}
       </main>
 
-      <Footer current={current} />
+      {!bare && <Footer current={current} />}
     </>
   );
 }

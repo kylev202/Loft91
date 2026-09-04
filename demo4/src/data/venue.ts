@@ -76,7 +76,7 @@ export const venue = {
      a real person by accident. Replace both with the client's own before
      launch, or delete this block to restore the [TBC] state. */
   contact: {
-    email: 'functions@loft91.com.au',
+    email: 'loftnineone@gmail.com',
     phone: `0491 570${NB}110`,
     phoneHref: 'tel:+61491570110',
   },

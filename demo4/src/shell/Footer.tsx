@@ -190,12 +190,29 @@ export function Footer({ current }: { current: string }) {
           />
         </div>
 
-        <p className="mt-lg max-w-(--container-measure) text-small text-ink-3">
-          <span className="label text-ink">Demo build.</span> The address, hours, drinks list and
-          photography come from the venue’s own listings and artwork. Function packages, capacity,
-          prices, contact details and the About copy are{' '}
-          <span className="text-ink">placeholder content written for this demo</span> — not the
-          venue’s, and not to be published.
+        {/* --- The venue's own way in -------------------------------------
+            Client instruction, 2026-09-03: the board should be reachable
+            "through the website under log in" rather than by remembering a URL.
+
+            Under the sign-off, not inside the `Pages` index above it — and the
+            distinction is the whole placement. That index is the site listing
+            itself in full, and `/admin/` is deliberately not in it (see the note
+            on `allPages` in data/site.ts); a staff log-in down here is where
+            every venue site puts this, and it is the one position that reads as
+            "the back of the bar" rather than as an eighth page.
+
+            `rel="nofollow"` for the same reason `admin/index.html` carries
+            `noindex, nofollow`: this link is now on all eight documents, and it
+            is the one path a crawler could take in from a public page. */}
+        <p className="mt-2xl">
+          <a
+            href={withBase('/admin/')}
+            rel="nofollow"
+            aria-current={current === 'admin' ? 'page' : undefined}
+            className="label inline-flex min-h-11 items-center text-ink-3 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
+          >
+            Log in
+          </a>
         </p>
       </div>
     </footer>

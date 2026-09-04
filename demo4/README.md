@@ -115,13 +115,47 @@ form's case, from the four "Enquire" buttons: the running head, the phone menu, 
 call to action and both buttons on `/packages/`.
 
 `/admin/` is in neither the nav nor the footer index, and carries `noindex, nofollow`. It is
-the back of the bar, not part of the site.
+the back of the bar, not part of the site. The one route to it from the site is a quiet
+**"Log in"** link at the foot of the footer, under the sign-off and outside the
+index — where a venue site puts a staff log-in, and `rel="nofollow"` so the crawler does
+not walk in from a public page.
 
-> **The board is per-device, and unauthenticated.** There is no server behind this build, so
-> a submitted enquiry is recorded in `localStorage` — `/admin/` shows what was submitted in
-> the browser it is opened in and nothing else. The delivery that actually works is the
-> email: the form composes the enquiry and the visitor sends it from Gmail or their own mail
-> app, so it arrives from their address and the owner replies to it directly. Swapping the
+Behind that link the board asks for a **user and a passphrase** (`src/lib/auth.ts`), and
+the session lasts a week or until Log out.
+
+`/admin/` is the one document that mounts **`bare`** (`shell/Page`): no loader, no nav, no
+footer. It is a tool rather than a page of the site, and the furniture that makes the other
+seven cohere is dead weight on it — a nav offering Menu and Gallery to somebody reading a
+booking, a footer restating the trading hours under a list of customer phone numbers. In
+their place is a slim bar carrying the mark (the way back to the site) and Log out.
+
+The board itself is **one line per enquiry, opening in place** — date, name, what the night
+is, how far off it is, and where it got to, with everything else behind the `+`. From `lg`
+those rows lock into columns via `display: contents` on the meta group, so the dates and
+statuses line up and the eye runs down one of them. Search, status chips carrying live
+counts, and a date/arrival order sit above it; **Download CSV** takes a copy off the device.
+
+⚠ **The board carries no notices any more.** It used to state on its own face that it was
+local to one browser and that the passphrase was a latch rather than a lock. Both were
+removed on client instruction (2026-09-04) along with the rest of the demo copy. **Neither
+limit changed** — they are recorded in `src/lib/auth.ts`, `src/lib/enquiries.ts` and
+MEMORY.md Q3, and the two blockquotes below are now the only place a reader is told.
+
+> **The passphrase is a latch, not a lock.** There is no server, so the check happens in the
+> page against a value that ships in the page — the passphrase is stored as a SHA-256 digest,
+> which keeps it out of a devtools panel and would not stop anybody who actually wanted in.
+> What it does stop is the next person to pick up the phone or the laptop behind the bar
+> reading a customer's mobile number off a screen somebody left open, which is the only risk
+> this page has while the store is local. It is also the log-in the venue keeps: when there
+> is a backend, `signIn` changes and the form, the session and the log-out survive.
+
+> **The board is per-device.** A submitted enquiry is recorded in `localStorage` — `/admin/`
+> shows what was submitted in the browser it is opened in and nothing else, so a stranger
+> who opens this URL on their own phone gets an empty board whether they log in or not. The
+> delivery that actually works is the email: the form composes the enquiry and the visitor
+> sends it from Gmail or their own mail app, so it arrives from their address and the owner
+> replies to it directly. **Download all as CSV** on the board is the only way a copy leaves
+> the device, and it matters — clearing site data takes every enquiry with it. Swapping the
 > local record for a real one is two calls in `src/lib/enquiries.ts`. See MEMORY.md Q3.
 
 **Cross-document view transitions** survive the reset unchanged: the cover photograph of
@@ -298,9 +332,18 @@ Still genuinely missing, and now **invisible** on the page:
 - photography publication clearance
 - a vector wordmark with per-letter paths, still blocking a true per-letter loader (Q2)
 
+⚠️⚠️ **As of 2026-09-04 the page no longer admits any of this.** The footer's "Demo build"
+paragraph — which named exactly which content was invented, and was the one thing on the
+site telling a reader not to trust the prices, the capacity or the phone number — was
+removed on client instruction, along with the `[TBC]` marker component and its styles. **The
+site now states invented prices, capacity, an invented email and an invented phone number
+for a real business, with nothing on any page marking them as invented.** This section and
+MEMORY.md §5/§6 are the only remaining record. The phone number is in a reserved fictitious
+range (D-60), so nobody can dial a stranger; nothing else is mitigated.
+
 The invention is contained: `src/data/packages.ts` is entirely placeholder, and the two
 blocks at the foot of `src/data/venue.ts` (`contact`, `story`) are the rest of it. Every
-one carries a ⚠ comment. The footer of every page names what is placeheld. To restore the
+one carries a ⚠ comment. To restore the
 honest build, delete `data/packages.ts` and those two blocks and revert
 `pages/packages.tsx`, `pages/about.tsx` and `data/faq.tsx`.
 

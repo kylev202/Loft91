@@ -1,89 +1,92 @@
+import { useState } from 'react';
 import { mount } from '../lib/mount';
 import { AdminBoard } from '../components/AdminBoard';
-import { Button } from '../components/ui/Button';
-import { venue } from '../data/venue';
+import { AdminLogin } from '../components/AdminLogin';
+import { readSession, signOut } from '../lib/auth';
+import { withBase } from '../lib/base';
+import { wordmarkBlack } from '../data/photos';
 
 /**
- * `/admin/` — the venue's own board. Every enquiry submitted through
- * `/enquire/`, newest first, with the customer's details one tap from a reply.
+ * `/admin/` — the venue's own board. Every enquiry from `/enquire/`, one line
+ * each, with the customer's details one tap from a reply.
  *
- * ── It is a real document, and it is not in the site ──────────────────────
- * It is built by Vite like the other seven, and it is reachable by typing its
- * URL. It is deliberately absent from `pages`, from `allPages` and therefore
- * from the nav, the phone menu and the footer index — the site lists itself in
- * full in the footer, and this is not part of the site the way `/faq/` is. It
- * is the back of the bar.
+ * ── It is a tool, so it does not wear the site ────────────────────────────
+ * It mounts `bare` (see `shell/Page`): no loader, no nav, no footer. The
+ * furniture that makes the other seven documents cohere is dead weight here —
+ * a nav offering Menu, Packages and Gallery to somebody reading a booking, and
+ * a footer restating the trading hours, the site index and a full-width masked
+ * wordmark underneath a list of customer phone numbers. In its place is the
+ * slim bar below: the mark, which is the way back to the site, and Log out.
  *
- * `noindex, nofollow` is set in `admin/index.html` for the same reason.
+ * It is still absent from `pages`, from `allPages` and therefore from the site
+ * index, and `admin/index.html` still carries `noindex, nofollow`. The one
+ * route in is the "Log in" link at the foot of the footer.
  *
- * ── There is no password on it, and that is deliberate ────────────────────
- * A static site cannot authenticate anybody. Any gate written here would be a
- * check the page performs on itself, with the answer sitting in the JavaScript
- * that performs it — anyone who can open the page can read the password out of
- * the bundle. A lock that opens for everyone is worse than no lock, because it
- * is the one that gets trusted.
+ * ── The passphrase is a latch, not a lock ─────────────────────────────────
+ * There is no server, so the check happens in the page against a value that
+ * ships in the page — the full argument, and the reason it is still worth
+ * having, is in the header of `lib/auth.ts`. It stops the next person to pick
+ * up the phone behind the bar reading a customer's number off a screen left
+ * open; it is not protecting the enquiries, which are held in this browser and
+ * nowhere else.
  *
- * What actually protects this page is that there is nothing behind it: the
- * board reads `localStorage`, which is per-browser, so a stranger opening this
- * URL sees an empty board. Real access control arrives with the backend that
- * answers MEMORY.md Q3, and it belongs there, not here.
- *
- * ── No cover photograph ──────────────────────────────────────────────────
- * Every public page opens on a plate of the room. This one opens on the words
- * alone — the same eyebrow, rule and display title the covers set, without the
- * picture above them. A 46svh photograph of the bar is the right first thing on
- * a page that is selling the room and the wrong first thing on a page the owner
- * opens to find a phone number. The type is identical, so it still reads as the
- * same site; it just does not spend a screen on atmosphere.
+ * That was said on the page in two paragraphs until 2026-09-04, when the client
+ * asked for the notices to come off. The limits are unchanged and are recorded
+ * in `lib/auth.ts`, `lib/enquiries.ts` and MEMORY.md Q3 — the page simply no
+ * longer explains itself to the person using it.
  */
-mount(
-  'admin',
-  <>
-    <header className="shell pt-(--gutter) pb-lg">
-      <p className="label flex items-baseline gap-xs text-ink-3" data-cover-tail>
-        <span className="text-ink">Venue only</span>
-      </p>
+function Admin() {
+  /* Read synchronously on the first render, so a signed-in owner never sees the
+     log-in screen flash before the board replaces it. There is no server render
+     to disagree with — every page here mounts client-side. */
+  const [user, setUser] = useState<string | null>(() => readSession()?.user ?? null);
 
-      <div className="rule-ink mt-sm w-full" data-cover-rule />
+  return (
+    <>
+      {/* --- The bar ------------------------------------------------------
+          The running head's own proportions — `--nav-h`, a hairline under it,
+          the mark at the left — carrying only what this page needs. Sticky for
+          the same reason the site's is: the way out should not require
+          scrolling back to the top of a long board. */}
+      <header className="sticky top-0 z-(--z-nav) border-b border-rule bg-page">
+        <div className="shell flex h-(--nav-h) items-center justify-between gap-md">
+          <a href={withBase('/')} className="flex h-full shrink-0 items-center pr-md">
+            <img
+              src={wordmarkBlack.src}
+              srcSet={wordmarkBlack.srcSet}
+              sizes="104px"
+              alt="Loft 91 — back to the site"
+              width={wordmarkBlack.w}
+              height={wordmarkBlack.h}
+              className="h-4 w-auto shrink-0"
+              translate="no"
+            />
+          </a>
 
-      <div className="mt-lg grid gap-lg lg:grid-cols-12 lg:gap-x-xl">
-        <h1 className="line-mask lg:col-span-7" data-cover-line>
-          <span className="block font-display text-display uppercase text-ink">Enquiries</span>
+          {user && (
+            <button
+              type="button"
+              className="label flex h-11 items-center text-ink-3 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
+              onClick={() => {
+                signOut();
+                setUser(null);
+              }}
+            >
+              Log out
+            </button>
+          )}
+        </div>
+      </header>
+
+      <section aria-labelledby="board" className="shell pt-xl pb-3xl">
+        <h1 id="board" className="font-display text-display uppercase text-ink">
+          {user ? 'Enquiries' : 'Log in'}
         </h1>
 
-        <div className="lg:col-span-5 lg:col-start-8 lg:self-end lg:pb-2xs">
-          <div className="mt-xl flex flex-wrap gap-sm lg:mt-0" data-cover-tail>
-            <Button href="/enquire/" variant="secondary">
-              Open the form
-            </Button>
-            <Button href={`mailto:${venue.contact.email}`} variant="secondary">
-              The venue inbox
-            </Button>
-          </div>
-        </div>
-      </div>
-    </header>
+        <div className="mt-lg">{user ? <AdminBoard /> : <AdminLogin onSignedIn={setUser} />}</div>
+      </section>
+    </>
+  );
+}
 
-    <section aria-labelledby="board" className="shell section-pad">
-      <h2 id="board" className="sr-only">
-        Enquiries received
-      </h2>
-
-      {/* ⚠ The honesty notice. Set in the same voice as the demo-build note in
-          the footer, because it is the same kind of statement: what this page
-          is, and what it is not. Do not remove it while the build is static —
-          an owner who believes this board is their inbox will miss a booking
-          that was sent to them by email and never appeared here. */}
-      <p className="mb-xl max-w-(--container-measure) text-small text-ink-3" data-reveal>
-        <span className="label text-ink">Local to this browser.</span> This build has no server, so
-        an enquiry is recorded in the browser it was submitted in — this board shows what was
-        submitted on this device, and nothing else. The enquiry itself reaches {venue.name} as an
-        email sent by the customer to {venue.contact.email}; that inbox is the record, and this is a
-        working model of it. Anyone who opens this URL can read whatever is on it, so treat it as an
-        unlocked page.
-      </p>
-
-      <AdminBoard />
-    </section>
-  </>,
-);
+mount('admin', <Admin />, { bare: true });

@@ -162,7 +162,15 @@ export const enquirePage = {
     subset; the footer is where the site lists itself in full.
 
     `/admin/` is the one document that is NOT in here and must not be added.
-    It is the venue's own board, not a destination — see `pages/admin.tsx`. */
+    It is the venue's own board, not a destination — see `pages/admin.tsx`.
+
+    ⚠ That is still true even though the footer now carries a "Log in" link to
+    it (2026-09-03, client instruction). The link is rendered *below* the
+    demo-build note, outside this index, precisely so the index continues to
+    list the public site and only the public site. Putting `/admin/` in
+    `allPages` would give it an index number, a row between `/enquire/` and the
+    end, and a place in the site's own table of contents — which is the thing
+    the paragraph above is refusing, and the link does not change it. */
 export const allPages = [...pages, faqPage, enquirePage] as const satisfies readonly PageDef[];
 
 export type PageId = (typeof pages)[number]['id'];

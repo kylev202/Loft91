@@ -73,8 +73,14 @@ export function Field({
   onChange: (value: string) => void;
   /* No `'date'`. A date is asked for with `DatePicker`, which draws its own
      calendar — routing one through here would reopen the OS picker that
-     component exists to replace. */
-  type?: 'text' | 'email' | 'tel';
+     component exists to replace.
+
+     `'password'` is here for the log-in on `/admin/`, and it is the one type
+     whose *native* behaviour is worth more than anything this system could
+     draw: the masking, the reveal control the browser adds, and the password
+     manager that fills it. The field's own anatomy — label, hairline, sweep,
+     red on error — is unchanged, so it still sits level with the rest. */
+  type?: 'text' | 'email' | 'tel' | 'password';
   autoComplete?: string;
   inputMode?: 'text' | 'email' | 'tel';
   placeholder?: string;

@@ -204,6 +204,34 @@ export function formatStamp(iso: string): string {
   });
 }
 
+/**
+ * Whole days from today to `value`; `null` when there is no usable date.
+ *
+ * Both ends are floored to local midnight, so the answer is a number of
+ * *calendar* days rather than a number of 24-hour periods — a function at 8 PM
+ * tonight and one at 10 AM tomorrow are one day apart on the only calendar the
+ * owner has, and rounding the elapsed hours would call them the same day.
+ */
+export function daysUntil(value: string): number | null {
+  const [y, m, d] = value.split('-').map(Number);
+  if (!y || !m || !d) return null;
+  const then = new Date(y, m - 1, d).setHours(0, 0, 0, 0);
+  const today = new Date().setHours(0, 0, 0, 0);
+  return Math.round((then - today) / 86_400_000);
+}
+
+/** How far off the function is, in the words the owner would use. `null` when
+    there is no date to count to — the card then says nothing at all, which is
+    the truth, rather than printing an empty marker. */
+export function countdown(value: string): string | null {
+  const days = daysUntil(value);
+  if (days === null) return null;
+  if (days < 0) return 'Past';
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  return `In ${days} days`;
+}
+
 export interface Line {
   readonly key: keyof Enquiry;
   readonly label: string;
@@ -235,6 +263,54 @@ export function enquiryLines(e: Enquiry): Line[] {
   lines.push({ key: 'session', label: 'Time of day', value: labelOf(sessions, e.session) });
   if (e.message) lines.push({ key: 'message', label: 'Details', value: e.message });
   return lines;
+}
+
+/* --------------------------------------------------------------------------
+   Taking it off the device
+   -------------------------------------------------------------------------- */
+
+/**
+ * The whole board as a spreadsheet.
+ *
+ * This is the one thing on `/admin/` that is not about reading an enquiry, and
+ * it earns its place from where the data lives. `localStorage` is one browser
+ * profile deep: clearing site data takes every enquiry with it, and so does a
+ * new phone. A file the owner can keep is the difference between a working
+ * model of an inbox and a trap that looks like one.
+ *
+ * RFC 4180 quoting — every field quoted, internal quotes doubled — so a comma,
+ * a newline or a quotation mark inside somebody's message cannot shift a
+ * column. CRLF endings because the reader this is written for is Excel.
+ *
+ * ⚠ A cell opening with `=`, `+`, `-` or `@` is read by a spreadsheet as a
+ * formula, and three of these columns are typed by a stranger. Those values get
+ * an apostrophe in front, which is the standard defusal: the cell stays text.
+ * The visible cost is that a phone number written `+61 400 …` exports with a
+ * leading apostrophe — which is the better of the two outcomes, since the same
+ * number without it is a broken formula rather than a phone number.
+ */
+export function toCsv(list: readonly Enquiry[]): string {
+  const columns: readonly (readonly [string, (e: Enquiry) => string])[] = [
+    ['Reference', (e) => e.ref],
+    ['Received', (e) => formatStamp(e.submittedAt)],
+    ['Status', (e) => STATUSES.find((s) => s.value === e.status)?.label ?? e.status],
+    ['Name', (e) => e.name],
+    ['Email', (e) => e.email],
+    ['Phone', (e) => e.phone],
+    ['Occasion', (e) => labelOf(occasions, e.occasion)],
+    ['Guests', (e) => labelOf(guestBands, e.guests)],
+    ['Preferred date', (e) => (e.date ? formatDate(e.date) : '')],
+    ['Time of day', (e) => labelOf(sessions, e.session)],
+    ['Details', (e) => e.message],
+  ];
+
+  const cell = (value: string) =>
+    `"${(/^[=+\-@]/.test(value) ? `'${value}` : value).replace(/"/g, '""')}"`;
+
+  return [
+    columns.map(([heading]) => cell(heading)).join(','),
+    ...list.map((enquiry) => columns.map(([, read]) => cell(read(enquiry))).join(',')),
+  ].join('\r\n');
 }
 
 /* --------------------------------------------------------------------------
