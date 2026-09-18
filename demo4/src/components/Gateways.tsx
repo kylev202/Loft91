@@ -1,4 +1,4 @@
-import { pages } from '../data/site';
+import { gateways } from '../data/site';
 import { withBase } from '../lib/base';
 import { Frame } from './ui/Frame';
 
@@ -58,16 +58,22 @@ import { Frame } from './ui/Frame';
  * `figure`/`figcaption` inside the link, so each frame is one link with one
  * accessible name — the destination's name — and the photograph is `alt=""`
  * rather than repeating it.
+ *
+ * ── Four frames, five destinations (2026-09-04) ──────────────────────────
+ * This reads `gateways` rather than `pages`, because `/space/` joined the nav
+ * and the wall did not grow with it: four is the 2 x 2 the client asked for,
+ * five is that wall with an orphan under it. The reasoning, and the one-word
+ * reversal, are on `gateways` in `data/site.ts`.
  */
 export function Gateways() {
   return (
-    <section aria-labelledby="explore" className="shell pt-lg pb-2xl">
+    <section aria-labelledby="explore" className="shell pt-lg pb-lg">
       <h2 id="explore" className="sr-only">
         Explore Loft 91
       </h2>
 
       <div className="mx-auto grid max-w-(--container-wall) grid-cols-1 gap-lg sm:grid-cols-2">
-        {pages.map(({ id, name, href, photo }) => (
+        {gateways.map(({ id, name, href, photo }) => (
           <a key={id} href={withBase(href)} className="group block">
             <figure>
               {/* `data-plate` belongs on the plate, not on the link that wraps

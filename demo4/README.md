@@ -91,15 +91,16 @@ viewports (360px / 1440px) on one continuous curve, and its top end came **down*
 against Nocturne's 96px — because a title on paper under a photograph does not need to
 compete with one.
 
-## 4. Eight documents, not a router
+## 4. Nine documents, not a router
 
-`vite.config.ts` declares eight HTML entries. No router library, each page ships only its own
+`vite.config.ts` declares nine HTML entries. No router library, each page ships only its own
 code, every URL is directly crawlable, and the shared React/GSAP/Lenis chunk is fetched once
 and served from cache thereafter.
 
 ```
 /            index.html          hero, then four frames — nothing else
 /menu/       menu/index.html     cover, happy hour, the full drinks list
+/space/      space/index.html    cover, the room, the floor plan, what is fitted
 /packages/   packages/index.html cover, the room, three package tiers, enquiry
 /gallery/    gallery/index.html  cover, eight plates in two bands by orientation
 /about/      about/index.html    cover, the venue, hours, getting here
@@ -108,11 +109,20 @@ and served from cache thereafter.
 /admin/      admin/index.html    the venue's board — every enquiry, newest first
 ```
 
-The nav carries four — Menu, Packages, Gallery, **About us**. `/faq/` and `/enquire/` are
+The nav carries five — Menu, **The Space**, Packages, Gallery, About us. `/faq/` and
+`/enquire/` are
 support material rather than destinations the venue is browsed from, so they are reached
 from the footer index — which lists the site in full and is on every page — and, in the
 form's case, from the four "Enquire" buttons: the running head, the phone menu, the footer
 call to action and both buttons on `/packages/`.
+
+`/space/` is the one destination in the nav that is **not** on the home page. The landing
+page's wall is four frames because the client asked for four, symmetrical, and five is a
+2 x 2 with an orphan under it — so `Gateways` reads `gateways` (the four) while the nav and
+the footer read the full list. It is a one-word reversal in `data/site.ts` if the wall
+should grow. The page itself answers the room question in full — what is up there, how the
+floor gets set, what is already fitted — and leaves every price on `/packages/`; the two
+link to each other rather than restating each other.
 
 `/admin/` is in neither the nav nor the footer index, and carries `noindex, nofollow`. It is
 the back of the bar, not part of the site. The one route to it from the site is a quiet
@@ -125,7 +135,7 @@ the session lasts a week or until Log out.
 
 `/admin/` is the one document that mounts **`bare`** (`shell/Page`): no loader, no nav, no
 footer. It is a tool rather than a page of the site, and the furniture that makes the other
-seven cohere is dead weight on it — a nav offering Menu and Gallery to somebody reading a
+eight cohere is dead weight on it — a nav offering Menu and Gallery to somebody reading a
 booking, a footer restating the trading hours under a list of customer phone numbers. In
 their place is a slim bar carrying the mark (the way back to the site) and Log out.
 
@@ -287,7 +297,7 @@ same reason the palette did. The white PNG stays in the pipeline; nothing render
 ## 7. Verified — and what is not
 
 **Verified in this session:** `npm run build` completes, which includes `tsc --noEmit`, so
-the eight documents compile and typecheck. Bundle sizes are reported below from that build.
+the nine documents compile and typecheck. Bundle sizes are reported below from that build.
 
 > ⚠ **Nothing else here has been measured.** demo3's README carried a long verification
 > section — contrast sampled off the render, overflow sweeps, touch-target counts, keyboard

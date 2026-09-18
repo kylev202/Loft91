@@ -119,17 +119,6 @@ mount(
               </dd>
             </div>
             <div className="border-t border-rule pt-sm pb-sm" data-reveal>
-              <dt className="label text-ink-3">Phone</dt>
-              <dd className="mt-2xs text-item text-ink tabular-nums">
-                <a
-                  href={venue.contact.phoneHref}
-                  className="transition-colors duration-(--dur-micro) ease-out hover:text-ink-2"
-                >
-                  {venue.contact.phone}
-                </a>
-              </dd>
-            </div>
-            <div className="border-t border-rule pt-sm pb-sm" data-reveal>
               <dt className="label text-ink-3">Instagram</dt>
               <dd className="mt-2xs text-item text-ink">
                 <a

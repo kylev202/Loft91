@@ -236,6 +236,64 @@
   }
 
   /* ------------------------------------------------------------------------
+     A map plate. `.plate` holds the frame, the radius and the panel ground; this
+     adds the three things a third-party embed needs that a photograph does not.
+
+     **It is desaturated and warmed, because colour is spoken for.** The thesis
+     of this design is that the page has no colour and the room has all of it —
+     every hue on the site arrives inside a photograph. A stock Google map is
+     blue water, green parks and a yellow arterial, and dropped into `/about/`
+     §03 it would be the loudest non-photographic colour on the site, sitting
+     directly beneath two photographs of the actual entrance. Grey, then warmed
+     back towards the panel tone with a little sepia, it reads as page furniture
+     — a printed locator — which is what it is for. The contrast and brightness
+     nudge sit the map's ink *below* the page's near-black type rather than
+     competing with it.
+
+     It goes back to full colour on hover or keyboard focus, which is not a
+     flourish: Google's terms want their logo and attribution rendered as
+     supplied, and the moment anyone actually uses the map they get it exactly
+     as Google served it. The transition is a token duration, and the global
+     reduced-motion block at the foot of this file collapses it.
+
+     **It is inert to touch.** A one-finger drag inside a map iframe pans the
+     map instead of scrolling the page, and the primary arrival path here is a
+     phone (CLAUDE.md §5) — so on a touch device the embed is a picture, and the
+     "Open in Google Maps" button directly beneath it is the affordance. That
+     button opens the native Maps app, which beats panning a 245px iframe by
+     some distance. Pointer devices keep the map fully interactive; keyboard
+     focus is untouched, since `pointer-events` says nothing about tabbing.
+     ------------------------------------------------------------------------ */
+  .map-plate > iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: grayscale(1) contrast(0.9) brightness(1.04) sepia(0.16);
+    transition: filter var(--dur-short) var(--ease-out);
+  }
+  .map-plate:hover > iframe,
+  .map-plate:focus-within > iframe {
+    filter: none;
+  }
+  @media (hover: none) {
+    .map-plate > iframe {
+      pointer-events: none;
+    }
+  }
+
+  /* The two display modes that have to undo the tint, kept here rather than in
+     the blocks at the foot of the file: `prefers-contrast: more` states that it
+     moves tokens and restyles nothing, and this is not a token. Both requests
+     mean the same thing — do not wash anything out — and a desaturating filter
+     over map labels is exactly that. */
+  @media (prefers-contrast: more), (forced-colors: active) {
+    .map-plate > iframe {
+      filter: none;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
      Line mask. A line of display type in an `overflow: hidden` box, rising
      from 100% of its own height — so it arrives from *behind* the rule above
      it rather than fading up out of nothing. Transform and opacity only.

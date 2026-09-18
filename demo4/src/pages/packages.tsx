@@ -93,7 +93,18 @@ mount(
 
     {/* --- 01 The room ---------------------------------------------------- */}
     <section aria-labelledby="the-room" className="shell section-pad">
-      <SectionHead index="01" label="The room" heading={<span id="the-room">What you are hiring</span>} />
+      {/* The way up to `/space/`, which is where the room is described in
+          full. This section keeps its six rows — they are what the tiers below
+          are priced against, and a reader comparing packages should not have
+          to leave the page to find out what a package contains — but the room
+          itself now has a document, and this is the link to it. */}
+      <SectionHead
+        index="01"
+        label="The room"
+        heading={<span id="the-room">What you are hiring</span>}
+        href="/space/"
+        linkLabel="The space"
+      />
 
       <div className="grid gap-lg xl:gap-2xl lg:grid-cols-12">
         <dl className="lg:col-span-5">
@@ -225,17 +236,6 @@ mount(
                 className="transition-colors duration-(--dur-micro) ease-out hover:text-ink-2"
               >
                 {venue.contact.email}
-              </a>
-            </dd>
-          </div>
-          <div className="mt-md border-t border-rule pt-sm" data-reveal>
-            <dt className="label text-ink-3">Phone</dt>
-            <dd className="mt-2xs text-item text-ink tabular-nums">
-              <a
-                href={venue.contact.phoneHref}
-                className="transition-colors duration-(--dur-micro) ease-out hover:text-ink-2"
-              >
-                {venue.contact.phone}
               </a>
             </dd>
           </div>

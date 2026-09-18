@@ -18,6 +18,12 @@
 
 const NB = ' '; // non-breaking space — a wrapped address is a broken address
 
+/* MEMORY.md §1 — Confirmed, off the Google Maps place link. Hoisted out of the
+   object so `mapsEmbed` below can be composed from it rather than retyped: the
+   pin dropped in the embedded map and the coordinates on record are then the
+   same two numbers, and cannot drift apart. */
+const GEO = { lat: -37.800198, lng: 144.899713 } as const;
+
 export interface OpeningHours {
   readonly day: string;
   readonly opens: string;
@@ -43,7 +49,26 @@ export const venue = {
 
   // MEMORY.md §1 — Confirmed
   maps: 'https://maps.app.goo.gl/S3cpVjSk9qNEjWpd7',
-  geo: { lat: -37.800198, lng: 144.899713 },
+  geo: GEO,
+
+  /* The same place, as an embeddable document — `/about/` §03 frames this in a
+     plate. Two things about the URL are deliberate.
+
+     **It is built from `GEO`, not from the address.** `?q=<street line>` would
+     send the address through Google's geocoder and print whatever came back,
+     and the street type in `address.line1` is still Derived rather than
+     Confirmed (MEMORY.md §1). A geocoder handed a slightly wrong street line
+     does not fail — it returns a confident pin at the wrong door, on a real
+     bar's real website. Coordinates cannot do that: they are the one fact here
+     that is signed off, and they resolve to exactly one point.
+
+     **It is the keyless `output=embed` form**, not the official Maps Embed
+     API, because that one needs a billable key and this is a demo. It is also
+     not the `maps/embed?pb=…` URL from Google's own Share → Embed dialog: that
+     string is an opaque serialisation only Google can mint, so it has to come
+     from the client's own dialog. When it does, paste it in here — this is the
+     only line that changes, and the plate around it is unaffected. */
+  mapsEmbed: `https://maps.google.com/maps?q=${GEO.lat},${GEO.lng}&z=16&hl=en&output=embed`,
   instagram: { url: 'https://www.instagram.com/loft_91_bar/', handle: '@loft_91_bar' },
 
   // MEMORY.md §1.1 — Confirmed from the Instagram bio as at 2026-08-08, NOT
@@ -60,25 +85,25 @@ export const venue = {
      states the three days that are known and says nothing about the other
      four, which is the only true statement available. `hoursTbc` below is the
      record of what is still unanswered — it has no caller. */
-  hoursTbc:
-    'hours not yet client-confirmed, incl. what “late” means and whether Mon – Thu open for private hire',
+
 
   // MEMORY.md §1 — the only bookings channel that exists today. Q3 is open.
   bookings: { channel: `Instagram${NB}DM`, tbc: 'functions enquiry channel, from client' },
 
   /* ⚠ PLACEHOLDER (D-60) — INVENTED, not supplied. MEMORY.md §5 lists the
-     enquiry email and phone as Missing, and Q3 is the open question about what
-     that channel should even be. These exist so the Packages enquiry block, the
+     enquiry email as Missing, and Q3 is the open question about what that
+     channel should even be. This exists so the Packages enquiry block, the
      FAQ and the footer read as a finished site in a walkthrough.
 
-     The number is deliberately taken from ACMA's reserved fictitious range
-     (0491 570 006 – 0491 570 156): nobody walking a demo can dial it and reach
-     a real person by accident. Replace both with the client's own before
-     launch, or delete this block to restore the [TBC] state. */
+     A placeholder phone number used to live here too (an ACMA reserved
+     fictitious number, so nobody walking a demo could dial it and reach a
+     real person). Removed on user instruction so no phone number — real or
+     fictitious-looking — renders on the public site. Replace `email` with
+     the client's own before launch, or delete this block to restore the
+     [TBC] state. */
   contact: {
     email: 'loftnineone@gmail.com',
-    phone: `0491 570${NB}110`,
-    phoneHref: 'tel:+61491570110',
+    instagram: 'https://www.instagram.com/loft_91_bar/',
   },
 
   /* ⚠ PLACEHOLDER (D-60) — INVENTED, not supplied. MEMORY.md §5 lists the
@@ -89,7 +114,7 @@ export const venue = {
      brick, the lit arches behind the bar, the screen along the far wall — and
      claims nothing the pictures do not show. */
   story: [
-    'Loft 91 opened in the winter of 2022, in a room that had sat empty above the shopfronts on Nicholson Street for the better part of a decade. The white brick was already there, and so was the ceiling height you do not get at street level in Footscray. Almost everything else — the bar, the lit arches behind it, the screen running the far wall — was built in.',
+    'Loft 91 opened in the winter of 2026, in a room that had sat empty above the shopfronts on Nicholson Street for the better part of a decade. The white brick was already there, and so was the ceiling height you do not get at street level in Footscray. Almost everything else — the bar, the lit arches behind it, the screen running the far wall — was built in.',
     'It is run by the two people usually standing behind that bar. The idea was never a big venue, just one good room: a flight of stairs up off a busy street, a drinks list worth reading, and a floor that can be handed over to a single party on a Saturday night without the rest of the week having to change around it.',
   ],
 } as const;

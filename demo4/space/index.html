@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The page ground. Flipped with the palette: a dark theme-color on a
+         warm-white site paints the phone browser chrome near-black above a
+         page that is not. -->
+    <meta name="theme-color" content="#FBFAF8" />
+    <title>The Space</title>
+    <meta
+      name="description"
+      content="The upstairs room at Loft 91, Footscray: what is in it, how it can be set, and what it holds — standing, seated or at one long table."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="The Space — Loft 91" />
+    <meta
+      property="og:description"
+      content="One upstairs room on Nicholson Street, Footscray — its bar, its screen wall, and how the floor gets set."
+    />
+    <meta property="og:image" content="/img/room-1600.jpg" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="/img/favicon-180.png" />
+
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset="/img/room-800.avif 800w, /img/room-1600.avif 1600w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+
+    <link rel="preload" href="/fonts/Switzer-Medium.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script>
+      (function () {
+        var skip = false;
+        try {
+          skip = sessionStorage.getItem('l91-loaded') === '1';
+        } catch (e) {
+          skip = false;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) skip = true;
+        if (skip) document.documentElement.setAttribute('data-loader', 'skip');
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/pages/space.tsx"></script>
+  </body>
+</html>

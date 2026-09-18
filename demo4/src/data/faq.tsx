@@ -15,7 +15,9 @@
      · capacity — invented, see `data/packages.ts`
      · AV, PA and the DJ booth — invented beyond the screen, which is in the
        photographs
-     · the enquiry email and phone — invented, see `venue.contact`
+     · the enquiry email — invented, see `venue.contact` (a placeholder phone
+       number used to sit alongside it; removed on user instruction so no
+       phone number renders on the public site)
      · what "late" means on Fri & Sat — invented; the venue publishes the word
        "late" and nothing more (MEMORY.md Q1)
      · function catering — invented; only the bar snacks are sourced
@@ -65,8 +67,7 @@ export const faqs: readonly FaqItem[] = [
           enquiry form
         </a>
         : it takes the date, rough numbers and what the night is for, then hands you the finished
-        email to send. {venue.contact.phone} reaches the bar on trading nights,{' '}
-        {venue.contact.email} works if you would rather write your own, and{' '}
+        email to send. {venue.contact.email} works if you would rather write your own, and{' '}
         {venue.instagram.handle} on Instagram is fine for a quick question.
       </>
     ),

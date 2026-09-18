@@ -6,8 +6,9 @@ import { fileURLToPath } from 'node:url';
 /** One HTML document per destination — this is a multi-page app, not a router.
  *
  *  The brief is "each nav item gets its own page", and the honest way to build
- *  that on a static host is a real document each. There are eight now — the six
- *  the brief asked for, plus `/enquire/` and the venue-only `/admin/` board.
+ *  that on a static host is a real document each. There are nine now — the six
+ *  the brief asked for, `/space/`, and `/enquire/` plus the venue-only
+ *  `/admin/` board.
  *  It costs no router library, it
  *  means a page ships only its own code, every URL is directly crawlable and
  *  cacheable, and the shared React/GSAP/Lenis chunk is fetched once and then
@@ -38,6 +39,7 @@ export default defineConfig({
       input: {
         home: page('./index.html'),
         menu: page('./menu/index.html'),
+        space: page('./space/index.html'),
         packages: page('./packages/index.html'),
         gallery: page('./gallery/index.html'),
         about: page('./about/index.html'),

@@ -52,7 +52,10 @@ export function Footer({ current }: { current: string }) {
 
             {/* ⚠ This used to be a [TBC] on the hours (MEMORY.md Q1, still
                 open). D-60 replaced it with contact detail — which is itself
-                invented, see `venue.contact`. */}
+                invented, see `venue.contact`. The phone number that used to
+                sit alongside the email is removed on user instruction: no
+                phone number, real or placeholder, renders on the public
+                site. */}
             <ul className="mt-lg">
               <li className="border-t border-rule">
                 <a
@@ -60,14 +63,6 @@ export function Footer({ current }: { current: string }) {
                   className="flex min-h-11 items-center text-small text-ink-2 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
                 >
                   {venue.contact.email}
-                </a>
-              </li>
-              <li className="border-t border-rule">
-                <a
-                  href={venue.contact.phoneHref}
-                  className="flex min-h-11 items-center text-small text-ink-2 tabular-nums transition-colors duration-(--dur-micro) ease-out hover:text-ink"
-                >
-                  {venue.contact.phone}
                 </a>
               </li>
             </ul>

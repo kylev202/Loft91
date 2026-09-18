@@ -43,18 +43,24 @@ import { photos, type Photo } from './photos';
 
 export interface PageDef {
   readonly id: string;
-  /** `01`…`04`. The same index appears in the nav, the section heads and the
-      footer, so the site has one table of contents rather than three. */
+  /** `01`…`05`. The same index appears in the nav, the section heads and the
+      footer, so the site has one table of contents rather than three. Adding
+      `/space/` at `02` therefore renumbered everything below it — the numerals
+      belong to the site's order, not to the pages, and a page that keeps its
+      old number while a new one takes its place is how two tables of contents
+      start. */
   readonly index: string;
-  /** Nav label and cover title — one word, set at display size. */
+  /** Nav label and cover title, set at display size. One word wherever one
+      word will do it — "About us" and "The Space" are the two that need
+      two. */
   readonly name: string;
   readonly href: string;
   /** The small line above the cover title. */
   readonly eyebrow: string;
   /** The cover photograph. Chosen because it carries that page's subject, not
       because it looked good: brass counter for the front door, tap bank for
-      the drinks, the lit room for hire, the neon arch for the gallery, the
-      street doorway for directions. */
+      the drinks, the room itself for the room, the lit room for hire, the neon
+      arch for the gallery, the street doorway for directions. */
   readonly photo: Photo;
   readonly title: string;
   readonly description: string;
@@ -73,8 +79,19 @@ export const pages = [
       'The drinks list at Loft 91, Footscray: draught and bottled beer, spirits, soju, cocktails and snacks.',
   },
   {
-    id: 'packages',
+    id: 'space',
     index: '02',
+    name: 'The Space',
+    href: '/space/',
+    eyebrow: 'Upstairs',
+    photo: photos.room,
+    title: 'The Space — Loft 91',
+    description:
+      'The upstairs room at Loft 91, Footscray: what is in it, how it can be set, and what it holds — standing, seated or at one long table.',
+  },
+  {
+    id: 'packages',
+    index: '03',
     name: 'Packages',
     href: '/packages/',
     eyebrow: 'Functions & venue hire',
@@ -85,7 +102,7 @@ export const pages = [
   },
   {
     id: 'gallery',
-    index: '03',
+    index: '04',
     name: 'Gallery',
     href: '/gallery/',
     eyebrow: 'The room',
@@ -96,7 +113,7 @@ export const pages = [
   },
   {
     id: 'about',
-    index: '04',
+    index: '05',
     name: 'About us',
     href: '/about/',
     eyebrow: 'The venue',
@@ -107,16 +124,35 @@ export const pages = [
   },
 ] as const satisfies readonly PageDef[];
 
+/** The four frames on the landing page — `pages` minus `/space/`.
+ *
+ *  This is the one place a destination is deliberately in the nav and not on
+ *  the home page, and it is worth saying why, because the note at the top of
+ *  this file says a destination cannot exist in one surface and be missing
+ *  from another.
+ *
+ *  The client's instruction for the landing page was specific: four gallery
+ *  images linking to four pages, symmetrical frames, as little text as
+ *  possible. Four is a 2 x 2 wall at every width the grid uses; five is a wall
+ *  with a card sitting on its own underneath, which is the exact composition
+ *  that instruction was reversing. So the wall stays as it was built and the
+ *  new page is reached from the nav, the footer index, `/packages/` and the
+ *  hand-off at the foot of `/gallery/`.
+ *
+ *  It is a one-word reversal if the client would rather the wall grew: export
+ *  `pages` here instead, and the home page becomes five frames. */
+export const gateways = pages.filter((page) => page.id !== 'space');
+
 /** The FAQ, which is a real document but NOT a nav destination.
  *
- *  The nav carries the four places the venue is being sold from; the questions
+ *  The nav carries the five places the venue is being sold from; the questions
  *  page is support material reached from the home page's FAQ heading and from
  *  the footer index. Keeping it out of `pages` is what stops it appearing as a
- *  fifth gateway and a fifth nav item — the user's instruction was that the
- *  fourth nav slot goes to About us instead of Visit, not that the nav grows. */
+ *  gateway card and a nav item of its own — it answers questions about the
+ *  other pages rather than being one of them. */
 export const faqPage = {
   id: 'faq',
-  index: '05',
+  index: '06',
   name: 'FAQ',
   href: '/faq/',
   eyebrow: 'Questions',
@@ -133,7 +169,7 @@ export const faqPage = {
  *  running head, the "Enquire about functions" button at the foot of the phone
  *  menu, both buttons on the Packages page and the footer's own call to
  *  action — four routes to it from every page on the site, which is more
- *  prominence than a fifth nav slot would buy it. The nav carries the four
+ *  prominence than a nav slot of its own would buy it. The nav carries the
  *  places the venue is *browsed*; this is where a visit is *asked for*, and it
  *  is the one page reached by pressing a button rather than by reading a list.
  *
@@ -148,7 +184,7 @@ export const faqPage = {
  *  photograph; this one is now spent. */
 export const enquirePage = {
   id: 'enquire',
-  index: '06',
+  index: '07',
   name: 'Enquire',
   href: '/enquire/',
   eyebrow: 'Functions & venue hire',

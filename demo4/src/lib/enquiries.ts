@@ -322,26 +322,95 @@ export function toCsv(list: readonly Enquiry[]): string {
 export const composeSubject = (e: Enquiry): string =>
   `Function enquiry — ${e.name || venue.name} — ${e.ref}`;
 
-/** Plain text, "Label: value", one per line. Not column-aligned with padding —
-    every mail client reflows it in a proportional face and the columns become
-    ragged whitespace. The details paragraph is set apart under its own heading
-    because it is the one field that runs to more than a line. */
+/**
+ * The enquiry as a plain-text letter.
+ *
+ * Plain text is the medium here, not a stylistic choice: both delivery paths
+ * carry the body as a URL parameter — `mailto:`'s RFC 6068 `body` and Gmail's
+ * `&body=` — and both insert it as text, so no markup of any kind survives the
+ * trip. Structure has to be built from the three things plain text still has:
+ * line breaks, headings and rules.
+ *
+ * Three rules follow from that, and each is load-bearing:
+ *
+ * - **Three numbered sections, in the order the form asks for them** — who is
+ *   asking, what the night is, then anything they want to add. Numbered from
+ *   position rather than hard-coded, so the optional last section dropping out
+ *   cannot leave a hole in the count.
+ * - **Nothing is column-aligned with padding.** Gmail sets plain text in a
+ *   proportional face, where padded columns that line up in this file arrive
+ *   as ragged whitespace. `Label: value` survives any face. Values *are*
+ *   indented under their heading, which is the one further hierarchy plain
+ *   text can suggest — but leading whitespace survives a `mailto:` intact and
+ *   may collapse when Gmail converts the body to HTML, so the indent is a
+ *   bonus where it lands and never load-bearing. The headings and rules carry
+ *   the structure without it.
+ * - **It closes like a letter**, with the sender's name under a sign-off,
+ *   because it is one — it arrives from the customer's own address and is
+ *   replied to directly. The reference and the timestamp sit below that as
+ *   what they are: the record of the message, not part of it.
+ */
 export function composeBody(e: Enquiry): string {
   const lines = enquiryLines(e);
-  const details = lines.find((l) => l.key === 'message');
-  const facts = lines.filter((l) => l.key !== 'message');
+  const pick = (...keys: (keyof Enquiry)[]) => lines.filter((l) => keys.includes(l.key));
+  const labelled = (rows: Line[]) => rows.map((l) => `${l.label}: ${l.value}`);
+
+  /* One measure for every rule in the letter, wide enough that the longest
+     indented value still sits under it rather than past it. */
+  const WIDTH = 36;
+  const rule = '─'.repeat(WIDTH);
+
+  /* A section opens with its heading set into the rule rather than stacked
+     above it: one line per section instead of two, and it reads as a labelled
+     divider rather than as a title that happens to be underlined. The trailing
+     fill is clamped at zero — a heading long enough to overrun the measure has
+     to shorten its own rule, never hand `repeat` a negative count. */
+  const headingRule = (text: string) =>
+    `── ${text} ${'─'.repeat(Math.max(0, WIDTH - text.length - 4))}`.trimEnd();
+
+  /* Indented per *rendered* line rather than per row: the special-requests
+     answer is a single row carrying its own newlines, so prefixing the string
+     would indent its first line and leave the rest hanging. Blank lines inside
+     that answer are left bare, so nothing goes out with trailing whitespace. */
+  const indent = (rows: string[]) =>
+    rows.flatMap((row) => row.split('\n').map((line) => (line ? `    ${line}` : line)));
+
+  /* The details paragraph goes in unlabelled — the heading above it already
+     says what it is, and "Details: " in front of a three-line answer only
+     pushes the first line out of alignment with the rest of it. */
+  const sections = [
+    { heading: 'Contact Details', rows: labelled(pick('name', 'email', 'phone')) },
+    { heading: 'Enquiry Details', rows: labelled(pick('occasion', 'guests', 'date', 'session')) },
+    { heading: 'Special Requests', rows: pick('message').map((l) => l.value) },
+  ].filter((section) => section.rows.length > 0);
 
   const parts = [
     `Hello ${venue.name},`,
     '',
     'I would like to enquire about hiring the room.',
-    '',
-    ...facts.map((l) => `${l.label}: ${l.value}`),
   ];
 
-  if (details) parts.push('', 'Details', details.value);
+  sections.forEach(({ heading, rows }, index) => {
+    parts.push(
+      '',
+      headingRule(`${String(index + 1).padStart(2, '0')} · ${heading.toUpperCase()}`),
+      ...indent(rows),
+    );
+  });
 
-  parts.push('', `Reference: ${e.ref}`, `Submitted: ${formatStamp(e.submittedAt)}`);
+  /* The sign-off follows the last section on a blank line, the way it would in
+     any letter — no rule above it. The single rule here is the one that fences
+     off the footer, so it reads as the record of the message rather than as a
+     fourth section of it. */
+  parts.push(
+    '',
+    'Thanks,',
+    e.name,
+    '',
+    rule,
+    `Reference: ${e.ref}`,
+    `${venue.name} · ${formatStamp(e.submittedAt)}`,
+  );
 
   return parts.join('\n');
 }

@@ -56,6 +56,12 @@ const page = pageById('about');
  *     page links to at the foot; the two photographs under the heading show
  *     the arch and the stairwell, and the street-level frame's alt text names
  *     the deli for a reader who cannot see them. Nothing was lost for anyone.
+ *
+ * §03 also carries the map (client instruction, 2026-09-05). It is the one
+ * embed on the site, and the one place a third party draws pixels into the
+ * page, so both of those are handled where they belong rather than inline: the
+ * URL and why it is composed from coordinates in `data/venue.ts`, the tint and
+ * the touch behaviour in `.map-plate`.
  */
 mount(
   'about',
@@ -161,7 +167,9 @@ mount(
             {/* The address and the ways to reach the venue. This column used to
                 be the address plus two [TBC] blocks — the street format and the
                 hours confirmation. Both markers are gone (D-60); what fills the
-                column instead is the contact detail the site never had. */}
+                column instead is the contact detail the site never had. The
+                phone number that used to appear here is removed on user
+                instruction — no phone number renders on the public site. */}
             <div className="lg:col-span-4 lg:col-start-9">
               <h3 className="label text-ink-3">Address</h3>
               <address className="mt-2xs text-lead text-ink not-italic">
@@ -178,14 +186,6 @@ mount(
                     className="flex min-h-11 items-center text-body text-ink-2 transition-colors duration-(--dur-micro) ease-out hover:text-ink"
                   >
                     {venue.contact.email}
-                  </a>
-                </li>
-                <li className="border-t border-rule">
-                  <a
-                    href={venue.contact.phoneHref}
-                    className="flex min-h-11 items-center text-body text-ink-2 tabular-nums transition-colors duration-(--dur-micro) ease-out hover:text-ink"
-                  >
-                    {venue.contact.phone}
                   </a>
                 </li>
                 <li className="border-t border-rule">
@@ -232,6 +232,31 @@ mount(
             />
           </div>
         </div>
+      </div>
+
+      {/* The map. Wide, full shell, directly under the two portraits — the
+          photographs answer “what does the door look like” and this answers
+          “where on the street is it”, and they are the same question asked from
+          two distances, so they read as one block: the top margin is the
+          grid’s own gap rather than a section step.
+
+          `venue.mapsEmbed` is built from the confirmed coordinates, never from
+          the address — the argument is in `data/venue.ts`. `.map-plate` warms
+          it into the page and makes it inert to touch (base.css); `loading`
+          keeps Google’s tiles off the wire until a phone on mobile data has
+          actually scrolled this far down. The button below stays where it was:
+          on a phone it is now the *only* way into the map, which is the right
+          way round — it opens the native app. */}
+      <div
+        className="map-plate plate mt-lg aspect-4/3 w-full md:aspect-21/9 xl:mt-2xl"
+        data-plate
+      >
+        <iframe
+          src={venue.mapsEmbed}
+          title={`Map showing ${venue.name}, ${venue.address.short}`}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
       </div>
 
       <div className="mt-xl" data-reveal>
