@@ -10,7 +10,7 @@
    ========================================================================== */
 
 var VENUE = {
-  name: 'Loft 91',
+  name: 'Loft91',
   wordmark: 'LOFT91',
 
   // MEMORY.md §1 — Instagram bio states "Upstairs, 91 Nicholson".

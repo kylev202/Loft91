@@ -57,7 +57,7 @@ export function Nav() {
               src={wordmarkBlack.src}
               srcSet={wordmarkBlack.srcSet}
               sizes="140px"
-              alt="Loft 91 — back to top"
+              alt="Loft91 — back to top"
               width={wordmarkBlack.w}
               height={wordmarkBlack.h}
               className="h-3.5 w-auto shrink-0"

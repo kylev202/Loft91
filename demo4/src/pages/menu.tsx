@@ -2,6 +2,7 @@ import { mount } from '../lib/mount';
 import { Cover } from '../shell/Cover';
 import { Button } from '../components/ui/Button';
 import { DrinksList } from '../components/DrinksList';
+import { FoodList } from '../components/FoodList';
 import { pageById } from '../data/site';
 
 const page = pageById('menu');
@@ -48,13 +49,18 @@ const page = pageById('menu');
  *
  * The pair is the site's standing one — the enquiry as the primary, since a
  * drinks list is also read by somebody pricing a night here, and beside it the
- * page's own list. "See all drinks" is an in-page hash rather than a
- * navigation: the list is directly below, and the cover now stands a full
- * screen above it on a phone, so the button is the way past the photograph for
- * anyone who came here to read prices.
+ * page's own list. It read "See all drinks" and landed on the drinks; on
+ * 2026-09-25, with the food menu added below the drinks, the client changed it
+ * to "Food menu", landing on the first restaurant's section (Co Thu Quan). The
+ * drinks are the first thing under the cover, so they no longer need a button
+ * of their own; the food is a long scroll further down, so it does. The link is
+ * an in-page hash rather than a navigation, and `base.css` gives every `[id]`
+ * the running head's height as `scroll-margin-top`, so the section's rule
+ * arrives clear of the nav.
  *
- * The page holds itself to three sizes: `--text-display` here, `--text-heading`
- * on a drinks group, `--text-item` on everything else. The first two are
+ * The page holds itself to `--text-display` here, `--text-heading` on a drinks
+ * group or a food section, `--text-item` on a row's name and price, and
+ * `--text-small` on a dish or drink's description. The first two are
  * uppercase Switzer Medium — the `.label` setting the running head uses at
  * 11px, scaled up and re-tracked — so the eyebrow, the title and the group
  * headings are one voice at three sizes rather than three voices.
@@ -63,16 +69,25 @@ mount(
   'menu',
   <>
     <Cover index={page.index} eyebrow={page.eyebrow} name={page.name} photo={page.photo}>
-      <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
+      {/* Stacked, left-aligned, on every phone. The other covers get this from
+          their labels being wide enough to wrap; "Food menu" is short enough
+          that the pair fits on one line from about 440px up, where the others
+          are still stacked, so the stack is set here rather than left to the
+          wrap. `sm` (480px) and up is the row, as elsewhere. */}
+      <div
+        className="mt-0 flex flex-col items-start gap-sm sm:flex-row sm:flex-wrap lg:mt-xl"
+        data-cover-tail
+      >
         <Button href="/enquire/" variant="primary">
           Start an enquiry
         </Button>
-        <Button href="#drinks" variant="secondary">
-          See all drinks
+        <Button href="#co-thu-quan" variant="secondary">
+          Food menu
         </Button>
       </div>
     </Cover>
 
     <DrinksList />
+    <FoodList />
   </>,
 );

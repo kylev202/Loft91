@@ -72,7 +72,7 @@ export const pages = [
     index: '01',
     name: 'Menu',
     href: '/menu/',
-    eyebrow: 'Behind the bar',
+    eyebrow: 'Food and Drinks',
     photo: photos.taps,
     title: 'Menu — Loft 91',
     description:

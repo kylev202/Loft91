@@ -69,7 +69,7 @@ export function Hero() {
           src={wordmarkBlack.src}
           srcSet={wordmarkBlack.srcSet}
           sizes="(min-width: 64rem) 26vw, (min-width: 48rem) 38vw, 62vw"
-          alt="Loft 91"
+          alt="Loft91"
           width={wordmarkBlack.w}
           height={wordmarkBlack.h}
           translate="no"

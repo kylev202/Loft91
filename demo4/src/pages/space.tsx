@@ -63,7 +63,7 @@ mount(
     <Cover index={page.index} eyebrow={page.eyebrow} name={page.name} photo={page.photo}>
       <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
         <Button href="/enquire/" variant="primary">
-          Enquire about hiring
+          Start an enquiry
         </Button>
         <Button href="/packages/" variant="secondary">
           What it costs

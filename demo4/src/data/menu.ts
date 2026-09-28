@@ -143,5 +143,195 @@ export const menuGroups: readonly MenuGroup[] = [
   },
 ];
 
+/* --------------------------------------------------------------------------
+   The food menu — two restaurants trading from the venue, each with its own
+   printed menu, so each is its own list rather than one merged one.
+
+   Transcribed from the text supplied on 2026-09-25 (pending client sign-off,
+   like the drinks). Every dish, price and ingredient is theirs; the order is
+   theirs too, so nothing is regrouped or re-sorted.
+
+   ── Descriptions are ingredient lists (client instruction, 2026-09-25) ──────
+   The printed menu describes each dish in a sentence or two — how it is
+   served, how it is cooked, how it feels to eat. The client asked for the
+   description to list the ingredients and nothing more, the way a cocktail
+   line above does ("Kahlúa, vodka, espresso"). So each one is cut to its
+   ingredients, in the order the print names them, and no ingredient is added:
+     · texture and narrative words go ("crunchy", "chewy", "golden", "served
+       with", "stuffed with", "wrapped in"); words that name the ingredient
+       stay ("pickled pork ears", "dried shrimp", "crispy fried shallot")
+     · "your choice of" becomes "or": "tamarind sauce or salt and pepper"
+     · no full stops, as in the drinks
+
+   Typographic corrections, as before: "Vienamese" → "Vietnamese", "house- made"
+   and "home made" joined, "w/" → "with", names in sentence case (the print is
+   all caps; the page's CSS uppercases headings, not dish names).
+
+   Left exactly as printed, for the client to confirm:
+     · "sundry tomatoes" (Duck salad) — reads as a slip for sun-dried, but that
+       is a kitchen fact, not a typo this file can settle
+     · "Green papaya salad with steamed prawn and pork belly" — its ingredients
+       name pork ears and no prawn or pork belly
+     · the Spicy rice paper salad ($16) is priced under the plain Rice paper
+       salad ($18) though it lists more
+   -------------------------------------------------------------------------- */
+
+export interface FoodVenue {
+  readonly id: string;
+  /** Printed as the line above the name: "A taste of Vietnam by". */
+  readonly tagline: string;
+  readonly name: string;
+  readonly items: readonly MenuItem[];
+}
+
+export const foodVenues: readonly FoodVenue[] = [
+  {
+    id: 'co-thu-quan',
+    tagline: 'A taste of Vietnam by',
+    name: 'Co Thu Quan',
+    items: [
+      {
+        name: 'Rice paper salad',
+        price: '$18',
+        desc: 'Shredded green papaya, pickled pork ears, Thai basil, peanuts, sweet dressing, chilli sauce',
+      },
+      {
+        name: 'Spicy rice paper salad',
+        price: '$16',
+        desc: 'Rice paper, beef jerky, dried shredded squid, dried shrimp, sour green mango, Vietnamese mint, spicy salted shrimp, quail eggs, crispy fried pork skin, crispy fried shallot, scallion oil, peanuts',
+      },
+      {
+        name: 'Vietnamese shrimp dumplings (5pcs)',
+        price: '$16',
+        desc: 'Tapioca dumpling, shrimp, ground pork, banana leaf, sweet and spicy Vietnamese fish sauce',
+      },
+      {
+        name: 'Fried fish balls (8pcs)',
+        price: '$15',
+        desc: 'Fish balls, house-made dipping sauce, pickled carrots',
+      },
+      {
+        name: 'Fried wontons (6pcs)',
+        price: '$15',
+        desc: 'Wontons, prawn filling, sweet and spicy sauce',
+      },
+      {
+        name: 'Hog plums slaw',
+        price: '$19',
+        desc: 'Hog plum, beef jerky, dried shredded squid, dried shrimp, persicaria odorata, sweet and sour Vietnamese dressing, peanuts, crispy fried shallot, chilli',
+      },
+      {
+        name: 'Barramundi slaw',
+        price: '$25',
+        desc: 'Fried barramundi fillet, salad mix, green apple, pickled carrot, homemade ginger sauce',
+      },
+      {
+        name: 'Vietnamese chicken slaw',
+        price: '$25',
+        desc: 'Shredded chicken breast, cabbage, carrot, Vietnamese mint, sweet and sour dressing, peanuts, crispy fried shallot',
+      },
+      {
+        name: 'Green papaya salad with beef jerky',
+        price: '$19',
+        desc: 'Shredded green papaya, Thai basil, beef jerky, peanuts, sweet dressing, chilli sauce',
+      },
+      {
+        name: 'Green papaya salad with steamed prawn and pork belly',
+        price: '$20',
+        desc: 'Steamed pork ears, pickled carrot and daikon, shredded green papaya, sweet and sour Vietnamese fish sauce, peanuts, fried shallot, persicaria odorata, Thai basil, chilli',
+      },
+      {
+        name: 'Roasted duck rice paper rolls (4pcs)',
+        price: '$19',
+        desc: 'Rice paper, vermicelli noodle, bean sprouts, cucumber, shredded lettuce, fresh herbs, roast Peking duck breast, homemade hoisin sauce, peanuts, crispy fried shallot, chilli',
+      },
+      {
+        name: 'Steamed prawns and pork rice paper rolls (4pcs)',
+        price: '$16',
+        desc: 'Rice paper, vermicelli noodle, bean sprouts, shredded lettuce, fresh herbs, prawns or prawns and pork, homemade Vietnamese sweet dipping sauce, peanuts, crispy fried shallot, chilli',
+      },
+      {
+        name: 'Vietnamese popiah (5pcs)',
+        price: '$15',
+        desc: 'Chinese sausage, dried shrimp, basil leaves, shredded lettuce, jicama, rice paper, house-made hoisin sauce, peanuts, crispy fried shallot, chilli',
+      },
+      {
+        name: 'Pork / chicken spring rolls (8pcs)',
+        price: '$17',
+        desc: 'Fried spring rolls, lettuce, fresh herbs, house-made Vietnamese dipping sauce',
+      },
+      {
+        name: 'Mixed rolls combo',
+        price: '$24',
+        desc: '2 Vietnamese popiah, 2 rice paper rolls, 4 spring rolls, 2 crispy fried wontons, Vietnamese sweet dipping sauce',
+      },
+      {
+        name: 'Salt & pepper squid tentacles',
+        price: '$25',
+        desc: 'Battered squid tentacles, seasoning, sweet chilli dipping sauce',
+      },
+      {
+        name: 'Tamarind / salt & pepper soft shell crab',
+        price: '$26',
+        desc: 'Soft-shell crab, tamarind sauce or salt and pepper, Vietnamese sweet chilli dipping sauce',
+      },
+      {
+        name: 'Tamarind / salt & pepper prawns',
+        price: '$26',
+        desc: 'Prawns, capsicum, garlic, tamarind sauce or salt and pepper',
+      },
+      {
+        name: 'Salt & pepper tofu / eggplant',
+        price: '$24',
+        desc: 'Tofu or eggplant, salt and pepper seasoning',
+      },
+    ],
+  },
+  {
+    id: 'juk-jut',
+    tagline: 'A taste of Asian fusion by',
+    name: 'Juk Jut',
+    items: [
+      {
+        name: 'Satay chicken skewers (2pcs)',
+        price: '$15',
+        desc: 'Satay sauce, peanuts, lemongrass, onion, lime leaves',
+      },
+      {
+        name: 'Chicken ribs (5pcs)',
+        price: '$22',
+        desc: 'Onion, lemongrass, coriander, cashew nuts, soybean',
+      },
+      {
+        name: 'Duck kra pao',
+        price: '$22',
+        desc: 'Duck, Thai basil, snake beans, chili, rice cracker, lettuce',
+      },
+      {
+        name: 'Roti Peking duck (4pcs)',
+        price: '$25',
+        desc: 'Roast duck breast, cucumber, spring onion, pickled carrot, radish, roti, special sauce',
+      },
+      {
+        name: 'Spiced lamb ribs with Asian slaw',
+        price: '$32',
+        desc: 'Special Juk Jut spices, fresh herbs, cabbage, chives',
+      },
+      { name: 'Duck salad', price: '$30', desc: 'Roast duck, orange, sundry tomatoes, spring onion' },
+      { name: 'Crispy pork gai lan', price: '$30', desc: 'Crispy pork, gai lan' },
+      {
+        name: 'Pad Thai chicken or prawn',
+        price: '$31',
+        desc: 'Prawns or chicken, bean sprouts, egg, tofu, chives, peanuts',
+      },
+      {
+        name: 'Beef salad',
+        price: '$29',
+        desc: 'Grilled beef, ground rice, onion, cucumber, mint, lime leaves, coriander, ginger',
+      },
+    ],
+  },
+];
+
 export const menuTbc =
   'transcribed from the venue’s printed menu & happy-hour posters; prices and spelling to be confirmed by client before launch';
