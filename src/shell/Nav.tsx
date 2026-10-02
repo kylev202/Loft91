@@ -59,23 +59,25 @@ export function Nav({ current }: { current: string }) {
           <a
             href={withBase(home.href)}
             aria-current={current === 'home' ? 'page' : undefined}
-            className="flex h-full shrink-0 items-center pr-md transition-opacity duration-(--dur-short) ease-out hover:opacity-60"
+            className="nav-logo flex h-full shrink-0 items-center pr-md"
           >
             {/* The BLACK lockup, everywhere. Nocturne used the white one on
                 every surface because every surface was dark; the inverse holds
                 just as absolutely here, and the white artwork is now used in
                 exactly one place — nowhere. It stays in the pipeline because
                 the client owns both and a future dark surface may want it. */}
-            <img
-              src={wordmarkBlack.src}
-              srcSet={wordmarkBlack.srcSet}
-              sizes="104px"
-              alt="Loft 91 — home"
-              width={wordmarkBlack.w}
-              height={wordmarkBlack.h}
-              className="h-4 w-auto shrink-0"
-              translate="no"
-            />
+            <span className="logo-glare">
+              <img
+                src={wordmarkBlack.src}
+                srcSet={wordmarkBlack.srcSet}
+                sizes="104px"
+                alt="Loft 91 — home"
+                width={wordmarkBlack.w}
+                height={wordmarkBlack.h}
+                className="h-4 w-auto shrink-0"
+                translate="no"
+              />
+            </span>
           </a>
 
           <nav aria-label="Pages" className="hidden h-full items-stretch lg:flex">

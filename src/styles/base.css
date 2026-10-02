@@ -663,6 +663,75 @@
     }
   }
 
+  /* The wordmark in the running head. On hover a thin glare crosses it once,
+     left to right. The band is drawn in the page colour, so over the paper it
+     is invisible and only shows where it passes over the ink of the letters —
+     no mask needed. It rests off the right edge and is invisible there, and
+     under reduced motion the global rule jumps it straight back to rest.
+
+     It also grows slightly toward the viewer and casts a faint shadow while
+     hovered — client
+     instruction, and the one shadow on the site. The shadow sits on the image,
+     not the wrapper, so it follows the letterforms (the PNG is transparent)
+     and the glare band never casts one. No `overflow: hidden` on the wrapper:
+     the band is already confined to its own box, and clipping would cut the
+     shadow off underneath. */
+  .logo-glare {
+    position: relative;
+    display: inline-flex;
+    transition: scale var(--dur-short) var(--ease-out);
+  }
+  .logo-glare img {
+    filter: drop-shadow(0 0 0 transparent);
+    transition: filter var(--dur-short) var(--ease-out);
+  }
+  .nav-logo:focus-visible .logo-glare {
+    scale: 1.08;
+  }
+  .nav-logo:focus-visible .logo-glare img {
+    filter: drop-shadow(0 4px 4px color-mix(in srgb, var(--color-ink) 22%, transparent));
+  }
+  @media (hover: hover) {
+    .nav-logo:hover .logo-glare {
+      scale: 1.08;
+    }
+    .nav-logo:hover .logo-glare img {
+      filter: drop-shadow(0 4px 4px color-mix(in srgb, var(--color-ink) 22%, transparent));
+    }
+  }
+  .logo-glare::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+      105deg,
+      transparent 41%,
+      var(--color-page) 48.5%,
+      var(--color-page) 51.5%,
+      transparent 59%
+    );
+    background-repeat: no-repeat;
+    background-size: 250% 100%;
+    background-position: 0 0;
+  }
+  .nav-logo:focus-visible .logo-glare::after {
+    animation: logo-glare var(--dur-long) var(--ease-move);
+  }
+  @media (hover: hover) {
+    .nav-logo:hover .logo-glare::after {
+      animation: logo-glare var(--dur-long) var(--ease-move);
+    }
+  }
+  @keyframes logo-glare {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+
   /* The boxed buttons. The ink fill wipes across instead of snapping:
      secondary fills in from the left, primary empties out to the right. Same
      trick as `.u-line` — a gradient whose size is transitioned and whose
