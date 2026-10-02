@@ -1,0 +1,259 @@
+import { mount } from '../lib/mount';
+import { Cover } from '../shell/Cover';
+import { SectionHead } from '../components/SectionHead';
+import { Frame } from '../components/ui/Frame';
+import { Button } from '../components/ui/Button';
+import { pageById } from '../data/site';
+import { photos } from '../data/photos';
+import { venue } from '../data/venue';
+import { capacity, minimumSpend, terms, tiers } from '../data/packages';
+
+const page = pageById('packages');
+
+/**
+ * The commercial page — and, until D-60, the one with the least content behind
+ * it.
+ *
+ * ⚠ WHAT CHANGED, AND WHAT IT COSTS. This page used to carry five visible
+ * [TBC] markers: capacity, minimum spend, the three package tiers, and the
+ * enquiry address. MEMORY.md §5 still lists every one of those as ❌ Missing,
+ * and D-05 forbade filling them with plausible-looking placeholder text for
+ * exactly the reason that matters here — an invented minimum spend on a real
+ * venue's website is a price the venue does not charge.
+ *
+ * The user asked for the blanks to be filled so the demo reads as a finished
+ * site, which is a fair thing to want from a demo, and that is the instruction
+ * this page now follows. The invention is quarantined in `data/packages.ts`,
+ * every figure in it is marked as invented at the top of that file, and the
+ * footer of every page says the build carries placeholder content. Deleting
+ * that one module and reverting this file restores the honest state.
+ *
+ * Everything in "The room" that describes fittings is still read off the
+ * client's own photographs — white brick, the wall-sized screen, banquette
+ * seating, the bar with draught taps. Describing a supplied photograph is
+ * reading a source. The two figures beside them are not.
+ *
+ * ── The subtitles are gone (client instruction, 2026-08-31) ───────────────
+ * Four blocks of written copy came off this page, and every one of them was
+ * already stated underneath itself:
+ *
+ *   · The cover statement, "The upstairs room, available for functions and
+ *     venue hire" — under an eyebrow reading "Functions & venue hire".
+ *   · §01's standfirst, "One upstairs room with its own bar, a wall-sized
+ *     screen and seating along the brick" — the four rows of the feature list
+ *     directly beneath it, run together into a sentence.
+ *   · §02's standfirst, which explained that the tiers are a minimum spend
+ *     rather than a per-head price and that they differ in how much of the
+ *     floor is yours. Each tier prints "From $X minimum spend" and a guest
+ *     range of its own, so the section said it four times.
+ *   · §03's "Email reaches the people who run the room…" paragraph, which
+ *     named the same three channels as the two buttons beside it and the
+ *     three-row list opposite.
+ *
+ * What survived is the one line on the page that is an instruction rather than
+ * a description — what to put in an enquiry — moved out of §03's standfirst
+ * into the body, where the paragraph it replaces used to be. It is the only
+ * thing a reader could not have worked out from the section around it.
+ */
+const features = [
+  { label: 'The space', value: 'One upstairs room, a flight up from Nicholson Street' },
+  { label: 'Screen', value: 'A wall-sized screen running the width of the room' },
+  { label: 'Seating', value: 'Tables and bentwood chairs, plus banquette seating along one wall' },
+  { label: 'Bar', value: 'A full bar in the room — draught taps, spirits, cocktails' },
+  // ⚠ The two invented rows (D-60).
+  { label: 'Standing / seated capacity', value: capacity.combined },
+  { label: 'Minimum spend', value: minimumSpend },
+] as const;
+
+const mailto = `mailto:${venue.contact.email}`;
+
+mount(
+  'packages',
+  <>
+    <Cover
+      index={page.index}
+      eyebrow={page.eyebrow}
+      name={page.name}
+      photo={page.photo}
+    >
+      <div className="mt-0 flex flex-wrap gap-sm lg:mt-xl" data-cover-tail>
+        {/* Was `#enquire`, an anchor to §03 at the foot of this page. The
+            enquiry is now its own document (`/enquire/`), so the cover's
+            commercial action goes straight there rather than scrolling past
+            the pricing to a block of addresses. §03 keeps its `id`, so any
+            link already written against `#enquire` still lands correctly. */}
+        <Button href="/enquire/" variant="primary">
+          Start an enquiry
+        </Button>
+        <Button href="/gallery/" variant="secondary">
+          See the room
+        </Button>
+      </div>
+    </Cover>
+
+    {/* --- 01 The room ---------------------------------------------------- */}
+    <section aria-labelledby="the-room" className="shell section-pad">
+      {/* The way up to `/space/`, which is where the room is described in
+          full. This section keeps its six rows — they are what the tiers below
+          are priced against, and a reader comparing packages should not have
+          to leave the page to find out what a package contains — but the room
+          itself now has a document, and this is the link to it. */}
+      <SectionHead
+        index="01"
+        label="The room"
+        heading={<span id="the-room">What you are hiring</span>}
+        href="/space/"
+        linkLabel="The space"
+      />
+
+      <div className="grid gap-lg xl:gap-2xl lg:grid-cols-12">
+        <dl className="lg:col-span-5">
+          {features.map(({ label, value }) => (
+            <div key={label} className="border-b border-rule py-md" data-reveal>
+              <dt className="label text-ink-3">{label}</dt>
+              <dd className="mt-2xs text-body text-ink">{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="grid gap-md lg:col-span-6 lg:col-start-7">
+          <div className="plate aspect-[16/10] w-full" data-plate>
+            <Frame
+              photo={photos.room}
+              sizes="(min-width: 48rem) 48vw, 100vw"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="plate aspect-[16/10] w-full" data-plate>
+            <Frame
+              photo={photos.lounge}
+              sizes="(min-width: 48rem) 48vw, 100vw"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* --- 02 Packages ----------------------------------------------------
+        Three tiers, three equal columns, each one a hairline and a column of
+        text — no boxes and no shadows, because this system marks a group with
+        a rule and nothing else. The price sits directly under the name at
+        `--text-item` with tabular figures, so the three of them align across
+        the row and can be compared at a glance, which is the only job this
+        section has. */}
+    <section aria-labelledby="tiers" className="frame">
+      {/* The tinted ground stops short of the screen, on client instruction —
+          nothing on this site touches the edge any more. `frame` + `shell-inset`
+          rather than a single `shell`: the panel takes `--frame` off the outside
+          and gives the remaining `--gutter - --frame` back on the inside, so this
+          heading lands on exactly the same left edge as the ones in the plain
+          sections above and below it. The arithmetic is in base.css. */}
+      <div className="rounded-plate bg-panel">
+        <div className="shell-inset section-pad">
+          <SectionHead
+            index="02"
+            label="Packages"
+            heading={<span id="tiers">Three ways to take the room</span>}
+          />
+
+          <ul className="grid gap-lg md:grid-cols-3 xl:gap-xl">
+            {tiers.map(({ id, name, scale, price, summary, includes }) => (
+              <li key={id} className="border-t border-rule-strong pt-md" data-reveal>
+                <h3 className="font-display text-lead tracking-wide uppercase text-ink">{name}</h3>
+                <p className="label mt-2xs text-ink-3">{scale}</p>
+                <p className="mt-sm text-item text-ink tabular-nums">{price}</p>
+                <p className="mt-sm text-body text-ink-2">{summary}</p>
+
+                <ul className="mt-md">
+                  {includes.map((line) => (
+                    <li key={line} className="border-t border-rule py-xs text-small text-ink-2">
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+
+          {/* The terms, as one row under the tiers rather than as small print
+              inside each of them — they are identical across all three, and
+              saying them three times would make them the loudest thing in the
+              section. */}
+          <dl className="mt-2xl grid gap-md md:grid-cols-2 lg:grid-cols-4">
+            {terms.map(({ label, value }) => (
+              <div key={label} className="border-t border-rule pt-sm" data-reveal>
+                <dt className="label text-ink-3">{label}</dt>
+                <dd className="mt-2xs text-small text-ink-2">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    {/* --- 03 Enquire ----------------------------------------------------- */}
+    <section aria-labelledby="enquire-h" id="enquire" className="shell section-pad">
+      <SectionHead index="03" label="Enquiries" heading={<span id="enquire-h">Start an enquiry</span>} />
+
+      <div className="grid gap-lg xl:gap-2xl lg:grid-cols-12">
+        <div className="lg:col-span-6">
+          {/* The page's one remaining paragraph. It is here rather than in the
+              section head because it is an instruction, not a description of
+              the section — the reader cannot get it from the buttons or the
+              list of addresses opposite. */}
+          <p className="max-w-(--container-measure) text-lead text-ink-2" data-reveal>
+            Send the date, rough numbers and what the night is for.
+          </p>
+          {/* The form is now the primary route and the two addresses are the
+              alternatives, which is a reversal of what stood here: before
+              `/enquire/` existed, emailing *was* the enquiry. The addresses
+              are kept rather than replaced — a form is one more thing to fill
+              in, and somebody who would rather write two lines to a human
+              should not have to. */}
+          <div className="mt-xl flex flex-wrap gap-sm" data-reveal>
+            <Button href="/enquire/" variant="primary">
+              Open the enquiry form
+            </Button>
+            <Button href={mailto} variant="secondary">
+              Email the venue
+            </Button>
+            <Button href={venue.instagram.url} variant="secondary" external>
+              Message on Instagram
+            </Button>
+          </div>
+        </div>
+
+        {/* The details in full as text, not only behind a button — a phone at
+            night is as likely to want to copy an address as to tap it, and a
+            `mailto:` that opens nothing is otherwise a dead end. */}
+        <dl className="lg:col-span-5 lg:col-start-8">
+          <div className="border-t border-rule pt-sm" data-reveal>
+            <dt className="label text-ink-3">Email</dt>
+            <dd className="mt-2xs text-item text-ink">
+              <a
+                href={mailto}
+                className="u-line transition-colors duration-(--dur-micro) ease-out hover:text-ink-2"
+              >
+                {venue.contact.email}
+              </a>
+            </dd>
+          </div>
+          <div className="mt-md border-t border-rule pt-sm" data-reveal>
+            <dt className="label text-ink-3">Instagram</dt>
+            <dd className="mt-2xs text-item text-ink">
+              <a
+                href={venue.instagram.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="u-line transition-colors duration-(--dur-micro) ease-out hover:text-ink-2"
+              >
+                {venue.instagram.handle}
+              </a>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  </>,
+);

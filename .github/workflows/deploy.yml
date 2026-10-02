@@ -1,0 +1,90 @@
+# Publish the site build to GitHub Pages.
+#
+# The project was promoted from demo4/ to the repo root once the design was
+# confirmed and the other demos (archive/) were retired. The build itself is
+# unchanged — same Vite multi-page output, same base-path handling, same six
+# documents.
+#
+# The site is a static multi-page Vite build, so there is nothing to run on the
+# host — Pages serves the documents in `dist/` as files. That output is
+# gitignored and generated, so it is built here on every push rather than
+# committed: `assets/` at the repo root is the tracked source of truth, and
+# `npm run build` regenerates `public/` from it (via the `prebuild`
+# sync-assets step) before Vite runs.
+#
+# The base path is NOT hardcoded. `configure-pages` reports where the site is
+# actually served from — `/Loft91` for a project page, empty for a custom domain
+# — and `vite.config.ts` normalises that into Vite's `base`. Add a custom domain
+# later and the URLs re-resolve on the next deploy with no edit here.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # So the demo can be republished without an empty commit — useful the first
+  # time, when Pages has just been switched on.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. A newer push supersedes an in-flight run instead of
+# racing it to the same URL; for a demo the latest commit is the one worth
+# publishing, so the older run is cancelled rather than queued.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # Reads where Pages serves this repo from, which becomes Vite's `base`.
+      #
+      # This step does NOT enable Pages. It was written with `enablement: true`
+      # so the first run would not need a visit to Settings, and that failed:
+      # creating a Pages site is an admin-scope write the default GITHUB_TOKEN
+      # is not granted, so the call returned "Resource not accessible by
+      # integration" while the preceding read returned a plain 404. Pages has to
+      # be switched on once by hand — Settings > Pages > Source: GitHub Actions —
+      # after which this step only reads the existing config and succeeds.
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      # `npm ci` rather than `npm install`: the lockfile decides, and a demo
+      # being shown to a client should build from the versions that were tested.
+      - name: Install
+        run: npm ci
+
+      # `npm run build` is `tsc --noEmit && vite build` — the typecheck is part
+      # of the gate, so a type error fails the deploy instead of shipping.
+      - name: Build
+        run: npm run build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
