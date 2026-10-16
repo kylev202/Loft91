@@ -183,7 +183,7 @@ export const faqPage = {
  *  photograph; this one is now spent. */
 export const enquirePage = {
   id: 'enquire',
-  index: '07',
+  index: '06',
   name: 'Enquire',
   href: '/enquire/',
   eyebrow: 'Functions & venue hire',

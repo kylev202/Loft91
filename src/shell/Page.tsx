@@ -7,6 +7,7 @@ import { prefetchOnIntent } from '../lib/prefetch';
 import { Loader } from './Loader';
 import { Nav } from './Nav';
 import { Footer } from './Footer';
+import { FloatingEnquire } from '../components/FloatingEnquire';
 
 /**
  * The shell every page mounts into: loader, skip link, nav, main, footer.
@@ -87,6 +88,26 @@ export function Page({
       <main id="main" ref={main}>
         {children}
       </main>
+
+      {/* The floating enquire button, on every page of the site but two.
+          Part of the furniture for the same reason the nav and the footer are:
+          a site-wide control defined once cannot be present on six documents
+          and missing from the seventh.
+
+          **`/enquire/` is excluded** because the button's one job is to reach
+          the enquiry form, and on the enquiry form that is a control that
+          scrolls with you offering to take you where you already are.
+
+          **`bare` is excluded** with the rest of the furniture — `/admin/` is
+          a tool, and the owner reading a booking is not the audience for a
+          call to action aimed at function organisers.
+
+          The landing page reveals it with the hero; every other page waits
+          until its cover (which carries a primary CTA of its own) has
+          scrolled away. See the component. */}
+      {!bare && current !== 'enquire' && (
+        <FloatingEnquire reveal={current === 'home' ? 'hero' : 'scroll'} />
+      )}
 
       {!bare && <Footer current={current} />}
     </>

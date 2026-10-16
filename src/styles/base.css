@@ -874,6 +874,247 @@
     }
   }
 }
+/* --------------------------------------------------------------------------
+   The floating enquire button — `/` on a phone only
+   (components/FloatingEnquire.tsx).
+
+   An ink disc with the venue's name turning around it, pinned to the bottom
+   right of the viewport. It is the landing page's call to action, put back as
+   a control over the page rather than as a block in it (D-57, D-59 both
+   cleared the page itself and neither is reversed here).
+
+   ── Three system rules it has to keep, and how ──────────────────────────
+   **No hue.** The disc is `--color-fill`, the type and the glyph on it are
+   `--color-on-fill`: the same two tokens as every primary button on the site,
+   at the same 17.38:1, and the ring outside the disc is drawn in the ink on
+   paper.
+
+   **No shadow, no elevation.** A floating action button in the language this
+   convention comes from floats on a drop shadow, and this system has neither
+   shadows nor an elevation scale. What separates this from the page instead is
+   the thing the system does have — a tone step: ink at full strength on warm
+   paper, which at this size needs no help being read as in front.
+
+   **Motion is a fade and a slow turn.** `--dur-spin`, the same 24s the
+   `/events/` roundel turns on, so the one piece of idle motion this design
+   sanctions has one speed. The entrance is the one addition: the button fades
+   and rises in once, after the loader has lifted, on `--delay-hero` — arriving
+   with the hero rather than being in front of the door while it opens.
+
+   ── Position ─────────────────────────────────────────────────────────────
+   `--frame` from both edges, so it sits inside the same white margin as every
+   plate on the site, and `env(safe-area-inset-*)` on top of that, so it clears
+   the home indicator on a notched phone rather than sitting under it.
+
+   Below `--z-nav`: the running head is sticky and the nav overlay is a modal
+   dialog, and a button that floats over an open dialog is a focus trap with a
+   hole in it. On this layer the overlay (`--z-overlay`) covers it completely,
+   which is correct — the overlay carries its own full-width enquire button.
+
+   ── Size ─────────────────────────────────────────────────────────────────
+   The disc is 76px of the 120px artboard, and the artboard is 6.5rem, so the
+   ink target is ~66px and the whole art ~104px. Both clear the 44px minimum
+   on their own; the ring of type is the part that needs the extra room, and it
+   is `aria-hidden` ornament around a target that would pass without it.
+   -------------------------------------------------------------------------- */
+@layer components {
+  .enquire-dot {
+    position: fixed;
+    right: max(var(--frame), env(safe-area-inset-right));
+    bottom: max(var(--frame), env(safe-area-inset-bottom));
+    z-index: calc(var(--z-nav) - 1);
+    display: block;
+    width: 6.5rem;
+    height: 6.5rem;
+    color: var(--color-ink);
+
+    /* ⚠ Load-bearing for the drag, and it is not obvious why.
+
+       Without it the browser treats a finger moving on this element as the
+       start of a page scroll: it fires ONE `pointermove`, then `pointercancel`,
+       then takes the gesture for itself. Measured in headless Chrome against
+       the real build, the disc travelled 0.07px and the pull died on the first
+       frame — the bubble could not be tugged at all on a touch device, and the
+       page scrolled under the finger instead.
+
+       `none` rather than `pan-y`: this is a 104px control in the corner of the
+       viewport, not a scroll surface, and anything the finger does on it is
+       meant for the button. The page is still scrollable everywhere else,
+       which is all of it bar this circle. */
+    touch-action: none;
+  }
+  /* Fades and rises in once, with the hero. `both` so it holds at frame one
+     through the delay instead of flashing at full opacity first.
+
+     ⚠ Hero mode ONLY. On an interior page the button is revealed on scroll and
+     GSAP owns its opacity; this animation's `both` fill would pin opacity to 0
+     through the whole 2s delay and then to 1 forever after, overriding the
+     tween in both directions. The two reveals are mutually exclusive by
+     attribute rather than by being careful. */
+  .enquire-dot[data-reveal-mode='hero'] {
+    animation: enquire-dot-in var(--dur-mid) var(--ease-out) var(--delay-hero) both;
+  }
+  /* The ring overhangs the disc, so the box is mostly transparent — only the
+     ink disc should take the tap. */
+  .enquire-dot__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .enquire-dot__disc {
+    fill: var(--color-fill);
+    transition: scale var(--dur-micro) var(--ease-out);
+  }
+  .enquire-dot__glyph {
+    color: var(--color-on-fill);
+  }
+  /* ── The ring has to survive the page moving under it ──────────────────
+     The ring is drawn OUTSIDE the disc, so unlike the glyph it has no
+     guaranteed ground: it is ink on whatever the button happens to be over.
+     On the landing page that is warm paper for the first screen and then the
+     gallery frames — the magenta stairwell and the lit room — where near-black
+     type on a dark photograph is simply not there. Measured on the stairwell
+     frame, the left arc of the ring was unreadable.
+
+     So each glyph carries its own paper behind it: a `--color-page` stroke
+     drawn UNDER the fill via `paint-order`, which is the type equivalent of
+     the die-cut backing the `/events/` roundels sit on — the same ink-on-paper
+     move, not a halo effect imported from somewhere else. 3px of stroke is
+     1.5px either side of the outline, enough to seat 11px caps on a busy
+     photograph without thickening them into a bolder weight.
+
+     `paint-order` is the whole mechanism and it is SVG-only, which is why the
+     ring is type in an `<svg>` rather than an HTML element rotated by
+     transform — there is no way to put paper behind a glyph in HTML without a
+     second copy of the string. */
+  .enquire-dot__ring {
+    fill: currentColor;
+    paint-order: stroke fill;
+    stroke: var(--color-page);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: var(--tracking-wide);
+  }
+  .enquire-dot__spin {
+    transform-origin: 60px 60px;
+    animation: sticker-spin var(--dur-spin) linear infinite;
+  }
+
+  /* ── The bubble: hover, press, drag ────────────────────────────────────
+     Client instruction — it should feel like a bubble, and it should be
+     draggable. Three states do that, and all three are scale and nothing else:
+     no shadow deepening, no hue shift, no glow, because the system has none of
+     those to shift. A bubble here is a thing that swells when approached,
+     squashes when pressed, and wobbles when let go.
+
+     ⚠ EVERY transform in this block is `scale` on a CHILD — the disc, the ring
+     group — and never a transform on `.enquire-dot` itself. That is a hard
+     constraint rather than a preference: the drag in FloatingEnquire.tsx owns
+     the link's own `x`/`y` via GSAP, and a CSS transform on the same element
+     is the classic way to have the two silently overwrite each other. The
+     split also happens to be the right call on its own terms — scaling the
+     child leaves the 104px hit box exactly where it was, so the target never
+     moves out from under a thumb that is already on it.
+
+     ── Hover ──────────────────────────────────────────────────────────────
+     The disc swells 6% and the ring opens 3%, the ring moving less so the two
+     do not travel as one rigid object — a bubble's skin stretches further than
+     its contents. `--dur-short` on `--ease-out`, which is the site's own
+     entrance curve.
+
+     Behind `(hover: hover)`, so it is desktop-only in practice. That is almost
+     academic on a control that is `lg:hidden`, but a phone in desktop-site
+     mode or a tablet with a trackpad will land here, and a sticky `:hover` on
+     a touch device would leave the disc swollen after the finger has gone.
+
+     ── Press ──────────────────────────────────────────────────────────────
+     Squash to 0.92 on `--dur-press`, and — this is the part that reads as a
+     bubble rather than as a button — the release overshoots. The `:active`
+     rule sets the squash with a fast duration; the base rule it falls back to
+     carries a longer duration and a backOut curve, so letting go springs past
+     100% and settles. Two rules, no keyframes, no JS.
+
+     ── Drag ───────────────────────────────────────────────────────────────
+     `[data-dragging]` is set by the pointer handler for the length of the
+     gesture. The disc holds a slight squash while it is being pulled, so the
+     thing in flight looks under tension rather than merely relocated, and the
+     transition is cut to zero — during a drag the position is already being
+     eased by `gsap.quickTo`, and a CSS transition on top of that is a second
+     lag on the same motion. */
+  .enquire-dot__disc,
+  .enquire-dot__spin {
+    transition:
+      scale var(--dur-short) var(--ease-out),
+      opacity var(--dur-short) var(--ease-out);
+  }
+  .enquire-dot__disc {
+    transform-origin: 60px 60px;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @media (hover: hover) {
+    .enquire-dot:hover .enquire-dot__disc {
+      scale: 1.06;
+    }
+    .enquire-dot:hover .enquire-dot__spin {
+      scale: 1.03;
+    }
+  }
+
+  /* Pressed: the disc alone contracts, the ring keeps turning. `scale` on the
+     circle rather than a transform on the link, so the type does not reflow
+     and the tap target does not move under the thumb. */
+  .enquire-dot:active .enquire-dot__disc {
+    scale: 0.92;
+    transition-duration: var(--dur-press);
+    transition-timing-function: var(--ease-out);
+  }
+
+  /* Held under tension for the length of the pull. Wins over `:active` by
+     order, which is what we want — a drag IS an active press, and this is the
+     more specific state of the two. */
+  .enquire-dot[data-dragging] .enquire-dot__disc {
+    scale: 0.95;
+    transition-duration: var(--dur-press);
+  }
+  .enquire-dot[data-dragging] {
+    transition: none;
+    cursor: grabbing;
+  }
+  @media (hover: hover) {
+    .enquire-dot {
+      cursor: grab;
+    }
+  }
+
+  /* The focus ring is drawn on the circle, not the box: the box is 104px of
+     mostly-transparent square around a disc, and a rectangle of focus ring
+     floating clear of the thing it is naming reads as a rendering fault.
+     `:focus-visible` on the link, `outline` on the SVG shape — which SVG2
+     honours on a `<circle>` and which follows its geometry. */
+  .enquire-dot:focus-visible {
+    outline: none;
+  }
+  .enquire-dot:focus-visible .enquire-dot__disc {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  @keyframes enquire-dot-in {
+    from {
+      opacity: 0;
+      translate: 0 var(--spacing-xs);
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
 
 /* --------------------------------------------------------------------------
    Reduced motion — a first-class mode, not a fallback. No loader, no smooth

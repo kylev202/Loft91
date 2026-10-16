@@ -45,7 +45,7 @@
 export const ADMIN_USER = 'loft91';
 
 /** SHA-256, hex. See the header for how to replace it. */
-const PASSPHRASE_SHA256 = 'a05bb107e150fb0a39f1b0e909f266dc58f785439f9dc57639d00a6703a2fa3d';
+const PASSPHRASE_SHA256 = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
 
 const SESSION_KEY = 'l91-admin-session';
 

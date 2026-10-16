@@ -65,6 +65,13 @@ import { MenuRow } from './MenuRow';
  * group is the other half of that row and goes with it, so the two headings
  * still start on the same line.
  *
+ * On phone, no group below the first draws a rule of its own either (client
+ * instruction: two line styles only, on a phone screen — the item hairline
+ * and the section-opening rule). Below `lg`, spacing alone separates one
+ * group's heading from the previous group's last row; the per-group
+ * `rule-ink` is `lg`-only, where the two-column grid still needs it to mark
+ * the start of each new row of groups.
+ *
  * ── Layout ────────────────────────────────────────────────────────────────
  * A real two-column grid from `lg`, not CSS multi-column. Multi-column balances
  * by height, so the two columns broke at different groups and the headings down
@@ -87,7 +94,13 @@ export function DrinksList() {
        rule arrives clear of the nav. */
     <section id="drinks" aria-labelledby="drinks-h" className="shell section-pad">
       <div className="rule-ink w-full" data-reveal />
-      <h2 id="drinks-h" className="label mt-xs mb-md text-ink" data-reveal>
+      {/* `.label` sets the tracked-uppercase voice; the size override is
+          `lg`-only (client instruction) — on the window view this head reads
+          largest, above the group heading (`--text-item`) and the row
+          (`--text-small`). Phone keeps the shared `.label` size, matching the
+          food heads there. Stepped down from `--text-display`/`--text-heading`
+          (client instruction, 2026-10-16): the first pass read too big. */}
+      <h2 id="drinks-h" className="label mt-xs mb-md text-ink lg:text-heading" data-reveal>
         Drink list
       </h2>
 
@@ -99,15 +112,15 @@ export function DrinksList() {
                 class is what lets the forced-colours repair in base.css reach
                 it. Drawn with nothing but a background colour it would be
                 forced to the system background and vanish. */}
-            <div className={`rule-ink w-full ${i === 0 ? 'hidden' : i === 1 ? 'lg:hidden' : ''}`} />
+            <div className={`rule-ink hidden w-full ${i >= 2 ? 'lg:block' : ''}`} />
 
             <div className="mt-sm flex flex-col gap-2xs sm:flex-row sm:items-baseline sm:justify-between sm:gap-md">
-              <h3 id={`group-${id}`} className="text-heading uppercase text-ink">
+              <h3 id={`group-${id}`} className="text-item font-medium uppercase text-ink">
                 {heading}
               </h3>
               {/* A group-level price is written as a full claim ("$12 each"),
                   never as a bare figure under unpriced rows. */}
-              {note && <p className="text-item text-ink-3 tabular-nums sm:shrink-0">{note}</p>}
+              {note && <p className="text-small text-ink-3 tabular-nums sm:shrink-0">{note}</p>}
             </div>
 
             <ul className="mt-md">
